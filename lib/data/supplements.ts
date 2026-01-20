@@ -75,7 +75,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['vitamin-k2', 'magnesium'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '☀️'
+    icon: 'Sun'
   },
   {
     id: 'vitamin-k2',
@@ -105,7 +105,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['vitamin-d3'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '💚'
+    icon: 'Heart'
   },
   {
     id: 'omega-3',
@@ -137,7 +137,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['vitamin-d3', 'curcumin'],
     monthlyBudget: 'medium',
     tier: 'essential',
-    icon: '🐟'
+    icon: 'Fish'
   },
   {
     id: 'magnesium',
@@ -168,7 +168,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['vitamin-d3', 'zinc'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '💫'
+    icon: 'Sparkles'
   },
 
   // ============================================================================
@@ -203,7 +203,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['resveratrol', 'pterostilbene'],
     monthlyBudget: 'high',
     tier: 'advanced',
-    icon: '⚡'
+    icon: 'Zap'
   },
   {
     id: 'nr',
@@ -233,7 +233,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['pterostilbene'],
     monthlyBudget: 'high',
     tier: 'intermediate',
-    icon: '🔋'
+    icon: 'Battery'
   },
 
   // ============================================================================
@@ -268,7 +268,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['nmn', 'quercetin'],
     monthlyBudget: 'medium',
     tier: 'intermediate',
-    icon: '🍇'
+    icon: 'Grape'
   },
   {
     id: 'quercetin',
@@ -298,7 +298,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['fisetin', 'dasatinib'],
     monthlyBudget: 'low',
     tier: 'intermediate',
-    icon: '🧹'
+    icon: 'Recycle'
   },
   {
     id: 'fisetin',
@@ -328,7 +328,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['quercetin'],
     monthlyBudget: 'medium',
     tier: 'advanced',
-    icon: '🍓'
+    icon: 'Cherry'
   },
   {
     id: 'spermidine',
@@ -358,7 +358,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['fasting'],
     monthlyBudget: 'high',
     tier: 'advanced',
-    icon: '🔄'
+    icon: 'RefreshCw'
   },
 
   // ============================================================================
@@ -392,7 +392,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['pqq', 'alpha-lipoic-acid'],
     monthlyBudget: 'medium',
     tier: 'essential',
-    icon: '🔥'
+    icon: 'Flame'
   },
   {
     id: 'pqq',
@@ -422,7 +422,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['coq10'],
     monthlyBudget: 'medium',
     tier: 'intermediate',
-    icon: '⚡'
+    icon: 'Zap'
   },
   {
     id: 'creatine',
@@ -453,7 +453,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['protein', 'hmb'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '💪'
+    icon: 'Dumbbell'
   },
 
   // ============================================================================
@@ -487,7 +487,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['magnesium', 'l-theanine'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '😴'
+    icon: 'Moon'
   },
   {
     id: 'l-theanine',
@@ -517,7 +517,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['caffeine', 'magnesium'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '🍵'
+    icon: 'Coffee'
   },
   {
     id: 'apigenin',
@@ -547,7 +547,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['magnesium', 'glycine'],
     monthlyBudget: 'low',
     tier: 'intermediate',
-    icon: '🌼'
+    icon: 'Flower'
   },
 
   // ============================================================================
@@ -581,7 +581,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['omega-3', 'bacopa'],
     monthlyBudget: 'medium',
     tier: 'intermediate',
-    icon: '🦁'
+    icon: 'Brain'
   },
   {
     id: 'alpha-gpc',
@@ -612,7 +612,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['racetams', 'caffeine'],
     monthlyBudget: 'medium',
     tier: 'intermediate',
-    icon: '🧠'
+    icon: 'Lightbulb'
   },
 
   // ============================================================================
@@ -648,7 +648,7 @@ export const supplements: Supplement[] = [
     contraindications: ['Pregnancy', 'Breastfeeding'],
     monthlyBudget: 'low',
     tier: 'intermediate',
-    icon: '🌿'
+    icon: 'Leaf'
   },
   {
     id: 'citrus-bergamot',
@@ -678,7 +678,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['omega-3', 'niacin'],
     monthlyBudget: 'medium',
     tier: 'intermediate',
-    icon: '🍊'
+    icon: 'Citrus'
   },
 
   // ============================================================================
@@ -713,7 +713,7 @@ export const supplements: Supplement[] = [
     stacksWith: ['omega-3', 'ginger'],
     monthlyBudget: 'low',
     tier: 'essential',
-    icon: '🧡'
+    icon: 'HeartPulse'
   }
 ];
 

@@ -62,7 +62,7 @@ export default function Protocols() {
   const getCategoryMeta = (category: string) => {
     return protocolCategories[category as keyof typeof protocolCategories] || {
       name: category,
-      icon: '📋',
+      icon: 'FileText',
       color: 'gray'
     };
   };

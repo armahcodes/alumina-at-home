@@ -11,7 +11,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <NeonAuthUIProvider
       // @ts-expect-error - Type mismatch due to peer dependency version differences
       authClient={authClient}
-      redirectTo="/dashboard"
+      redirectTo="/"
       emailOTP
       credentials={{ forgotPassword: true }}
     >

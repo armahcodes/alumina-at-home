@@ -15,8 +15,40 @@ import {
 } from '@chakra-ui/react';
 import { 
   Check, ChevronDown, Clock, DollarSign, AlertTriangle, 
-  Info, Beaker, Layers, Package
+  Info, Beaker, Layers, Package, Sun, Heart, Fish, Sparkles,
+  Zap, Battery, Grape, Recycle, Cherry, RefreshCw, Flame,
+  Dumbbell, Moon, Coffee, Flower2, Brain, Lightbulb, Leaf,
+  Citrus, HeartPulse, Ban, Pill,
+  type LucideIcon
 } from 'lucide-react';
+
+// Icon mapping for supplement icons
+const supplementIcons: Record<string, LucideIcon> = {
+  'Sun': Sun,
+  'Heart': Heart,
+  'Fish': Fish,
+  'Sparkles': Sparkles,
+  'Zap': Zap,
+  'Battery': Battery,
+  'Grape': Grape,
+  'Recycle': Recycle,
+  'Cherry': Cherry,
+  'RefreshCw': RefreshCw,
+  'Flame': Flame,
+  'Dumbbell': Dumbbell,
+  'Moon': Moon,
+  'Coffee': Coffee,
+  'Flower': Flower2,
+  'Brain': Brain,
+  'Lightbulb': Lightbulb,
+  'Leaf': Leaf,
+  'Citrus': Citrus,
+  'HeartPulse': HeartPulse,
+};
+
+const getSupplementIcon = (iconName: string): LucideIcon => {
+  return supplementIcons[iconName] || Pill;
+};
 
 export default function Supplements() {
   const [selectedSupplement, setSelectedSupplement] = useState<string | null>(null);
@@ -228,9 +260,8 @@ export default function Supplements() {
                             align="center"
                             justify="center"
                             flexShrink={0}
-                            fontSize="xl"
                           >
-                            {supplement.icon}
+                            <Box as={getSupplementIcon(supplement.icon)} w={6} h={6} color="accent.400" />
                           </Flex>
                           <Box flex={1}>
                             <Flex align="center" gap={2} mb={1} flexWrap="wrap">
@@ -363,9 +394,12 @@ export default function Supplements() {
                             >
                               {supplement.interactions && supplement.interactions.length > 0 && (
                                 <Box mb={supplement.sideEffects?.length ? 3 : 0}>
-                                  <Text color="yellow.300" fontSize="sm" fontWeight="medium" mb={1}>
-                                    ⚠️ Interactions
-                                  </Text>
+                                  <Flex align="center" gap={1.5} mb={1}>
+                                    <Box as={AlertTriangle} w={4} h={4} color="yellow.400" />
+                                    <Text color="yellow.300" fontSize="sm" fontWeight="medium">
+                                      Interactions
+                                    </Text>
+                                  </Flex>
                                   <Text color="yellow.200" fontSize="sm">
                                     {supplement.interactions.join(', ')}
                                   </Text>
@@ -394,9 +428,12 @@ export default function Supplements() {
                               borderLeft="3px solid"
                               borderColor="red.500"
                             >
-                              <Text color="red.300" fontSize="sm" fontWeight="medium" mb={1}>
-                                🚫 Contraindications
-                              </Text>
+                              <Flex align="center" gap={1.5} mb={1}>
+                                <Box as={Ban} w={4} h={4} color="red.400" />
+                                <Text color="red.300" fontSize="sm" fontWeight="medium">
+                                  Contraindications
+                                </Text>
+                              </Flex>
                               <Text color="red.200" fontSize="sm">
                                 {supplement.contraindications.join(', ')}
                               </Text>
@@ -422,7 +459,10 @@ export default function Supplements() {
                                       borderRadius="full"
                                       fontSize="xs"
                                     >
-                                      {stackSupplement.icon} {stackSupplement.name}
+                                      <Flex align="center" gap={1}>
+                                        <Box as={getSupplementIcon(stackSupplement.icon)} w={3} h={3} />
+                                        {stackSupplement.name}
+                                      </Flex>
                                     </Badge>
                                   ) : null;
                                 })}
@@ -544,7 +584,7 @@ export default function Supplements() {
                           py={2}
                         >
                           <Flex align="center" gap={2}>
-                            <Text>{supp.icon}</Text>
+                            <Box as={getSupplementIcon(supp.icon)} w={4} h={4} color="accent.400" />
                             <Text color="white" fontSize="sm" fontWeight="medium">
                               {supp.name}
                             </Text>

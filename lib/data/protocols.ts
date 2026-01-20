@@ -514,55 +514,55 @@ export const protocolCategories = {
   circadian: {
     name: 'Circadian Rhythm',
     description: 'Optimize your internal clock for better sleep, energy, and hormone regulation',
-    icon: '☀️',
+    icon: 'Sun',
     color: 'yellow'
   },
   'cold-exposure': {
     name: 'Cold Exposure',
     description: 'Harness the power of cold for metabolism, mood, and resilience',
-    icon: '🧊',
+    icon: 'Snowflake',
     color: 'blue'
   },
   'heat-exposure': {
     name: 'Heat Exposure',
     description: 'Use heat stress for cardiovascular health and longevity',
-    icon: '🔥',
+    icon: 'Flame',
     color: 'orange'
   },
   breathwork: {
     name: 'Breathwork',
     description: 'Control your nervous system through conscious breathing',
-    icon: '🌬️',
+    icon: 'Wind',
     color: 'cyan'
   },
   movement: {
     name: 'Movement',
     description: 'Exercise protocols for strength, cardio, and longevity',
-    icon: '🏃',
+    icon: 'Activity',
     color: 'green'
   },
   sleep: {
     name: 'Sleep',
     description: 'Optimize recovery and regeneration through better sleep',
-    icon: '😴',
+    icon: 'Moon',
     color: 'purple'
   },
   nutrition: {
     name: 'Nutrition',
     description: 'Eating patterns and timing for metabolic health',
-    icon: '🥗',
+    icon: 'Utensils',
     color: 'emerald'
   },
   mindfulness: {
     name: 'Mindfulness',
     description: 'Mental practices for focus, calm, and wellbeing',
-    icon: '🧘',
+    icon: 'Brain',
     color: 'pink'
   },
   recovery: {
     name: 'Recovery',
     description: 'Active recovery techniques for optimal adaptation',
-    icon: '🔄',
+    icon: 'RefreshCw',
     color: 'teal'
   }
 };
