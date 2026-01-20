@@ -27,48 +27,33 @@ GOOGLE_GENERATIVE_AI_API_KEY='your_google_ai_api_key'
 
 ## AI Provider Configuration (Alumina Assistant)
 
-The Alumina Assistant uses [Mastra v1](https://mastra.ai) with [AI SDK](https://sdk.vercel.ai) to support **40+ model providers**.
+The Alumina Assistant uses [Mastra v1](https://mastra.ai) with [Vercel AI Gateway](https://vercel.com/docs/ai-gateway).
 
-### Recommended: Google AI (Free Tier)
+Based on: https://mastra.ai/guides/v1/getting-started/next-js
 
-```env
-AI_PROVIDER=google
-GOOGLE_GENERATIVE_AI_API_KEY='your_key_here'
-```
-
-**Get your free API key:** https://aistudio.google.com/apikey
-
-### Alternative: Anthropic (Claude)
+### Vercel AI Gateway Setup
 
 ```env
-AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY='your_key_here'
+# Vercel AI Gateway API Key
+AI_GATEWAY_API_KEY='your_vercel_gateway_key'
 ```
 
-**Get your API key:** https://console.anthropic.com/
+**Get your gateway key:** https://vercel.com/dashboard → AI Gateway
 
-### Alternative: OpenAI
+### Model Configuration
 
-```env
-AI_PROVIDER=openai
-OPENAI_API_KEY='your_key_here'
+The default model is `google/gemini-2.0-flash`. To change it, edit `lib/mastra/agents/alumina-agent.ts`:
+
+```typescript
+model: gateway('google/gemini-2.0-flash'),  // or any supported model
 ```
 
-**Get your API key:** https://platform.openai.com/api-keys
+### Supported Models via Gateway
 
-### Adding More Providers
-
-Mastra supports many more providers. To add them:
-
-```bash
-# Install the provider SDK
-npm install @ai-sdk/groq @ai-sdk/mistral @ai-sdk/togetherai
-
-# Add to your .env.local
-GROQ_API_KEY=your_key
-```
-
-Then update `lib/mastra/index.ts` to include the new provider case.
+- `google/gemini-2.0-flash` - Google Gemini
+- `anthropic/claude-3-5-sonnet-20241022` - Anthropic Claude
+- `mistral/mistral-large-latest` - Mistral
+- And many more...
 
 ---
 

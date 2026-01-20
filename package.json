@@ -19,9 +19,7 @@
     "test:drizzle": "tsx scripts/test-drizzle.ts"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^3.0.15",
-    "@ai-sdk/google": "^3.0.10",
-    "@ai-sdk/openai": "^3.0.12",
+    "@ai-sdk/gateway": "^3.0.17",
     "@ai-sdk/react": "^3.0.44",
     "@chakra-ui/next-js": "^2.4.2",
     "@chakra-ui/react": "^3.27.1",

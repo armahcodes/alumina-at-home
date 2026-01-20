@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useStore } from '@/lib/store';
+import { useChat } from '@ai-sdk/react';
+import { DefaultChatTransport } from 'ai';
 import {
   Box,
   Flex,
@@ -23,44 +24,28 @@ import {
   Maximize2,
 } from 'lucide-react';
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
-
-interface UserContext {
-  name?: string;
-  currentStreak?: number;
-  level?: number;
-  totalPoints?: number;
-  completedProtocols?: string[];
-  goals?: string[];
-}
-
+/**
+ * Alumina Assistant - Floating AI Chat Component
+ * 
+ * Based on: https://mastra.ai/guides/v1/getting-started/next-js
+ * Uses @ai-sdk/react useChat() hook with Mastra backend
+ */
 export default function AluminaAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasGreeted, setHasGreeted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // Get user context from store
-  const { user, completedTasks } = useStore();
+  // useChat hook from @ai-sdk/react - connects to /api/chat
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: '/api/chat',
+    }),
+  });
 
-  const userContext: UserContext = {
-    name: user?.name,
-    currentStreak: 7, // Would come from actual user data
-    level: 3,
-    totalPoints: 2450,
-    completedProtocols: completedTasks,
-    goals: ['Improve sleep', 'Build resilience', 'Optimize energy'],
-  };
+  const isLoading = status === 'streaming' || status === 'submitted';
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -74,103 +59,18 @@ export default function AluminaAssistant() {
     }
   }, [isOpen, isMinimized]);
 
-  // Send initial greeting when chat first opens
-  const sendGreeting = useCallback(async () => {
-    if (hasGreeted) return;
-    setHasGreeted(true);
-    setIsLoading(true);
-
-    const greetingPrompt = userContext.name
-      ? `Greet ${userContext.name} warmly and briefly. Mention you're here to help with their longevity journey. Keep it to 2-3 sentences.`
-      : `Greet the user warmly and introduce yourself as Alumina, their longevity assistant. Keep it to 2-3 sentences.`;
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: greetingPrompt }],
-          userContext,
-        }),
-      });
-
-      const data = await response.json();
-      
-      setMessages([{
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: data.message?.content || "Hi! I'm Alumina, your personal longevity assistant. I'm here to help you optimize your health and wellbeing. What would you like to know?",
-        timestamp: new Date(),
-      }]);
-    } catch (error) {
-      console.error('Greeting error:', error);
-      setMessages([{
-        id: Date.now().toString(),
-        role: 'assistant',
-        content: `Hi${userContext.name ? ` ${userContext.name}` : ''}! I'm Alumina, your personal longevity assistant. I'm here to help you with protocols, supplements, and your health optimization journey. How can I help you today?`,
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [hasGreeted, userContext]);
-
   // Handle opening chat
   const handleOpen = () => {
     setIsOpen(true);
     setIsMinimized(false);
-    if (!hasGreeted) {
-      sendGreeting();
-    }
   };
 
-  // Send message
-  const sendMessage = async () => {
+  // Send message using AI SDK
+  const handleSendMessage = () => {
     if (!inputValue.trim() || isLoading) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputValue.trim(),
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    
+    sendMessage({ text: inputValue.trim() });
     setInputValue('');
-    setIsLoading(true);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [...messages, userMessage].map(m => ({
-            role: m.role,
-            content: m.content,
-          })),
-          userContext,
-        }),
-      });
-
-      const data = await response.json();
-
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.message?.content || "I apologize, but I couldn't process that. Could you try rephrasing?",
-        timestamp: new Date(),
-      }]);
-    } catch (error) {
-      console.error('Chat error:', error);
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: "I'm having trouble connecting right now. Please try again in a moment.",
-        timestamp: new Date(),
-      }]);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   // Quick action suggestions
@@ -178,7 +78,7 @@ export default function AluminaAssistant() {
     "What protocol should I do next?",
     "Tell me about cold exposure",
     "Best supplements for sleep?",
-    "How's my progress?",
+    "How can I improve my energy?",
   ];
 
   return (
@@ -398,13 +298,21 @@ export default function AluminaAssistant() {
                             px={3}
                             py={2}
                           >
-                            <Text
-                              fontSize="sm"
-                              color={message.role === 'user' ? 'accent.200' : 'whiteAlpha.900'}
-                              whiteSpace="pre-wrap"
-                            >
-                              {message.content}
-                            </Text>
+                            {message.parts?.map((part, i) => {
+                              if (part.type === 'text') {
+                                return (
+                                  <Text
+                                    key={i}
+                                    fontSize="sm"
+                                    color={message.role === 'user' ? 'accent.200' : 'whiteAlpha.900'}
+                                    whiteSpace="pre-wrap"
+                                  >
+                                    {part.text}
+                                  </Text>
+                                );
+                              }
+                              return null;
+                            })}
                           </Box>
                         </Flex>
                       </Flex>
@@ -445,7 +353,7 @@ export default function AluminaAssistant() {
                   </Box>
 
                   {/* Quick Actions */}
-                  {messages.length <= 1 && !isLoading && (
+                  {messages.length === 0 && !isLoading && (
                     <Flex
                       gap={2}
                       px={4}
@@ -499,7 +407,7 @@ export default function AluminaAssistant() {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                           e.preventDefault();
-                          sendMessage();
+                          handleSendMessage();
                         }
                       }}
                       disabled={isLoading}
@@ -516,7 +424,7 @@ export default function AluminaAssistant() {
                       className="chat-input"
                     />
                     <Button
-                      onClick={sendMessage}
+                      onClick={handleSendMessage}
                       aria-label="Send message"
                       w={10}
                       h={10}
