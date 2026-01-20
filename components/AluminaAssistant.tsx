@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport } from 'ai';
+import { useStore } from '@/lib/store';
+import { useAuth } from '@/lib/hooks/useAuth';
 import {
   Box,
   Flex,
@@ -14,7 +16,6 @@ import {
   Spinner,
 } from '@chakra-ui/react';
 import {
-  MessageCircle,
   X,
   Send,
   Sparkles,
@@ -25,24 +26,58 @@ import {
 } from 'lucide-react';
 
 /**
- * Alumina Assistant - Floating AI Chat Component
+ * Alumina Assistant - Personalized AI Chat Component
  * 
- * Based on: https://mastra.ai/guides/v1/getting-started/next-js
- * Uses @ai-sdk/react useChat() hook with Mastra backend
+ * Integrates with Mastra memory system for personalization:
+ * - Sends user context (profile, goals, progress) with each message
+ * - Uses thread/resource IDs for memory scoping
+ * 
+ * Docs: https://mastra.ai/guides/v1/getting-started/next-js
  */
 export default function AluminaAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [threadId] = useState(() => `thread-${Date.now()}`); // Unique thread per session
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
-  // useChat hook from @ai-sdk/react - connects to /api/chat
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({
-      api: '/api/chat',
+  // Get user data from auth and store
+  const { user: authUser } = useAuth();
+  const storeData = useStore();
+
+  // Build user context for personalization
+  const userContext = useMemo(() => ({
+    userId: authUser?.id || 'anonymous',
+    threadId,
+    name: storeData.user?.name || authUser?.name,
+    email: storeData.user?.email || authUser?.email,
+    experienceLevel: storeData.user?.experienceLevel,
+    availableTime: storeData.user?.availableTime,
+    budget: storeData.user?.budget,
+    goals: storeData.user?.goals,
+    healthConditions: storeData.user?.healthConditions,
+    currentStreak: storeData.currentStreak,
+    totalPoints: storeData.totalPoints,
+    completedProtocols: storeData.completedTasks,
+    supplements: storeData.supplements,
+  }), [authUser, storeData, threadId]);
+
+  // Configure chat transport with user context
+  const chatTransport = useMemo(() => new DefaultChatTransport({
+    api: '/api/chat',
+    prepareSendMessagesRequest: ({ messages }) => ({
+      body: {
+        messages,
+        data: { userContext },
+      },
     }),
+  }), [userContext]);
+
+  // useChat hook from @ai-sdk/react
+  const { messages, sendMessage, status } = useChat({
+    transport: chatTransport,
   });
 
   const isLoading = status === 'streaming' || status === 'submitted';
@@ -73,13 +108,36 @@ export default function AluminaAssistant() {
     setInputValue('');
   };
 
-  // Quick action suggestions
-  const quickActions = [
-    "What protocol should I do next?",
-    "Tell me about cold exposure",
-    "Best supplements for sleep?",
-    "How can I improve my energy?",
-  ];
+  // Personalized quick actions based on user data
+  const quickActions = useMemo(() => {
+    const actions = [];
+    
+    if (storeData.currentStreak > 0) {
+      actions.push(`How can I keep my ${storeData.currentStreak}-day streak going?`);
+    } else {
+      actions.push("Help me start a protocol today");
+    }
+    
+    if (storeData.user?.goals?.includes('improve-sleep')) {
+      actions.push("Best sleep optimization tips?");
+    } else {
+      actions.push("What protocol should I try first?");
+    }
+    
+    actions.push("Tell me about cold exposure benefits");
+    actions.push("What supplements do you recommend?");
+    
+    return actions.slice(0, 4);
+  }, [storeData.currentStreak, storeData.user?.goals]);
+
+  // Get personalized greeting
+  const greeting = useMemo(() => {
+    const name = storeData.user?.name || authUser?.name;
+    if (name) {
+      return `Hi ${name.split(' ')[0]}, I'm Alumina`;
+    }
+    return "Hi, I'm Alumina";
+  }, [storeData.user?.name, authUser?.name]);
 
   return (
     <>
@@ -189,7 +247,9 @@ export default function AluminaAssistant() {
                     </Heading>
                     <Flex align="center" gap={1}>
                       <Box w={2} h={2} bg="green.400" borderRadius="full" />
-                      <Text fontSize="xs" color="whiteAlpha.600">Online</Text>
+                      <Text fontSize="xs" color="whiteAlpha.600">
+                        {storeData.user?.name ? `Personalized for you` : 'Online'}
+                      </Text>
                     </Flex>
                   </Box>
                 </Flex>
@@ -255,11 +315,16 @@ export default function AluminaAssistant() {
                           <Box as={Sparkles} w={8} h={8} color="accent.400" />
                         </Flex>
                         <Heading as="h4" size="sm" color="white" mb={2}>
-                          Hi, I&apos;m Alumina
+                          {greeting}
                         </Heading>
-                        <Text fontSize="sm" color="whiteAlpha.600" mb={4}>
+                        <Text fontSize="sm" color="whiteAlpha.600" mb={2}>
                           Your personal longevity assistant
                         </Text>
+                        {storeData.currentStreak > 0 && (
+                          <Badge colorScheme="green" fontSize="xs" mb={2}>
+                            {storeData.currentStreak} day streak
+                          </Badge>
+                        )}
                       </Flex>
                     )}
 

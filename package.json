@@ -29,6 +29,8 @@
     "@mastra/ai-sdk": "^1.0.0-beta.16",
     "@mastra/client-js": "^1.0.0-beta.25",
     "@mastra/core": "^1.0.0-beta.25",
+    "@mastra/libsql": "^1.0.0-beta.13",
+    "@mastra/memory": "^1.0.0-beta.15",
     "@neondatabase/auth": "^0.1.0-beta.21",
     "@neondatabase/serverless": "^1.0.2",
     "@sinclair/typebox": "^0.34.41",
