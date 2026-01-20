@@ -19,6 +19,8 @@
     "test:drizzle": "tsx scripts/test-drizzle.ts"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.15",
+    "@ai-sdk/google": "^3.0.10",
     "@ai-sdk/openai": "^3.0.12",
     "@ai-sdk/react": "^3.0.44",
     "@chakra-ui/next-js": "^2.4.2",
@@ -26,6 +28,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@hookform/resolvers": "^5.2.2",
+    "@mastra/ai-sdk": "^1.0.0-beta.16",
     "@mastra/client-js": "^1.0.0-beta.25",
     "@mastra/core": "^1.0.0-beta.25",
     "@neondatabase/auth": "^0.1.0-beta.21",

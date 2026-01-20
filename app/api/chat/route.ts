@@ -1,4 +1,4 @@
-import { mastra } from '@/lib/mastra';
+import { getAluminaAgent } from '@/lib/mastra';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the agent
-    const agent = mastra.getAgent('aluminaAgent');
+    // Get the agent (loaded lazily with configured provider)
+    const agent = await getAluminaAgent();
 
     // Build system context with user personalization
     let systemContext = '';
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: {
         role: 'assistant',
-        content: "Hi! I'm Alumina, your longevity assistant. I'm here to help you optimize your health and wellbeing. While I'm having trouble connecting to my full capabilities right now, I can still help answer questions about protocols, supplements, and your health journey. What would you like to know?",
+        content: "Hi! I'm Alumina, your longevity assistant. I'm here to help you optimize your health and wellbeing. To enable AI responses, please configure your AI provider in .env.local (AI_PROVIDER and the corresponding API key). What would you like to know about protocols, supplements, or your health journey?",
       },
     });
   }

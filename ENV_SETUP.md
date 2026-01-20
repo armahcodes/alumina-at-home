@@ -13,13 +13,62 @@
 
 ```env
 # Neon Database
-DATABASE_URL='postgresql://neondb_owner:npg_6Q2jgMDxFVNI@ep-young-fog-a4qtobep-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require'
+DATABASE_URL='postgresql://user:password@host/database?sslmode=require'
 
-# Stack Auth (Neon Auth)
-NEXT_PUBLIC_STACK_PROJECT_ID='86b2c6f2-ad1c-49d7-849a-bd97b2948d40'
-NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY='pck_4aq7sjhggt24syv1m2wrp9ms4p8n8natjwgyh2m6pzc7r'
-STACK_SECRET_SERVER_KEY='ssk_m7j2qac4env4t1nmspnhaj0h3ystfeawc5943mmzgs7gr'
+# Neon Auth
+NEON_AUTH_BASE_URL='https://your-project.neonauth.your-region.aws.neon.tech/your-db/auth'
+
+# AI Provider for Alumina Assistant
+AI_PROVIDER=google
+GOOGLE_GENERATIVE_AI_API_KEY='your_google_ai_api_key'
 ```
+
+---
+
+## AI Provider Configuration (Alumina Assistant)
+
+The Alumina Assistant uses [Mastra v1](https://mastra.ai) with [AI SDK](https://sdk.vercel.ai) to support **40+ model providers**.
+
+### Recommended: Google AI (Free Tier)
+
+```env
+AI_PROVIDER=google
+GOOGLE_GENERATIVE_AI_API_KEY='your_key_here'
+```
+
+**Get your free API key:** https://aistudio.google.com/apikey
+
+### Alternative: Anthropic (Claude)
+
+```env
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY='your_key_here'
+```
+
+**Get your API key:** https://console.anthropic.com/
+
+### Alternative: OpenAI
+
+```env
+AI_PROVIDER=openai
+OPENAI_API_KEY='your_key_here'
+```
+
+**Get your API key:** https://platform.openai.com/api-keys
+
+### Adding More Providers
+
+Mastra supports many more providers. To add them:
+
+```bash
+# Install the provider SDK
+npm install @ai-sdk/groq @ai-sdk/mistral @ai-sdk/togetherai
+
+# Add to your .env.local
+GROQ_API_KEY=your_key
+```
+
+Then update `lib/mastra/index.ts` to include the new provider case.
 
 ---
 
@@ -37,10 +86,17 @@ touch .env.local
 Open `.env.local` in your editor and paste:
 
 ```env
-DATABASE_URL='postgresql://neondb_owner:npg_6Q2jgMDxFVNI@ep-young-fog-a4qtobep-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require'
-NEXT_PUBLIC_STACK_PROJECT_ID='86b2c6f2-ad1c-49d7-849a-bd97b2948d40'
-NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY='pck_4aq7sjhggt24syv1m2wrp9ms4p8n8natjwgyh2m6pzc7r'
-STACK_SECRET_SERVER_KEY='ssk_m7j2qac4env4t1nmspnhaj0h3ystfeawc5943mmzgs7gr'
+# Database
+DATABASE_URL='postgresql://user:password@host/database?sslmode=require'
+
+# Neon Auth
+NEON_AUTH_BASE_URL='https://your-project.neonauth.your-region.aws.neon.tech/your-db/auth'
+
+# AI Provider (choose one)
+AI_PROVIDER=google
+GOOGLE_GENERATIVE_AI_API_KEY='your_google_ai_key'
+# ANTHROPIC_API_KEY='your_anthropic_key'
+# OPENAI_API_KEY='your_openai_key'
 ```
 
 ### Step 3: Verify setup
@@ -61,20 +117,30 @@ You should see NO warnings about missing environment variables.
 - **Used by:** `lib/db.ts` - All database operations
 - **Format:** `postgresql://user:password@host/database?sslmode=require`
 
-### NEXT_PUBLIC_STACK_PROJECT_ID
-- **Purpose:** Your Stack Auth project identifier
-- **Used by:** Stack Auth SDK (client-side)
-- **Public:** Yes (safe to expose to browser)
+### NEON_AUTH_BASE_URL
+- **Purpose:** Base URL for Neon Auth service
+- **Used by:** Auth middleware and auth routes
+- **Format:** `https://your-project.neonauth.region.aws.neon.tech/database/auth`
 
-### NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY
-- **Purpose:** Publishable key for Stack Auth client SDK
-- **Used by:** Stack Auth SDK (client-side authentication)
-- **Public:** Yes (safe to expose to browser)
+### AI_PROVIDER
+- **Purpose:** Select which AI model provider to use
+- **Options:** `google`, `anthropic`, `openai`
+- **Default:** `google` (if not set)
 
-### STACK_SECRET_SERVER_KEY
-- **Purpose:** Secret key for Stack Auth server-side operations
-- **Used by:** Stack Auth SDK (server-side API routes)
-- **Security:** NEVER expose this in client-side code or commit to git
+### GOOGLE_GENERATIVE_AI_API_KEY
+- **Purpose:** API key for Google AI (Gemini models)
+- **Models used:** `gemini-2.0-flash`
+- **Get key:** https://aistudio.google.com/apikey
+
+### ANTHROPIC_API_KEY
+- **Purpose:** API key for Anthropic (Claude models)
+- **Models used:** `claude-3-5-sonnet-20241022`
+- **Get key:** https://console.anthropic.com/
+
+### OPENAI_API_KEY
+- **Purpose:** API key for OpenAI (GPT models)
+- **Models used:** `gpt-4o-mini`
+- **Get key:** https://platform.openai.com/api-keys
 
 ---
 
@@ -106,16 +172,16 @@ You should see NO warnings about missing environment variables.
 2. Verify the file contains `DATABASE_URL=...`
 3. Restart dev server: `npm run dev`
 
+### AI Assistant returns fallback response
+**Cause:** Missing or invalid AI provider API key  
+**Solution:**
+1. Verify `AI_PROVIDER` is set correctly
+2. Check the corresponding API key is set
+3. Test your API key directly with the provider
+
 ### Database connection fails
 **Cause:** Neon database may be in sleep mode  
 **Solution:** Wait 10-20 seconds for Neon to wake up, then try again
-
-### Stack Auth not working
-**Cause:** Missing or incorrect Stack Auth credentials  
-**Solution:** 
-1. Verify all three Stack variables are in `.env.local`
-2. Check for typos in the keys
-3. Verify keys match your Stack Auth dashboard
 
 ---
 
@@ -127,9 +193,9 @@ Add these environment variables in your hosting platform's dashboard:
 2. Find "Environment Variables" section
 3. Add each variable:
    - `DATABASE_URL`
-   - `NEXT_PUBLIC_STACK_PROJECT_ID`
-   - `NEXT_PUBLIC_STACK_PUBLISHABLE_CLIENT_KEY`
-   - `STACK_SECRET_SERVER_KEY`
+   - `NEON_AUTH_BASE_URL`
+   - `AI_PROVIDER`
+   - Your chosen provider's API key (e.g., `GOOGLE_GENERATIVE_AI_API_KEY`)
 
 **Note:** Some platforms require redeployment after adding environment variables.
 
@@ -137,23 +203,26 @@ Add these environment variables in your hosting platform's dashboard:
 
 ## Quick Test
 
-After setup, test your configuration:
+After setup, test your AI configuration:
 
 ```bash
 # Start dev server
 npm run dev
 
-# In another terminal, test the API
-curl http://localhost:3000/api/profile/update?userId=test-123
+# Test the chat API
+curl -X POST http://localhost:3000/api/chat \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Hello!"}]}'
 ```
 
-If configured correctly, you'll get a response (even if "Profile not found" - that's OK!).
+If configured correctly, you'll get an AI response from Alumina.
 
 ---
 
 ## Need Help?
 
+- [Mastra Documentation](https://mastra.ai/docs)
+- [AI SDK Documentation](https://sdk.vercel.ai/docs)
+- [Google AI Studio](https://aistudio.google.com)
 - [Neon Documentation](https://neon.tech/docs)
-- [Stack Auth Documentation](https://docs.stack-auth.com/)
 - Check `DATABASE_MIGRATION.md` for full migration guide
-
