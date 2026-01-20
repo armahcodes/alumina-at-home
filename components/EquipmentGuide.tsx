@@ -81,32 +81,40 @@ export default function EquipmentGuide() {
         bg="primary.700/50"
         borderRadius="xl"
         p={1}
-        w="fit-content"
+        w={{ base: 'full', sm: 'fit-content' }}
       >
         <Button
           onClick={() => setViewMode('equipment')}
-          px={4}
+          flex={{ base: 1, sm: 'initial' }}
+          px={{ base: 3, sm: 4 }}
           py={2}
+          minH="44px"
           borderRadius="lg"
-          fontSize="sm"
+          fontSize={{ base: 'xs', sm: 'sm' }}
           fontWeight="medium"
           bg={viewMode === 'equipment' ? 'accent.500/20' : 'transparent'}
           color={viewMode === 'equipment' ? 'accent.300' : 'whiteAlpha.600'}
-          _hover={{ color: 'white' }}
+          _hover={{ color: 'white', bg: viewMode === 'equipment' ? 'accent.500/30' : 'whiteAlpha.50' }}
+          _active={{ transform: 'scale(0.98)' }}
+          transition="all 0.2s"
         >
           <Box as={ShoppingBag} w={4} h={4} mr={2} />
-          All Equipment
+          Equipment
         </Button>
         <Button
           onClick={() => setViewMode('bundles')}
-          px={4}
+          flex={{ base: 1, sm: 'initial' }}
+          px={{ base: 3, sm: 4 }}
           py={2}
+          minH="44px"
           borderRadius="lg"
-          fontSize="sm"
+          fontSize={{ base: 'xs', sm: 'sm' }}
           fontWeight="medium"
           bg={viewMode === 'bundles' ? 'accent.500/20' : 'transparent'}
           color={viewMode === 'bundles' ? 'accent.300' : 'whiteAlpha.600'}
-          _hover={{ color: 'white' }}
+          _hover={{ color: 'white', bg: viewMode === 'bundles' ? 'accent.500/30' : 'whiteAlpha.50' }}
+          _active={{ transform: 'scale(0.98)' }}
+          transition="all 0.2s"
         >
           <Box as={Package} w={4} h={4} mr={2} />
           Bundles
@@ -125,10 +133,9 @@ export default function EquipmentGuide() {
               overflowX="auto"
               pb={2}
               mb={4}
-              css={{
-                '&::-webkit-scrollbar': { display: 'none' },
-                scrollbarWidth: 'none'
-              }}
+              mx={{ base: -4, sm: 0 }}
+              px={{ base: 4, sm: 0 }}
+              className="hide-scrollbar"
             >
               {categories.map((category) => {
                 const meta = category !== 'all' ? getCategoryMeta(category) : null;

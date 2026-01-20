@@ -156,10 +156,24 @@ export default function LoginPage() {
                 fontWeight="semibold"
                 py={3.5}
                 borderRadius="xl"
-                _active={{
-                  bgGradient: "linear(to-r, accent.600, accent.700)"
+                boxShadow="lg"
+                _hover={{
+                  bgGradient: "linear(to-r, accent.600, accent.700)",
+                  transform: "translateY(-1px)",
+                  boxShadow: "xl"
                 }}
-                minH="48px"
+                _active={{
+                  bgGradient: "linear(to-r, accent.600, accent.700)",
+                  transform: "translateY(0)"
+                }}
+                _focus={{
+                  ring: 2,
+                  ringColor: "accent.400",
+                  ringOffset: 2,
+                  ringOffsetColor: "primary.900"
+                }}
+                minH="52px"
+                transition="all 0.2s"
               >
                 {isSignUp ? 'Create Account' : 'Sign In'}
               </Button>

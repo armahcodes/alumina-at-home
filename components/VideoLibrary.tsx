@@ -269,31 +269,39 @@ export default function VideoLibrary() {
           bg="primary.700/50"
           borderRadius="xl"
           p={1}
-          w="fit-content"
+          w={{ base: 'full', sm: 'fit-content' }}
         >
           <Button
             onClick={() => setShowCollections(false)}
-            px={4}
+            flex={{ base: 1, sm: 'initial' }}
+            px={{ base: 3, sm: 4 }}
             py={2}
+            minH="44px"
             borderRadius="lg"
-            fontSize="sm"
+            fontSize={{ base: 'xs', sm: 'sm' }}
             fontWeight="medium"
             bg={!showCollections ? 'accent.500/20' : 'transparent'}
             color={!showCollections ? 'accent.300' : 'whiteAlpha.600'}
-            _hover={{ color: 'white' }}
+            _hover={{ color: 'white', bg: !showCollections ? 'accent.500/30' : 'whiteAlpha.50' }}
+            _active={{ transform: 'scale(0.98)' }}
+            transition="all 0.2s"
           >
             All Videos
           </Button>
           <Button
             onClick={() => setShowCollections(true)}
-            px={4}
+            flex={{ base: 1, sm: 'initial' }}
+            px={{ base: 3, sm: 4 }}
             py={2}
+            minH="44px"
             borderRadius="lg"
-            fontSize="sm"
+            fontSize={{ base: 'xs', sm: 'sm' }}
             fontWeight="medium"
             bg={showCollections ? 'accent.500/20' : 'transparent'}
             color={showCollections ? 'accent.300' : 'whiteAlpha.600'}
-            _hover={{ color: 'white' }}
+            _hover={{ color: 'white', bg: showCollections ? 'accent.500/30' : 'whiteAlpha.50' }}
+            _active={{ transform: 'scale(0.98)' }}
+            transition="all 0.2s"
           >
             Collections
           </Button>
@@ -311,10 +319,9 @@ export default function VideoLibrary() {
                 overflowX="auto"
                 pb={2}
                 mb={4}
-                css={{
-                  '&::-webkit-scrollbar': { display: 'none' },
-                  scrollbarWidth: 'none'
-                }}
+                mx={{ base: -4, sm: 0 }}
+                px={{ base: 4, sm: 0 }}
+                className="hide-scrollbar"
               >
                 {categories.map((category) => {
                   const meta = category !== 'all' ? getCategoryMeta(category) : null;
