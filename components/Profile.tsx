@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useStore } from '@/lib/store';
+import { authClient } from '@/lib/auth/client';
 import FocusTrap from './FocusTrap';
 import {
   Box,
@@ -16,7 +18,7 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
-import { Check, Zap, CheckCircle, Bell, User, Lock, FileText, HelpCircle, ChevronRight, X } from 'lucide-react';
+import { Check, Zap, CheckCircle, Bell, User, Lock, FileText, HelpCircle, ChevronRight, X, LogOut, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 interface Goal {
@@ -35,6 +37,15 @@ export default function Profile() {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const router = useRouter();
+  
+  // Get Neon Auth session
+  const { data: sessionData } = authClient.useSession();
+  const neonUser = sessionData?.user;
+  
+  // Use Neon Auth user data with fallback to Zustand store
+  const displayName = neonUser?.name || user?.name || 'User';
+  const displayEmail = neonUser?.email || user?.email || '';
 
   const goals = [
     {
@@ -60,10 +71,21 @@ export default function Profile() {
     },
   ];
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (confirm('Are you sure you want to sign out?')) {
-      logout();
+      try {
+        await authClient.signOut();
+        logout();
+        router.push('/auth/sign-in');
+      } catch (error) {
+        console.error('Sign out error:', error);
+      }
     }
+  };
+  
+  // Navigate to Neon Auth account settings
+  const handleAccountSettings = () => {
+    router.push('/account/settings');
   };
 
   return (

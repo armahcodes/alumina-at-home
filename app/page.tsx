@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
+import { authClient } from '@/lib/auth/client';
 import LoginPage from '@/components/auth/LoginPage';
 import OnboardingFlow from '@/components/auth/OnboardingFlow';
 import Dashboard from '@/components/Dashboard';
@@ -21,6 +23,7 @@ import {
   Text,
   Button,
   Grid,
+  Spinner,
 } from '@chakra-ui/react';
 import { 
   Home as HomeIcon, 
@@ -36,6 +39,7 @@ import {
   Globe,
   PlayCircle,
   Package,
+  LogOut,
   LucideIcon
 } from 'lucide-react';
 
@@ -51,10 +55,52 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [showAchievements, setShowAchievements] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { isAuthenticated, hasCompletedOnboarding, currentStreak, totalPoints, user } = useStore();
+  const router = useRouter();
+  
+  // Use Neon Auth session
+  const { data: sessionData, isPending: isSessionLoading } = authClient.useSession();
+  
+  // Zustand store for app-specific state
+  const { hasCompletedOnboarding, currentStreak, totalPoints, user, completeOnboarding, logout } = useStore();
+
+  // Sync Neon Auth user with Zustand store
+  useEffect(() => {
+    if (sessionData?.user && !user) {
+      // If we have a Neon Auth user but no Zustand user, we need onboarding
+      // The user info from Neon Auth can be used to pre-fill
+    }
+  }, [sessionData, user]);
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      await authClient.signOut();
+      logout();
+      router.push('/auth/sign-in');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
+
+  // Show loading state while checking auth
+  if (isSessionLoading) {
+    return (
+      <Flex
+        minH="100vh"
+        bgGradient="linear(to-br, primary.900, primary.700, primary.900)"
+        align="center"
+        justify="center"
+      >
+        <Flex direction="column" align="center" gap={4}>
+          <Spinner size="xl" color="accent.400" borderWidth="4px" />
+          <Text color="whiteAlpha.700">Loading your sanctuary...</Text>
+        </Flex>
+      </Flex>
+    );
+  }
 
   // Show login if not authenticated
-  if (!isAuthenticated) {
+  if (!sessionData?.session) {
     return <LoginPage />;
   }
 
@@ -62,6 +108,10 @@ export default function Home() {
   if (!hasCompletedOnboarding) {
     return <OnboardingFlow />;
   }
+
+  // Get display name from Neon Auth or Zustand
+  const displayName = sessionData?.user?.name || user?.name || 'User';
+  const displayEmail = sessionData?.user?.email || user?.email || '';
 
   const renderContent = () => {
     switch (activeTab) {
@@ -187,14 +237,14 @@ export default function Home() {
                   color="white"
                   fontWeight="bold"
                 >
-                  {user?.name?.[0]?.toUpperCase() || 'U'}
+                  {displayName?.[0]?.toUpperCase() || 'U'}
                 </Flex>
                 <Box flex={1} minW={0}>
                   <Text fontSize="sm" fontWeight="semibold" color="white" truncate>
-                    {user?.name || 'User'}
+                    {displayName}
                   </Text>
                   <Text fontSize="xs" color="whiteAlpha.600" truncate>
-                    {user?.email || 'user@email.com'}
+                    {displayEmail}
                   </Text>
                 </Box>
               </Flex>
@@ -273,26 +323,47 @@ export default function Home() {
               })}
             </Box>
 
-            {/* Achievements Button */}
+            {/* Bottom Actions */}
             <Box px={4} py={4} borderTop="1px solid" borderColor="accent.500/20">
-              <Button
-                onClick={() => setShowAchievements(true)}
-                aria-label="View all achievements"
-                w="full"
-                gap={3}
-                px={4}
-                py={3}
-                bgGradient="linear(to-r, accent.500, accent.600)"
-                color="white"
-                borderRadius="xl"
-                boxShadow="lg"
-                _hover={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
-                transition="all 0.3s"
-                _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
-              >
-                <Box as={CheckCircle} w={5} h={5} aria-hidden="true" />
-                <Text fontWeight="semibold">Achievements</Text>
-              </Button>
+              <Flex direction="column" gap={2}>
+                <Button
+                  onClick={() => setShowAchievements(true)}
+                  aria-label="View all achievements"
+                  w="full"
+                  gap={3}
+                  px={4}
+                  py={3}
+                  bgGradient="linear(to-r, accent.500, accent.600)"
+                  color="white"
+                  borderRadius="xl"
+                  boxShadow="lg"
+                  _hover={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                  transition="all 0.3s"
+                  _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
+                >
+                  <Box as={CheckCircle} w={5} h={5} aria-hidden="true" />
+                  <Text fontWeight="semibold">Achievements</Text>
+                </Button>
+                
+                <Button
+                  onClick={handleSignOut}
+                  aria-label="Sign out"
+                  w="full"
+                  gap={3}
+                  px={4}
+                  py={3}
+                  bg="primary.700/50"
+                  borderWidth="1px"
+                  borderColor="primary.400"
+                  color="whiteAlpha.700"
+                  borderRadius="xl"
+                  _hover={{ bg: 'primary.700/70', color: 'white' }}
+                  transition="all 0.3s"
+                >
+                  <Box as={LogOut} w={5} h={5} aria-hidden="true" />
+                  <Text fontWeight="medium">Sign Out</Text>
+                </Button>
+              </Flex>
             </Box>
           </Flex>
         </Box>
@@ -362,14 +433,14 @@ export default function Home() {
                       color="white"
                       fontWeight="bold"
                     >
-                      {user?.name?.[0]?.toUpperCase() || 'U'}
+                      {displayName?.[0]?.toUpperCase() || 'U'}
                     </Flex>
                     <Box flex={1} minW={0}>
                       <Text fontSize="sm" fontWeight="semibold" color="white" truncate>
-                        {user?.name || 'User'}
+                        {displayName}
                       </Text>
                       <Text fontSize="xs" color="whiteAlpha.600" truncate>
-                        {user?.email || 'user@email.com'}
+                        {displayEmail}
                       </Text>
                     </Box>
                   </Flex>
@@ -451,28 +522,52 @@ export default function Home() {
                   })}
                 </Box>
 
-                {/* Achievements Button - Mobile */}
+                {/* Bottom Actions - Mobile */}
                 <Box px={4} py={4} borderTop="1px solid" borderColor="accent.500/20">
-                  <Button
-                    onClick={() => {
-                      setShowAchievements(true);
-                      setSidebarOpen(false);
-                    }}
-                    aria-label="View all achievements"
-                    w="full"
-                    gap={3}
-                    px={4}
-                    py={3}
-                    bgGradient="linear(to-r, accent.500, accent.600)"
-                    color="white"
-                    borderRadius="xl"
-                    boxShadow="lg"
-                    _active={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
-                    transition="all 0.3s"
-                  >
-                    <Box as={CheckCircle} w={5} h={5} aria-hidden="true" />
-                    <Text fontWeight="semibold">Achievements</Text>
-                  </Button>
+                  <Flex direction="column" gap={2}>
+                    <Button
+                      onClick={() => {
+                        setShowAchievements(true);
+                        setSidebarOpen(false);
+                      }}
+                      aria-label="View all achievements"
+                      w="full"
+                      gap={3}
+                      px={4}
+                      py={3}
+                      bgGradient="linear(to-r, accent.500, accent.600)"
+                      color="white"
+                      borderRadius="xl"
+                      boxShadow="lg"
+                      _active={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                      transition="all 0.3s"
+                    >
+                      <Box as={CheckCircle} w={5} h={5} aria-hidden="true" />
+                      <Text fontWeight="semibold">Achievements</Text>
+                    </Button>
+                    
+                    <Button
+                      onClick={() => {
+                        handleSignOut();
+                        setSidebarOpen(false);
+                      }}
+                      aria-label="Sign out"
+                      w="full"
+                      gap={3}
+                      px={4}
+                      py={3}
+                      bg="primary.700/50"
+                      borderWidth="1px"
+                      borderColor="primary.400"
+                      color="whiteAlpha.700"
+                      borderRadius="xl"
+                      _active={{ bg: 'primary.700/70', color: 'white' }}
+                      transition="all 0.3s"
+                    >
+                      <Box as={LogOut} w={5} h={5} aria-hidden="true" />
+                      <Text fontWeight="medium">Sign Out</Text>
+                    </Button>
+                  </Flex>
                 </Box>
               </Flex>
             </Box>

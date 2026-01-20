@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useStore } from '@/lib/store';
+import { authClient } from '@/lib/auth/client';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Box,
@@ -21,9 +22,13 @@ export default function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const completeOnboarding = useStore((state) => state.completeOnboarding);
   const shouldReduceMotion = useReducedMotion();
+  
+  // Get user data from Neon Auth session
+  const { data: sessionData } = authClient.useSession();
+  const neonUser = sessionData?.user;
 
   const [formData, setFormData] = useState({
-    name: '',
+    name: neonUser?.name || '',
     goals: [] as string[],
     experienceLevel: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
     availableTime: 30,
@@ -39,7 +44,7 @@ export default function OnboardingFlow() {
     } else {
       completeOnboarding({
         ...formData,
-        email: useStore.getState().user?.email || ''
+        email: neonUser?.email || ''
       });
     }
   };
@@ -50,8 +55,8 @@ export default function OnboardingFlow() {
 
   const handleSkip = () => {
     completeOnboarding({
-      name: formData.name || 'Friend',
-      email: useStore.getState().user?.email || '',
+      name: formData.name || neonUser?.name || 'Friend',
+      email: neonUser?.email || '',
       goals: formData.goals.length > 0 ? formData.goals : ['Increase energy'],
       experienceLevel: formData.experienceLevel,
       availableTime: formData.availableTime,

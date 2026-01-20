@@ -8,11 +8,6 @@ export default neonAuthMiddleware({
 export const config = {
   matcher: [
     // Protected routes requiring authentication
-    "/dashboard/:path*",
-    "/protocols/:path*",
-    "/supplements/:path*",
-    "/progress/:path*",
-    "/profile/:path*",
     "/account/:path*",
   ],
 };

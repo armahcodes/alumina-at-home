@@ -1,30 +1,52 @@
 'use client';
 
-import { useState } from 'react';
-import { useStore } from '@/lib/store';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { authClient } from '@/lib/auth/client';
 import {
   Box,
   Flex,
   Heading,
   Text,
   Button,
-  Input,
-  Stack,
-  Grid
+  Spinner,
 } from '@chakra-ui/react';
-import { Field } from '@chakra-ui/react';
+import { LogIn, UserPlus } from 'lucide-react';
 
+/**
+ * LoginPage component that redirects to Neon Auth
+ * 
+ * This page serves as a landing/splash screen that checks auth state
+ * and redirects appropriately to Neon Auth pages
+ */
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
-  const login = useStore((state) => state.login);
+  const router = useRouter();
+  const { data, isPending } = authClient.useSession();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    login(email, password);
-  };
+  // If already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (data?.session) {
+      router.push('/');
+    }
+  }, [data, router]);
+
+  // Show loading state while checking auth
+  if (isPending) {
+    return (
+      <Flex
+        minH="100vh"
+        bgGradient="linear(to-br, primary.900, primary.700, primary.900)"
+        align="center"
+        justify="center"
+      >
+        <Flex direction="column" align="center" gap={4}>
+          <Spinner size="xl" color="accent.400" borderWidth="4px" />
+          <Text color="whiteAlpha.700">Loading...</Text>
+        </Flex>
+      </Flex>
+    );
+  }
 
   return (
     <Flex
@@ -59,12 +81,12 @@ export default function LoginPage() {
           <Text color="accent.200/60" fontSize="lg">
             At Home
           </Text>
-          <Text color="whiteAlpha.600" fontSize="md" mt={{ base: 4, sm: 5 }}>
+          <Text color="whiteAlpha.600" fontSize="md" mt={{ base: 4, sm: 5 }} textAlign="center">
             Longevity in Your Personal Sanctuary
           </Text>
         </Flex>
 
-        {/* Form */}
+        {/* Auth Actions */}
         <Box
           bg="primary.600/50"
           borderWidth="1px"
@@ -74,161 +96,82 @@ export default function LoginPage() {
         >
           <Heading
             as="h2"
-            id="form-title"
             size={{ base: "lg", sm: "xl" }}
             color="white"
-            mb={{ base: 5, sm: 6 }}
+            mb={2}
+            textAlign="center"
           >
-            {isSignUp ? 'Create Account' : 'Welcome Back'}
+            Welcome
           </Heading>
+          <Text color="whiteAlpha.600" textAlign="center" mb={{ base: 5, sm: 6 }}>
+            Sign in to continue your longevity journey
+          </Text>
 
-          <form onSubmit={handleSubmit} aria-labelledby="form-title">
-            <Stack gap={4}>
-              <Field.Root>
-                <Field.Label htmlFor="email" color="whiteAlpha.700" fontSize="sm">
-                  Email
-                </Field.Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  px={4}
-                  py={3.5}
-                  bg="primary.700/50"
-                  borderWidth="1px"
-                  borderColor="primary.400"
-                  borderRadius="xl"
-                  color="white"
-                  fontSize="base"
-                  placeholder="your@email.com"
-                  _placeholder={{ color: "whiteAlpha.600" }}
-                  _focus={{
-                    borderColor: "accent.400",
-                    outline: "none",
-                    ring: 2,
-                    ringColor: "accent.400/50"
-                  }}
-                  required
-                  autoComplete="email"
-                  minH="52px"
-                  aria-required="true"
-                />
-              </Field.Root>
-
-              <Field.Root>
-                <Field.Label htmlFor="password" color="whiteAlpha.700" fontSize="sm">
-                  Password
-                </Field.Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  px={4}
-                  py={3.5}
-                  bg="primary.700/50"
-                  borderWidth="1px"
-                  borderColor="primary.400"
-                  borderRadius="xl"
-                  color="white"
-                  fontSize="base"
-                  placeholder="••••••••"
-                  _placeholder={{ color: "whiteAlpha.600" }}
-                  _focus={{
-                    borderColor: "accent.400",
-                    outline: "none",
-                    ring: 2,
-                    ringColor: "accent.400/50"
-                  }}
-                  required
-                  autoComplete={isSignUp ? "new-password" : "current-password"}
-                  minH="52px"
-                  aria-required="true"
-                />
-              </Field.Root>
-
-              <Button
-                type="submit"
-                w="full"
-                bgGradient="linear(to-r, accent.500, accent.600)"
-                color="white"
-                fontWeight="semibold"
-                py={3.5}
-                borderRadius="xl"
-                boxShadow="lg"
-                _hover={{
-                  bgGradient: "linear(to-r, accent.600, accent.700)",
-                  transform: "translateY(-1px)",
-                  boxShadow: "xl"
-                }}
-                _active={{
-                  bgGradient: "linear(to-r, accent.600, accent.700)",
-                  transform: "translateY(0)"
-                }}
-                _focus={{
-                  ring: 2,
-                  ringColor: "accent.400",
-                  ringOffset: 2,
-                  ringOffsetColor: "primary.900"
-                }}
-                minH="52px"
-                transition="all 0.2s"
-              >
-                {isSignUp ? 'Create Account' : 'Sign In'}
-              </Button>
-            </Stack>
-          </form>
-
-          <Box mt={5} textAlign="center">
+          <Flex direction="column" gap={3}>
             <Button
-              onClick={() => setIsSignUp(!isSignUp)}
-              variant="ghost"
-              color="accent.400"
-              fontSize="sm"
-              _active={{ color: "accent.300" }}
-              minH="44px"
+              onClick={() => router.push('/auth/sign-in')}
+              w="full"
+              bgGradient="linear(to-r, accent.500, accent.600)"
+              color="white"
+              fontWeight="semibold"
+              py={3.5}
+              borderRadius="xl"
+              boxShadow="lg"
+              _hover={{
+                bgGradient: "linear(to-r, accent.600, accent.700)",
+                transform: "translateY(-1px)",
+                boxShadow: "xl"
+              }}
+              _active={{
+                bgGradient: "linear(to-r, accent.600, accent.700)",
+                transform: "translateY(0)"
+              }}
+              _focus={{
+                ring: 2,
+                ringColor: "accent.400",
+                ringOffset: 2,
+                ringOffsetColor: "primary.900"
+              }}
+              minH="52px"
+              transition="all 0.2s"
+              gap={2}
             >
-              {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              <Box as={LogIn} w={5} h={5} />
+              Sign In
             </Button>
-          </Box>
 
-          {/* Social Login */}
-          <Box mt={5} pt={5} borderTopWidth="1px" borderColor="primary.400/30">
-            <Text color="whiteAlpha.400" fontSize="xs" textAlign="center" mb={3}>
-              Or continue with
-            </Text>
-            <Grid templateColumns="repeat(2, 1fr)" gap={3}>
-              <Button
-                px={4}
-                py={3}
-                bg="primary.700/50"
-                borderWidth="1px"
-                borderColor="primary.400"
-                borderRadius="xl"
-                color="whiteAlpha.700"
-                fontSize="sm"
-                _active={{ bg: "primary.700/60" }}
-                minH="48px"
-              >
-                Google
-              </Button>
-              <Button
-                px={4}
-                py={3}
-                bg="primary.700/50"
-                borderWidth="1px"
-                borderColor="primary.400"
-                borderRadius="xl"
-                color="whiteAlpha.700"
-                fontSize="sm"
-                _active={{ bg: "primary.700/60" }}
-                minH="48px"
-              >
-                Apple
-              </Button>
-            </Grid>
-          </Box>
+            <Button
+              onClick={() => router.push('/auth/sign-up')}
+              w="full"
+              bg="primary.700/50"
+              borderWidth="1px"
+              borderColor="primary.400"
+              color="whiteAlpha.800"
+              fontWeight="semibold"
+              py={3.5}
+              borderRadius="xl"
+              _hover={{
+                bg: "primary.700/70",
+                borderColor: "primary.300",
+                color: "white"
+              }}
+              _active={{
+                bg: "primary.700/60"
+              }}
+              _focus={{
+                ring: 2,
+                ringColor: "accent.400",
+                ringOffset: 2,
+                ringOffsetColor: "primary.900"
+              }}
+              minH="52px"
+              transition="all 0.2s"
+              gap={2}
+            >
+              <Box as={UserPlus} w={5} h={5} />
+              Create Account
+            </Button>
+          </Flex>
         </Box>
 
         {/* Footer */}
