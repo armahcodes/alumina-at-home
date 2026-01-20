@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Box, Flex, Heading, Text, Button, Icon, Center } from '@chakra-ui/react';
+import { Box, Flex, Heading, Text, Button, Center } from '@chakra-ui/react';
+import { X, RotateCcw, Play, Pause, CheckCircle } from 'lucide-react';
 import FocusTrap from './FocusTrap';
 
 interface ProtocolTimerProps {
@@ -68,8 +69,7 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
         position="fixed"
         inset={0}
         zIndex={50}
-        bg="primary.900"
-        opacity={0.95}
+        bg="rgba(16, 36, 46, 0.98)"
         backdropFilter="blur(16px)"
         align="center"
         justify="center"
@@ -85,16 +85,18 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
         >
           <Box textAlign="center">
             <Flex justify="center" mb={4}>
-              <Icon viewBox="0 0 24 24" w={24} h={24} color="accent.400" aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </Icon>
+              <Flex
+                w={24}
+                h={24}
+                bg="accent.500/20"
+                borderRadius="full"
+                align="center"
+                justify="center"
+                borderWidth="3px"
+                borderColor="accent.400"
+              >
+                <Box as={CheckCircle} w={12} h={12} color="accent.400" aria-hidden="true" />
+              </Flex>
             </Flex>
             <Heading as="h2" id="celebration-title" size="2xl" color="accent.400" mb={2}>
               Protocol Complete!
@@ -119,8 +121,7 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
         position="fixed"
         inset={0}
         zIndex={50}
-        bg="primary.900"
-        opacity={0.95}
+        bg="rgba(16, 36, 46, 0.98)"
         backdropFilter="blur(16px)"
         align="center"
         justify="center"
@@ -132,7 +133,6 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
         <Box maxW="md" w="full">
           <Box
             bg="primary.600"
-            opacity={0.5}
             borderWidth="1px"
             borderColor="primary.400"
             borderRadius="2xl"
@@ -150,19 +150,11 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
               minW={10}
               variant="ghost"
               color="whiteAlpha.600"
-              _hover={{ color: "whiteAlpha.800" }}
+              _hover={{ color: "white", bg: "primary.500" }}
               aria-label="Close timer"
+              borderRadius="full"
             >
-              <Icon viewBox="0 0 24 24" w={6} h={6} aria-hidden="true">
-                <path
-                  fill="none"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </Icon>
+              <Box as={X} w={6} h={6} aria-hidden="true" />
             </Button>
 
             {/* Protocol Name */}
@@ -170,134 +162,101 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
               {protocolName}
             </Heading>
 
-          {/* Timer Circle */}
-          <Box position="relative" w={64} h={64} mx="auto" mb={8} role="timer" aria-live="off">
-            <svg className="transform -rotate-90 w-64 h-64" style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
-              <circle
-                cx="128"
-                cy="128"
-                r="120"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                color="var(--chakra-colors-primary-700)"
-              />
-              <circle
-                cx="128"
-                cy="128"
-                r="120"
-                stroke="currentColor"
-                strokeWidth="8"
-                fill="none"
-                strokeDasharray={`${progress * 7.54} 754`}
-                color="var(--chakra-colors-accent-400)"
-                style={{ transition: shouldReduceMotion ? 'none' : 'all 1s' }}
-              />
-            </svg>
-            <Center position="absolute" inset={0}>
-              <Text fontSize="6xl" fontWeight="bold" color="white" aria-label={`Time remaining: ${formatTime(timeLeft)}`}>
-                {formatTime(timeLeft)}
-              </Text>
-            </Center>
-          </Box>
-
-          {/* Controls */}
-          <Flex align="center" justify="center" gap={4}>
-            <Button
-              onClick={resetTimer}
-              w={14}
-              h={14}
-              minW={14}
-              bg="primary.700"
-              opacity={0.5}
-              borderWidth="1px"
-              borderColor="primary.400"
-              borderRadius="full"
-              color="whiteAlpha.700"
-              _hover={{ color: "white", bg: "primary.700" }}
-            >
-              <Icon viewBox="0 0 24 24" w={6} h={6}>
-                <path
-                  fill="none"
+            {/* Timer Circle */}
+            <Box position="relative" w={64} h={64} mx="auto" mb={8} role="timer" aria-live="off">
+              <svg className="transform -rotate-90 w-64 h-64" style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
+                <circle
+                  cx="128"
+                  cy="128"
+                  r="120"
                   stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  strokeWidth="8"
+                  fill="none"
+                  color="var(--chakra-colors-primary-500)"
                 />
-              </Icon>
-            </Button>
+                <circle
+                  cx="128"
+                  cy="128"
+                  r="120"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={`${progress * 7.54} 754`}
+                  color="var(--chakra-colors-accent-400)"
+                  style={{ transition: shouldReduceMotion ? 'none' : 'all 1s' }}
+                />
+              </svg>
+              <Center position="absolute" inset={0}>
+                <Text fontSize="6xl" fontWeight="bold" color="white" aria-label={`Time remaining: ${formatTime(timeLeft)}`}>
+                  {formatTime(timeLeft)}
+                </Text>
+              </Center>
+            </Box>
 
-            <Button
-              onClick={toggleTimer}
-              w={20}
-              h={20}
-              minW={20}
-              bgGradient="linear(to-r, accent.500, accent.600)"
-              borderRadius="full"
-              color="white"
-              boxShadow="lg"
-              _hover={{ transform: "scale(1.05)" }}
-              transition="all 0.2s"
-            >
-              {isRunning ? (
-                <Icon viewBox="0 0 24 24" w={10} h={10}>
-                  <path
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </Icon>
-              ) : (
-                <Icon viewBox="0 0 24 24" w={10} h={10} ml={1}>
-                  <path
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-                  />
-                  <path
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </Icon>
-              )}
-            </Button>
+            {/* Controls */}
+            <Flex align="center" justify="center" gap={4}>
+              <Button
+                onClick={resetTimer}
+                w={14}
+                h={14}
+                minW={14}
+                bg="primary.500"
+                borderWidth="1px"
+                borderColor="primary.400"
+                borderRadius="full"
+                color="whiteAlpha.700"
+                _hover={{ color: "white", bg: "primary.400" }}
+                aria-label="Reset timer"
+              >
+                <Box as={RotateCcw} w={6} h={6} />
+              </Button>
 
-            <Button
-              onClick={() => setTimeLeft(Math.max(0, timeLeft - 60))}
-              w={14}
-              h={14}
-              minW={14}
-              bg="primary.700"
-              opacity={0.5}
-              borderWidth="1px"
-              borderColor="primary.400"
-              borderRadius="full"
-              color="whiteAlpha.700"
-              _hover={{ color: "white", bg: "primary.700" }}
-            >
-              <Text fontSize="sm" fontWeight="semibold">
-                -1m
-              </Text>
-            </Button>
-          </Flex>
+              <Button
+                onClick={toggleTimer}
+                w={20}
+                h={20}
+                minW={20}
+                bgGradient="linear(to-r, accent.500, accent.600)"
+                borderRadius="full"
+                color="white"
+                boxShadow="lg"
+                _hover={{ transform: "scale(1.05)", boxShadow: "xl" }}
+                _active={{ transform: "scale(0.98)" }}
+                transition="all 0.2s"
+                aria-label={isRunning ? "Pause timer" : "Start timer"}
+              >
+                {isRunning ? (
+                  <Box as={Pause} w={10} h={10} />
+                ) : (
+                  <Box as={Play} w={10} h={10} ml={1} />
+                )}
+              </Button>
 
-          {/* Progress Text */}
-          <Text textAlign="center" color="whiteAlpha.600" fontSize="sm" mt={6} aria-live="polite">
-            {isRunning ? 'Timer running...' : 'Press play to start'}
-          </Text>
+              <Button
+                onClick={() => setTimeLeft(Math.max(0, timeLeft - 60))}
+                w={14}
+                h={14}
+                minW={14}
+                bg="primary.500"
+                borderWidth="1px"
+                borderColor="primary.400"
+                borderRadius="full"
+                color="whiteAlpha.700"
+                _hover={{ color: "white", bg: "primary.400" }}
+                aria-label="Skip 1 minute"
+              >
+                <Text fontSize="sm" fontWeight="semibold">
+                  -1m
+                </Text>
+              </Button>
+            </Flex>
+
+            {/* Progress Text */}
+            <Text textAlign="center" color="whiteAlpha.600" fontSize="sm" mt={6} aria-live="polite">
+              {isRunning ? 'Timer running...' : 'Press play to start'}
+            </Text>
+          </Box>
         </Box>
-      </Box>
 
         {/* Audio element for completion sound */}
         <audio ref={audioRef} src="/sounds/complete.mp3" />
