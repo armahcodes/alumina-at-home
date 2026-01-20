@@ -13,12 +13,17 @@ import { gateway } from '@ai-sdk/gateway';
  * Docs: 
  * - https://mastra.ai/docs/memory/working-memory
  * - https://mastra.ai/docs/memory/threads-and-resources
+ * 
+ * Note: Using in-memory storage for serverless compatibility.
+ * For production with persistence, use Turso or Upstash.
  */
 
-// Initialize storage for memory persistence
+// Initialize storage - use in-memory for serverless environments (Vercel)
+// For persistence, set MASTRA_DB_URL to a Turso database URL
 const storage = new LibSQLStore({
   id: 'alumina-memory',
-  url: process.env.MASTRA_DB_URL || 'file:./mastra-memory.db',
+  url: process.env.MASTRA_DB_URL || ':memory:',
+  ...(process.env.MASTRA_DB_AUTH_TOKEN && { authToken: process.env.MASTRA_DB_AUTH_TOKEN }),
 });
 
 // Working memory template for user personalization
