@@ -805,52 +805,52 @@ export const equipmentCategories = {
   'cold-exposure': {
     name: 'Cold Exposure',
     description: 'Equipment for deliberate cold exposure and contrast therapy',
-    icon: '🧊'
+    icon: 'Snowflake'
   },
   'heat-exposure': {
     name: 'Heat Exposure',
     description: 'Sauna and heat therapy equipment',
-    icon: '🔥'
+    icon: 'Flame'
   },
   'light-therapy': {
     name: 'Light Therapy',
     description: 'Red light, bright light, and blue light blocking equipment',
-    icon: '💡'
+    icon: 'Sun'
   },
   sleep: {
     name: 'Sleep Optimization',
     description: 'Equipment for improving sleep quality',
-    icon: '😴'
+    icon: 'Moon'
   },
   fitness: {
     name: 'Fitness',
     description: 'Cardio and strength training equipment',
-    icon: '🏋️'
+    icon: 'Dumbbell'
   },
   recovery: {
     name: 'Recovery',
     description: 'Muscle recovery and massage equipment',
-    icon: '🔄'
+    icon: 'RefreshCw'
   },
   'air-quality': {
     name: 'Air Quality',
     description: 'Air purification and monitoring equipment',
-    icon: '🌬️'
+    icon: 'Wind'
   },
   water: {
     name: 'Water',
     description: 'Water filtration and enhancement equipment',
-    icon: '💧'
+    icon: 'Droplet'
   },
   monitoring: {
     name: 'Health Monitoring',
     description: 'Wearables and health tracking devices',
-    icon: '📊'
+    icon: 'Activity'
   },
   breathwork: {
     name: 'Breathwork',
     description: 'Breathing training and monitoring equipment',
-    icon: '🫁'
+    icon: 'Stethoscope'
   }
 };
 
