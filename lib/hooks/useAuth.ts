@@ -53,15 +53,11 @@ export function useUser() {
 export function useSignOut() {
   const logout = useStore((state) => state.logout);
 
-  const signOut = async () => {
-    try {
-      await authClient.signOut();
-      logout();
-      // Redirect to sign-in page
-      window.location.href = '/auth/sign-in';
-    } catch (error) {
-      console.error('Sign out error:', error);
-    }
+  const signOut = () => {
+    logout();
+    // Use window.location for a full page redirect to the Neon Auth sign-out page
+    // This ensures the session is properly cleared server-side
+    window.location.href = '/auth/sign-out';
   };
 
   return { signOut };

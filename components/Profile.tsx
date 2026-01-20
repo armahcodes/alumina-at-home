@@ -71,15 +71,11 @@ export default function Profile() {
     },
   ];
 
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     if (confirm('Are you sure you want to sign out?')) {
-      try {
-        await authClient.signOut();
-        logout();
-        router.push('/auth/sign-in');
-      } catch (error) {
-        console.error('Sign out error:', error);
-      }
+      logout();
+      // Use window.location for a full page redirect to ensure session is cleared
+      window.location.href = '/auth/sign-out';
     }
   };
   
