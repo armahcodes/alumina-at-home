@@ -627,116 +627,83 @@ export default function Home() {
           bottom={0}
           left={0}
           right={0}
-          bg="primary.700/95"
-          backdropFilter="blur(10px)"
+          bg="primary.800/98"
+          backdropFilter="blur(20px)"
           borderTop="1px solid"
-          borderColor="accent.500/20"
+          borderColor="accent.500/10"
           display={{ base: 'block', lg: 'none' }}
           role="navigation"
           aria-label="Mobile navigation"
+          className="safe-area-bottom mobile-nav"
+          zIndex={40}
         >
-          <Flex justify="space-around" align="center" px={2} py={2}>
-            <Button
-              onClick={() => setActiveTab('dashboard')}
-              aria-label="Dashboard"
-              aria-current={activeTab === 'dashboard' ? 'page' : undefined}
-              flexDir="column"
-              alignItems="center"
-              justifyContent="center"
-              minW="64px"
-              minH="56px"
-              px={3}
-              borderRadius="lg"
-              transition="all 0.3s"
-              bg={activeTab === 'dashboard' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'dashboard' ? 'accent.400' : 'whiteAlpha.600'}
-              _active={{ color: activeTab === 'dashboard' ? 'accent.400' : 'whiteAlpha.700' }}
-              _focus={{ ring: 2, ringColor: 'accent.400' }}
-            >
-              <Box as={HomeIcon} w={6} h={6} mb={0.5} aria-hidden="true" />
-              <Text fontSize="10px" lineHeight="tight" fontWeight="medium">Home</Text>
-            </Button>
-
-            <Button
-              onClick={() => setActiveTab('protocols')}
-              aria-label="Protocols"
-              aria-current={activeTab === 'protocols' ? 'page' : undefined}
-              flexDir="column"
-              alignItems="center"
-              justifyContent="center"
-              minW="64px"
-              minH="56px"
-              px={3}
-              borderRadius="lg"
-              transition="all 0.3s"
-              bg={activeTab === 'protocols' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'protocols' ? 'accent.400' : 'whiteAlpha.600'}
-              _active={{ color: activeTab === 'protocols' ? 'accent.400' : 'whiteAlpha.700' }}
-              _focus={{ ring: 2, ringColor: 'accent.400' }}
-            >
-              <Box as={ClipboardCheck} w={6} h={6} mb={0.5} aria-hidden="true" />
-              <Text fontSize="10px" lineHeight="tight" fontWeight="medium">Protocols</Text>
-            </Button>
-
-            <Button
-              onClick={() => setActiveTab('supplements')}
-              aria-label="Supplements"
-              aria-current={activeTab === 'supplements' ? 'page' : undefined}
-              flexDir="column"
-              alignItems="center"
-              justifyContent="center"
-              minW="64px"
-              minH="56px"
-              px={3}
-              borderRadius="lg"
-              transition="all 0.3s"
-              bg={activeTab === 'supplements' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'supplements' ? 'accent.400' : 'whiteAlpha.600'}
-              _active={{ color: activeTab === 'supplements' ? 'accent.400' : 'whiteAlpha.700' }}
-              _focus={{ ring: 2, ringColor: 'accent.400' }}
-            >
-              <Box as={Pill} w={6} h={6} mb={0.5} aria-hidden="true" />
-              <Text fontSize="10px" lineHeight="tight" fontWeight="medium">Supps</Text>
-            </Button>
-
-            <Button
-              onClick={() => setActiveTab('progress')}
-              aria-label="Progress"
-              aria-current={activeTab === 'progress' ? 'page' : undefined}
-              flexDir="column"
-              alignItems="center"
-              justifyContent="center"
-              minW="64px"
-              minH="56px"
-              px={3}
-              borderRadius="lg"
-              transition="all 0.3s"
-              bg={activeTab === 'progress' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'progress' ? 'accent.400' : 'whiteAlpha.600'}
-              _active={{ color: activeTab === 'progress' ? 'accent.400' : 'whiteAlpha.700' }}
-              _focus={{ ring: 2, ringColor: 'accent.400' }}
-            >
-              <Box as={BarChart3} w={6} h={6} mb={0.5} aria-hidden="true" />
-              <Text fontSize="10px" lineHeight="tight" fontWeight="medium">Progress</Text>
-            </Button>
-
+          <Flex justify="space-around" align="center" px={1} pt={2} pb={1} maxW="500px" mx="auto">
+            {[
+              { id: 'dashboard', label: 'Home', icon: HomeIcon },
+              { id: 'protocols', label: 'Protocols', icon: ClipboardCheck },
+              { id: 'supplements', label: 'Supps', icon: Pill },
+              { id: 'progress', label: 'Progress', icon: BarChart3 },
+            ].map((item) => {
+              const isActive = activeTab === item.id;
+              return (
+                <Button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id as Tab)}
+                  aria-label={item.label}
+                  aria-current={isActive ? 'page' : undefined}
+                  flexDir="column"
+                  alignItems="center"
+                  justifyContent="center"
+                  minW="60px"
+                  minH="52px"
+                  px={2}
+                  py={1.5}
+                  borderRadius="xl"
+                  transition="all 0.2s"
+                  bg={isActive ? 'accent.500/15' : 'transparent'}
+                  color={isActive ? 'accent.400' : 'whiteAlpha.500'}
+                  _hover={{ bg: isActive ? 'accent.500/20' : 'whiteAlpha.50', color: isActive ? 'accent.400' : 'whiteAlpha.700' }}
+                  _active={{ transform: 'scale(0.95)' }}
+                  _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
+                >
+                  <Box 
+                    as={item.icon} 
+                    w={5} 
+                    h={5} 
+                    mb={0.5} 
+                    aria-hidden="true"
+                    strokeWidth={isActive ? 2.5 : 2}
+                  />
+                  <Text 
+                    fontSize="10px" 
+                    lineHeight="tight" 
+                    fontWeight={isActive ? 'semibold' : 'medium'}
+                    letterSpacing={isActive ? '0.01em' : 'normal'}
+                  >
+                    {item.label}
+                  </Text>
+                </Button>
+              );
+            })}
             <Button
               onClick={() => setSidebarOpen(true)}
               aria-label="More options"
               flexDir="column"
               alignItems="center"
               justifyContent="center"
-              minW="64px"
-              minH="56px"
-              px={3}
-              borderRadius="lg"
-              color="whiteAlpha.600"
+              minW="60px"
+              minH="52px"
+              px={2}
+              py={1.5}
+              borderRadius="xl"
+              color="whiteAlpha.500"
               bg="transparent"
-              _active={{ color: 'whiteAlpha.700' }}
-              transition="all 0.3s"
-              _focus={{ ring: 2, ringColor: 'accent.400' }}
+              _hover={{ bg: 'whiteAlpha.50', color: 'whiteAlpha.700' }}
+              _active={{ transform: 'scale(0.95)' }}
+              transition="all 0.2s"
+              _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
             >
-              <Box as={MenuIcon} w={6} h={6} mb={0.5} aria-hidden="true" />
+              <Box as={MenuIcon} w={5} h={5} mb={0.5} aria-hidden="true" />
               <Text fontSize="10px" lineHeight="tight" fontWeight="medium">More</Text>
             </Button>
           </Flex>

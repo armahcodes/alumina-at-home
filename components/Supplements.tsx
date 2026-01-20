@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useStore } from '@/lib/store';
-import { supplements, supplementStacks, supplementCategories, type Supplement } from '@/lib/data/supplements';
+import { supplements, supplementStacks, supplementCategories } from '@/lib/data/supplements';
 import {
   Box,
   Flex,
@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react';
 import { 
   Check, ChevronDown, Clock, DollarSign, AlertTriangle, 
-  Info, Beaker, Layers, Star, Package
+  Info, Beaker, Layers, Package
 } from 'lucide-react';
 
 export default function Supplements() {
@@ -180,7 +180,7 @@ export default function Supplements() {
             {filteredSupplements.map((supplement, index) => {
               const isTaken = takenSupplements.includes(supplement.id);
               const isExpanded = selectedSupplement === supplement.id;
-              const categoryMeta = getCategoryMeta(supplement.category);
+              // Category for potential future use
 
               return (
                 <motion.div

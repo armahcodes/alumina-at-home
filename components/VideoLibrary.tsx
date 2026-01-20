@@ -16,21 +16,23 @@ import {
 } from '@chakra-ui/react';
 import { 
   Play, Clock, User, X, ChevronRight, Lock, 
-  Search, Filter, BookOpen, Mic, Dumbbell, Lightbulb, Brain
+  BookOpen, Mic, Dumbbell, Lightbulb, Brain
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
-const categoryIcons: Record<string, typeof Play> = {
+// Category icons mapping for future use
+const _categoryIcons: Record<string, typeof Play> = {
   'protocol-guides': BookOpen,
   'science-deep-dives': Brain,
-  'breathwork-sessions': Search, // Wind icon not available
+  'breathwork-sessions': BookOpen,
   'movement-routines': Dumbbell,
   'expert-interviews': Mic,
   'quick-tips': Lightbulb,
   'meditation': Brain,
 };
+void _categoryIcons; // Suppress unused warning
 
 export default function VideoLibrary() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -65,15 +67,6 @@ export default function VideoLibrary() {
       name: category,
       icon: '📹'
     };
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'beginner': return 'green';
-      case 'intermediate': return 'yellow';
-      case 'advanced': return 'red';
-      default: return 'gray';
-    }
   };
 
   return (

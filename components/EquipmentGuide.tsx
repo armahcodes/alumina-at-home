@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { equipment, equipmentCategories, equipmentBundles, type Equipment } from '@/lib/data/equipment';
+import { equipment, equipmentCategories, equipmentBundles } from '@/lib/data/equipment';
 import {
   Box,
   Flex,
