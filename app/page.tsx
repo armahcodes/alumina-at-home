@@ -16,6 +16,7 @@ import Profile from '@/components/Profile';
 import VideoLibrary from '@/components/VideoLibrary';
 import EquipmentGuide from '@/components/EquipmentGuide';
 import AchievementsModal from '@/components/AchievementsModal';
+import AluminaAssistant from '@/components/AluminaAssistant';
 import {
   Box,
   Flex,
@@ -781,6 +782,9 @@ export default function Home() {
           </Flex>
         </Box>
       </Box>
+
+      {/* Alumina AI Assistant */}
+      <AluminaAssistant />
     </>
   );
 }

@@ -1,0 +1,25 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#235B4E;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a1a17;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EFC2B3;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e5a896;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle with rounded corners for maskable icon -->
+  <rect width="512" height="512" rx="96" fill="url(#bg-gradient)"/>
+  
+  <!-- Outer glow ring -->
+  <circle cx="256" cy="256" r="180" fill="none" stroke="url(#accent-gradient)" stroke-width="4" opacity="0.3"/>
+  
+  <!-- Main "A" letter stylized -->
+  <path d="M256 100 L340 380 L300 380 L280 320 L232 320 L212 380 L172 380 L256 100Z" fill="url(#accent-gradient)"/>
+  <path d="M256 180 L275 280 L237 280 L256 180Z" fill="url(#bg-gradient)"/>
+  
+  <!-- Decorative dot -->
+  <circle cx="256" cy="420" r="16" fill="url(#accent-gradient)" opacity="0.8"/>
+</svg>
