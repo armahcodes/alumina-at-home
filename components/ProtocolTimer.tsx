@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Box, Flex, Heading, Text, Button, Icon, Center } from '@chakra-ui/react';
+import FocusTrap from './FocusTrap';
 
 interface ProtocolTimerProps {
   protocolName: string;
@@ -16,6 +17,7 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
   const [isRunning, setIsRunning] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -72,28 +74,32 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
         align="center"
         justify="center"
         p={4}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="celebration-title"
       >
         <motion.div
-          initial={{ scale: 0, rotate: -180 }}
+          initial={shouldReduceMotion ? { scale: 1, rotate: 0 } : { scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
+          transition={shouldReduceMotion ? { duration: 0.1 } : undefined}
         >
           <Box textAlign="center">
-          <Flex justify="center" mb={4}>
-            <Icon viewBox="0 0 24 24" w={24} h={24} color="accent.400">
-              <path
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </Icon>
-          </Flex>
-          <Heading as="h2" size="2xl" color="accent.400" mb={2}>
-            Protocol Complete!
-          </Heading>
-          <Text color="whiteAlpha.700">+10 points earned</Text>
+            <Flex justify="center" mb={4}>
+              <Icon viewBox="0 0 24 24" w={24} h={24} color="accent.400" aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </Icon>
+            </Flex>
+            <Heading as="h2" id="celebration-title" size="2xl" color="accent.400" mb={2}>
+              Protocol Complete!
+            </Heading>
+            <Text color="whiteAlpha.700" aria-live="polite">+10 points earned</Text>
           </Box>
         </motion.div>
       </Flex>
@@ -101,60 +107,72 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
   }
 
   return (
-    <Flex
-      position="fixed"
-      inset={0}
-      zIndex={50}
-      bg="primary.900"
-      opacity={0.95}
-      backdropFilter="blur(16px)"
-      align="center"
-      justify="center"
-      p={4}
+    <FocusTrap
+      active={true}
+      focusTrapOptions={{
+        onDeactivate: onClose,
+        clickOutsideDeactivates: false,
+        escapeDeactivates: true,
+      }}
     >
-      <Box maxW="md" w="full">
-        <Box
-          bg="primary.600"
-          opacity={0.5}
-          borderWidth="1px"
-          borderColor="primary.400"
-          borderRadius="2xl"
-          p={8}
-          position="relative"
-        >
-          {/* Close Button */}
-          <Button
-            onClick={onClose}
-            position="absolute"
-            top={4}
-            right={4}
-            w={10}
-            h={10}
-            minW={10}
-            variant="ghost"
-            color="whiteAlpha.400"
-            _hover={{ color: "whiteAlpha.700" }}
+      <Flex
+        position="fixed"
+        inset={0}
+        zIndex={50}
+        bg="primary.900"
+        opacity={0.95}
+        backdropFilter="blur(16px)"
+        align="center"
+        justify="center"
+        p={4}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="timer-title"
+      >
+        <Box maxW="md" w="full">
+          <Box
+            bg="primary.600"
+            opacity={0.5}
+            borderWidth="1px"
+            borderColor="primary.400"
+            borderRadius="2xl"
+            p={8}
+            position="relative"
           >
-            <Icon viewBox="0 0 24 24" w={6} h={6}>
-              <path
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </Icon>
-          </Button>
+            {/* Close Button */}
+            <Button
+              onClick={onClose}
+              position="absolute"
+              top={4}
+              right={4}
+              w={10}
+              h={10}
+              minW={10}
+              variant="ghost"
+              color="whiteAlpha.600"
+              _hover={{ color: "whiteAlpha.800" }}
+              aria-label="Close timer"
+            >
+              <Icon viewBox="0 0 24 24" w={6} h={6} aria-hidden="true">
+                <path
+                  fill="none"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </Icon>
+            </Button>
 
-          {/* Protocol Name */}
-          <Heading as="h2" size="xl" color="white" mb={8} textAlign="center">
-            {protocolName}
-          </Heading>
+            {/* Protocol Name */}
+            <Heading as="h2" id="timer-title" size="xl" color="white" mb={8} textAlign="center">
+              {protocolName}
+            </Heading>
 
           {/* Timer Circle */}
-          <Box position="relative" w={64} h={64} mx="auto" mb={8}>
-            <svg className="transform -rotate-90 w-64 h-64" style={{ transform: 'rotate(-90deg)' }}>
+          <Box position="relative" w={64} h={64} mx="auto" mb={8} role="timer" aria-live="off">
+            <svg className="transform -rotate-90 w-64 h-64" style={{ transform: 'rotate(-90deg)' }} aria-hidden="true">
               <circle
                 cx="128"
                 cy="128"
@@ -173,11 +191,11 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
                 fill="none"
                 strokeDasharray={`${progress * 7.54} 754`}
                 color="var(--chakra-colors-accent-400)"
-                style={{ transition: 'all 1s' }}
+                style={{ transition: shouldReduceMotion ? 'none' : 'all 1s' }}
               />
             </svg>
             <Center position="absolute" inset={0}>
-              <Text fontSize="6xl" fontWeight="bold" color="white">
+              <Text fontSize="6xl" fontWeight="bold" color="white" aria-label={`Time remaining: ${formatTime(timeLeft)}`}>
                 {formatTime(timeLeft)}
               </Text>
             </Center>
@@ -275,14 +293,15 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
           </Flex>
 
           {/* Progress Text */}
-          <Text textAlign="center" color="whiteAlpha.600" fontSize="sm" mt={6}>
+          <Text textAlign="center" color="whiteAlpha.600" fontSize="sm" mt={6} aria-live="polite">
             {isRunning ? 'Timer running...' : 'Press play to start'}
           </Text>
         </Box>
       </Box>
 
-      {/* Audio element for completion sound */}
-      <audio ref={audioRef} src="/sounds/complete.mp3" />
-    </Flex>
+        {/* Audio element for completion sound */}
+        <audio ref={audioRef} src="/sounds/complete.mp3" />
+      </Flex>
+    </FocusTrap>
   );
 }

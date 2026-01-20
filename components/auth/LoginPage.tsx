@@ -74,6 +74,7 @@ export default function LoginPage() {
         >
           <Heading
             as="h2"
+            id="form-title"
             size={{ base: "lg", sm: "xl" }}
             color="white"
             mb={{ base: 5, sm: 6 }}
@@ -81,13 +82,14 @@ export default function LoginPage() {
             {isSignUp ? 'Create Account' : 'Welcome Back'}
           </Heading>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} aria-labelledby="form-title">
             <Stack gap={4}>
               <Field.Root>
-                <Field.Label color="whiteAlpha.700" fontSize="sm">
+                <Field.Label htmlFor="email" color="whiteAlpha.700" fontSize="sm">
                   Email
                 </Field.Label>
                 <Input
+                  id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -100,22 +102,26 @@ export default function LoginPage() {
                   color="white"
                   fontSize="base"
                   placeholder="your@email.com"
-                  _placeholder={{ color: "whiteAlpha.400" }}
+                  _placeholder={{ color: "whiteAlpha.600" }}
                   _focus={{
                     borderColor: "accent.400",
-                    outline: "none"
+                    outline: "none",
+                    ring: 2,
+                    ringColor: "accent.400/50"
                   }}
                   required
                   autoComplete="email"
                   minH="52px"
+                  aria-required="true"
                 />
               </Field.Root>
 
               <Field.Root>
-                <Field.Label color="whiteAlpha.700" fontSize="sm">
+                <Field.Label htmlFor="password" color="whiteAlpha.700" fontSize="sm">
                   Password
                 </Field.Label>
                 <Input
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -128,14 +134,17 @@ export default function LoginPage() {
                   color="white"
                   fontSize="base"
                   placeholder="••••••••"
-                  _placeholder={{ color: "whiteAlpha.400" }}
+                  _placeholder={{ color: "whiteAlpha.600" }}
                   _focus={{
                     borderColor: "accent.400",
-                    outline: "none"
+                    outline: "none",
+                    ring: 2,
+                    ringColor: "accent.400/50"
                   }}
                   required
-                  autoComplete="current-password"
+                  autoComplete={isSignUp ? "new-password" : "current-password"}
                   minH="52px"
+                  aria-required="true"
                 />
               </Field.Root>
 

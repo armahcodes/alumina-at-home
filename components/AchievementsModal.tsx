@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Box,
   Flex,
@@ -10,6 +10,7 @@ import {
   Grid,
   Icon
 } from '@chakra-ui/react';
+import FocusTrap from './FocusTrap';
 
 interface Achievement {
   id: string;
@@ -108,37 +109,50 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
     .filter(a => a.unlocked)
     .reduce((sum, a) => sum + a.points, 0);
 
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <Flex
-          position="fixed"
-          inset={0}
-          zIndex={50}
-          align={{ base: "flex-end", sm: "center" }}
-          justify="center"
+        <FocusTrap
+          active={isOpen}
+          focusTrapOptions={{
+            onDeactivate: onClose,
+            clickOutsideDeactivates: true,
+            escapeDeactivates: true,
+          }}
         >
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundColor: 'rgba(16, 36, 46, 0.95)',
-              backdropFilter: 'blur(16px)'
-            }}
-          />
-
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, y: '100%' }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          <Flex
+            position="fixed"
+            inset={0}
+            zIndex={50}
+            align={{ base: "flex-end", sm: "center" }}
+            justify="center"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="achievements-modal-title"
           >
+            {/* Backdrop */}
+            <motion.div
+              initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0 }}
+              onClick={onClose}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                backgroundColor: 'rgba(16, 36, 46, 0.95)',
+                backdropFilter: 'blur(16px)'
+              }}
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: '100%' }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={shouldReduceMotion ? { opacity: 0, y: 0 } : { opacity: 0, y: '100%' }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : { type: 'spring', damping: 25, stiffness: 300 }}
+            >
             <Box
               position="relative"
               w="full"
@@ -184,7 +198,7 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
 
             {/* Header */}
             <Box p={{ base: 4, sm: 6 }} borderBottomWidth="1px" borderColor="primary.400" opacity={0.3}>
-              <Heading as="h2" size={{ base: "xl", sm: "2xl" }} color="white" mb={2}>
+              <Heading as="h2" id="achievements-modal-title" size={{ base: "xl", sm: "2xl" }} color="white" mb={2}>
                 Achievements
               </Heading>
               <Flex align="center" gap={{ base: 3, sm: 4 }} fontSize={{ base: "xs", sm: "sm" }}>
@@ -303,6 +317,7 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
           </Box>
         </motion.div>
       </Flex>
+    </FocusTrap>
     )}
   </AnimatePresence>
 );

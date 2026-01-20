@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useStore } from '@/lib/store';
 import ProtocolTimer from './ProtocolTimer';
+import FocusTrap from './FocusTrap';
 import {
   Box,
   Flex,
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const { completedTasks, toggleTask, user } = useStore();
   const [activeTimer, setActiveTimer] = useState<{ id: string; name: string; duration: number } | null>(null);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const todayProtocols = [
     { id: 'morning-light', title: 'Morning Light Exposure', time: '6:30 AM', duration: 15, durationStr: '15 min', category: 'circadian' },
@@ -89,9 +91,9 @@ export default function Dashboard() {
       <Flex direction="column" gap={{ base: 6, sm: 8 }}>
         {/* Welcome Section */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.4 }}
+          transition={shouldReduceMotion ? { duration: 0.1 } : { duration: 0.4 }}
         >
           <Box
             bgGradient="linear(to-br, accent.500/10, accent.600/10)"
@@ -109,9 +111,9 @@ export default function Dashboard() {
 
           {/* Progress Ring */}
           <motion.div
-            initial={{ scale: 0 }}
+            initial={shouldReduceMotion ? false : { scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+            transition={shouldReduceMotion ? { duration: 0.1 } : { delay: 0.2, type: 'spring', stiffness: 200 }}
           >
             <Flex
               align="center"
@@ -161,9 +163,9 @@ export default function Dashboard() {
 
         {/* Quick Stats */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
+          transition={shouldReduceMotion ? { duration: 0.1 } : { delay: 0.3, duration: 0.4 }}
         >
           <Grid
             templateColumns={{ base: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
@@ -229,9 +231,9 @@ export default function Dashboard() {
             {todayProtocols.map((protocol, index) => (
               <motion.div
                 key={protocol.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05, duration: 0.3 }}
+                transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.05, duration: 0.3 }}
               >
                 <Box
                   p={{ base: 3.5, sm: 4 }}
@@ -320,9 +322,9 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.4 }}
+          transition={shouldReduceMotion ? { duration: 0.1 } : { delay: 0.6, duration: 0.4 }}
         >
           <Grid
             templateColumns={{ base: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
@@ -418,33 +420,44 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Box
-      position="fixed"
-      inset={0}
-      zIndex={50}
-      bg="primary.900/95"
-      backdropFilter="blur(10px)"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      p={4}
-      onClick={onClose}
+    <FocusTrap
+      active={true}
+      focusTrapOptions={{
+        onDeactivate: onClose,
+        clickOutsideDeactivates: true,
+        escapeDeactivates: true,
+      }}
     >
       <Box
-        maxW="2xl"
-        w="full"
-        maxH="90vh"
-        overflowY="auto"
-        onClick={(e) => e.stopPropagation()}
+        position="fixed"
+        inset={0}
+        zIndex={50}
+        bg="primary.900/95"
+        backdropFilter="blur(10px)"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        p={4}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="consultation-modal-title"
       >
         <Box
-          bg="primary.600/50"
-          borderWidth="1px"
-          borderColor="primary.400"
-          borderRadius="2xl"
-          overflow="hidden"
-          boxShadow="2xl"
+          maxW="2xl"
+          w="full"
+          maxH="90vh"
+          overflowY="auto"
+          onClick={(e) => e.stopPropagation()}
         >
+          <Box
+            bg="primary.600/50"
+            borderWidth="1px"
+            borderColor="primary.400"
+            borderRadius="2xl"
+            overflow="hidden"
+            boxShadow="2xl"
+          >
           {!submitted ? (
             <>
               {/* Header */}
@@ -454,7 +467,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
                 borderColor="accent.500/20"
                 p={{ base: 5, sm: 6 }}
               >
-                <Heading as="h3" size={{ base: "lg", sm: "xl" }} color="white" mb={2}>
+                <Heading as="h3" id="consultation-modal-title" size={{ base: "lg", sm: "xl" }} color="white" mb={2}>
                   Book a Consultation
                 </Heading>
                 <Text color="whiteAlpha.700" fontSize={{ base: "sm", sm: "base" }}>
@@ -687,7 +700,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
               <Heading as="h3" size="lg" color="white" mb={2}>
                 Booking Submitted!
               </Heading>
-              <Text color="whiteAlpha.700" fontSize="base">
+              <Text color="whiteAlpha.700" fontSize="base" aria-live="polite">
                 We&apos;ll contact you shortly to confirm your consultation
               </Text>
             </Box>
@@ -695,6 +708,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
         </Box>
       </Box>
     </Box>
+  </FocusTrap>
   );
 }
 

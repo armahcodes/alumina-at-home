@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import { useState, useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { videos, videoCategories, videoCollections, type Video } from '@/lib/data/videos';
+import FocusTrap from './FocusTrap';
 import {
   Box,
   Flex,
@@ -11,386 +12,612 @@ import {
   Button,
   Grid,
   Badge,
+  Spinner,
 } from '@chakra-ui/react';
-import { X, Play, Video } from 'lucide-react';
+import { 
+  Play, Clock, User, X, ChevronRight, Lock, 
+  Search, Filter, BookOpen, Mic, Dumbbell, Lightbulb, Brain
+} from 'lucide-react';
+import dynamic from 'next/dynamic';
 
-// Define proper type for ReactPlayer
-type ReactPlayerProps = {
-  url: string;
-  width?: string | number;
-  height?: string | number;
-  controls?: boolean;
-  playing?: boolean;
+const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
+
+const categoryIcons: Record<string, typeof Play> = {
+  'protocol-guides': BookOpen,
+  'science-deep-dives': Brain,
+  'breathwork-sessions': Search, // Wind icon not available
+  'movement-routines': Dumbbell,
+  'expert-interviews': Mic,
+  'quick-tips': Lightbulb,
+  'meditation': Brain,
 };
-
-const ReactPlayer = dynamic(
-  () => import('react-player').then(mod => mod.default),
-  { ssr: false }
-) as React.ComponentType<ReactPlayerProps>;
-
-interface Video {
-  id: string;
-  title: string;
-  description: string;
-  duration: string;
-  category: string;
-  thumbnail: string;
-  url: string;
-}
 
 export default function VideoLibrary() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeDifficulty, setActiveDifficulty] = useState<string>('all');
+  const [showCollections, setShowCollections] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  const videos: Video[] = [
-    {
-      id: '1',
-      title: 'Morning Light Exposure Protocol',
-      description: 'Learn the optimal way to get morning sunlight for circadian rhythm',
-      duration: '8:32',
-      category: 'circadian',
-      thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=450&fit=crop&q=80',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' // Replace with actual video
-    },
-    {
-      id: '2',
-      title: 'Contrast Shower Technique',
-      description: 'Step-by-step guide to hot/cold therapy at home',
-      duration: '12:15',
-      category: 'contrast',
-      thumbnail: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&h=450&fit=crop&q=80',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-    {
-      id: '3',
-      title: 'Box Breathing for Beginners',
-      description: 'Master the 4-4-4-4 breathing pattern for stress reduction',
-      duration: '6:45',
-      category: 'breathwork',
-      thumbnail: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&h=450&fit=crop&q=80',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-    {
-      id: '4',
-      title: 'Setting Up Your Sleep Sanctuary',
-      description: 'Optimize your bedroom for deep, restorative sleep',
-      duration: '15:20',
-      category: 'environment',
-      thumbnail: 'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800&h=450&fit=crop&q=80',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-    {
-      id: '5',
-      title: 'Supplement Timing & Stacking',
-      description: 'When and how to take your longevity supplements',
-      duration: '18:40',
-      category: 'supplements',
-      thumbnail: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=800&h=450&fit=crop&q=80',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-    {
-      id: '6',
-      title: 'Advanced Cold Exposure',
-      description: 'Ice baths and advanced techniques for experienced practitioners',
-      duration: '22:10',
-      category: 'advanced',
-      thumbnail: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=450&fit=crop&q=80',
-      url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-    },
-  ];
+  const categories = ['all', ...Object.keys(videoCategories)];
+  const difficulties = ['all', 'beginner', 'intermediate', 'advanced'];
 
-  const categories = ['all', 'circadian', 'contrast', 'breathwork', 'environment', 'supplements', 'advanced'];
+  const filteredVideos = useMemo(() => {
+    return videos.filter(v => {
+      const categoryMatch = activeCategory === 'all' || v.category === activeCategory;
+      const difficultyMatch = activeDifficulty === 'all' || v.difficulty === activeDifficulty;
+      return categoryMatch && difficultyMatch;
+    });
+  }, [activeCategory, activeDifficulty]);
 
-  const filteredVideos = activeCategory === 'all'
-    ? videos
-    : videos.filter(v => v.category === activeCategory);
+  const featuredVideos = useMemo(() => videos.filter(v => v.featured), []);
+
+  const formatDuration = (seconds: number) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes} min`;
+  };
+
+  const getCategoryMeta = (category: string) => {
+    return videoCategories[category as keyof typeof videoCategories] || {
+      name: category,
+      icon: '📹'
+    };
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'green';
+      case 'intermediate': return 'yellow';
+      case 'advanced': return 'red';
+      default: return 'gray';
+    }
+  };
 
   return (
     <>
       {/* Video Player Modal */}
       {selectedVideo && (
-        <Box
-          position="fixed"
-          inset={0}
-          zIndex={50}
-          bg="primary.900/95"
-          backdropFilter="blur(10px)"
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          p={4}
+        <FocusTrap
+          active={true}
+          focusTrapOptions={{
+            onDeactivate: () => setSelectedVideo(null),
+            clickOutsideDeactivates: true,
+            escapeDeactivates: true,
+          }}
         >
-          <Box maxW="5xl" w="full">
-            <Box
-              bg="primary.600/50"
-              borderWidth="1px"
-              borderColor="primary.400"
-              borderRadius="2xl"
-              overflow="hidden"
-              boxShadow="2xl"
+          <Box
+            position="fixed"
+            inset={0}
+            zIndex={50}
+            bg="primary.900/98"
+            backdropFilter="blur(20px)"
+            display="flex"
+            flexDir="column"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="video-player-title"
+          >
+            {/* Header */}
+            <Flex
+              align="center"
+              justify="space-between"
+              px={{ base: 4, sm: 6 }}
+              py={4}
+              borderBottom="1px solid"
+              borderColor="primary.400/30"
             >
-              {/* Close Button */}
+              <Box>
+                <Heading as="h2" id="video-player-title" size={{ base: 'sm', md: 'md' }} color="white" lineClamp={1}>
+                  {selectedVideo.title}
+                </Heading>
+                <Flex align="center" gap={3} mt={1}>
+                  <Flex align="center" gap={1}>
+                    <Box as={User} w={4} h={4} color="whiteAlpha.500" />
+                    <Text color="whiteAlpha.500" fontSize="sm">{selectedVideo.instructor}</Text>
+                  </Flex>
+                  <Flex align="center" gap={1}>
+                    <Box as={Clock} w={4} h={4} color="whiteAlpha.500" />
+                    <Text color="whiteAlpha.500" fontSize="sm">{formatDuration(selectedVideo.duration)}</Text>
+                  </Flex>
+                </Flex>
+              </Box>
               <Button
                 onClick={() => setSelectedVideo(null)}
                 aria-label="Close video player"
-                position="absolute"
-                top={4}
-                right={4}
-                zIndex={10}
-                w={{ base: 11, sm: 12 }}
-                h={{ base: 11, sm: 12 }}
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                bg="primary.700/80"
-                backdropFilter="blur(4px)"
+                w={10}
+                h={10}
                 borderRadius="full"
+                bg="primary.700/50"
                 color="whiteAlpha.700"
-                _hover={{ color: 'white' }}
-                transition="colors 0.3s"
+                _hover={{ bg: 'primary.700', color: 'white' }}
                 _focus={{ ring: 2, ringColor: 'accent.400' }}
               >
-                <Box as={X} w={{ base: 6, sm: 7 }} h={{ base: 6, sm: 7 }} />
+                <Box as={X} w={5} h={5} />
               </Button>
+            </Flex>
 
-              {/* Video Player */}
-              <Box aspectRatio={16 / 9} bg="black">
-                <ReactPlayer
-                  url={selectedVideo.url}
-                  width="100%"
-                  height="100%"
-                  controls
-                  playing
-                />
-              </Box>
-
-              {/* Video Info */}
-              <Box p={{ base: 5, sm: 6, lg: 8 }}>
-                <Heading
-                  as="h3"
-                  size={{ base: 'lg', sm: 'xl', lg: '2xl' }}
-                  color="white"
-                  mb={{ base: 2, sm: 3 }}
-                >
-                  {selectedVideo.title}
-                </Heading>
-                <Text color="whiteAlpha.700" fontSize={{ base: 'sm', sm: 'base' }} mb={4}>
-                  {selectedVideo.description}
-                </Text>
+            {/* Video Player */}
+            <Flex flex={1} align="center" justify="center" p={{ base: 4, sm: 6 }} position="relative">
+              {videoLoading && (
                 <Flex
+                  position="absolute"
+                  inset={0}
                   align="center"
-                  gap={{ base: 3, sm: 4 }}
-                  fontSize={{ base: 'sm', sm: 'base' }}
-                  color="whiteAlpha.500"
-                  flexWrap="wrap"
+                  justify="center"
+                  bg="primary.900/80"
+                  zIndex={10}
                 >
-                  <Text>Duration: {selectedVideo.duration}</Text>
-                  <Text>•</Text>
-                  <Text textTransform="capitalize">{selectedVideo.category}</Text>
+                  <Spinner size="xl" color="accent.400" />
                 </Flex>
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      )}
-
-      <Flex direction="column" gap={{ base: 6, sm: 8 }}>
-        {/* Category Filter */}
-        <Flex
-          gap={2}
-          overflowX="auto"
-          pb={2}
-          mx={{ base: -4, sm: 0 }}
-          px={{ base: 4, sm: 0 }}
-        >
-          {categories.map((category) => (
-            <Button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              aria-label={`Filter by ${category}`}
-              aria-current={activeCategory === category ? 'true' : undefined}
-              px={{ base: 4, sm: 5 }}
-              py={{ base: 2, sm: 2.5 }}
-              borderRadius="full"
-              fontSize={{ base: 'sm', sm: 'base' }}
-              whiteSpace="nowrap"
-              transition="all 0.3s"
-              bg={activeCategory === category ? 'accent.500/20' : 'primary.600/50'}
-              borderWidth="1px"
-              borderColor={activeCategory === category ? 'accent.500' : 'primary.400'}
-              color={activeCategory === category ? 'accent.300' : 'whiteAlpha.600'}
-              boxShadow={activeCategory === category ? 'lg' : 'none'}
-              _hover={{
-                bg: activeCategory === category ? 'accent.500/30' : 'primary.600/70',
-                color: activeCategory === category ? 'accent.300' : 'whiteAlpha.800',
-              }}
-              _focus={{
-                ring: 2,
-                ringColor: 'accent.400',
-                ringOffset: 2,
-                ringOffsetColor: 'primary.900',
-              }}
-            >
-              {category.charAt(0).toUpperCase() + category.slice(1)}
-            </Button>
-          ))}
-        </Flex>
-
-        {/* Video Grid */}
-        {filteredVideos.length > 0 ? (
-          <Grid templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={{ base: 4, sm: 5 }}>
-            {filteredVideos.map((video) => (
-              <Button
-                key={video.id}
-                onClick={() => setSelectedVideo(video)}
-                aria-label={`Play ${video.title}`}
-                bg="primary.600/50"
-                borderWidth="1px"
-                borderColor="primary.400"
+              )}
+              <Box
+                w="full"
+                maxW="1200px"
+                position="relative"
                 borderRadius="xl"
                 overflow="hidden"
-                textAlign="left"
-                h="auto"
-                p={0}
-                flexDir="column"
-                alignItems="stretch"
-                _hover={{
-                  bg: 'primary.600/60',
-                  borderColor: 'primary.400',
-                  boxShadow: 'xl',
-                }}
-                transition="all 0.3s"
-                _focus={{
-                  ring: 2,
-                  ringColor: 'accent.400',
-                  ringOffset: 2,
-                  ringOffsetColor: 'primary.900',
-                }}
+                bg="black"
+                aspectRatio={16/9}
               >
-                {/* Thumbnail */}
-                <Box position="relative" aspectRatio={16 / 9} bg="primary.700">
-                  <Image src={video.thumbnail} alt={`${video.title} thumbnail`} fill style={{ objectFit: 'cover' }} />
-                  <Box
+                {selectedVideo.premium ? (
+                  <Flex
                     position="absolute"
                     inset={0}
-                    bgGradient="linear(to-t, blackAlpha.600, transparent)"
-                  />
-                  <Box
-                    position="absolute"
-                    bottom={2}
-                    right={2}
-                    px={2}
-                    py={1}
-                    bg="blackAlpha.700"
-                    backdropFilter="blur(4px)"
-                    borderRadius="md"
-                    fontSize={{ base: 'xs', sm: 'sm' }}
-                    color="white"
-                    fontWeight="medium"
+                    bg="primary.800"
+                    align="center"
+                    justify="center"
+                    flexDir="column"
+                    gap={4}
                   >
-                    {video.duration}
-                  </Box>
-                  {/* Play Icon */}
-                  <Flex position="absolute" inset={0} align="center" justify="center">
                     <Flex
-                      w={{ base: 14, sm: 16 }}
-                      h={{ base: 14, sm: 16 }}
-                      bg="accent.500/90"
+                      w={16}
+                      h={16}
+                      bg="accent.500/20"
                       borderRadius="full"
                       align="center"
                       justify="center"
-                      transition="all 0.3s"
-                      boxShadow="lg"
-                      _groupHover={{ transform: 'scale(1.1)', bg: 'accent.500' }}
                     >
-                      <Box
-                        as={Play}
-                        w={{ base: 7, sm: 8 }}
-                        h={{ base: 7, sm: 8 }}
-                        color="white"
-                        fill="currentColor"
-                        ml={0.5}
-                      />
+                      <Box as={Lock} w={8} h={8} color="accent.400" />
                     </Flex>
+                    <Heading as="h3" size="lg" color="white">Premium Content</Heading>
+                    <Text color="whiteAlpha.600" textAlign="center" maxW="md">
+                      Upgrade to access this and all premium videos
+                    </Text>
+                    <Button
+                      bgGradient="linear(to-r, accent.500, accent.600)"
+                      color="white"
+                      px={8}
+                      py={3}
+                      borderRadius="full"
+                      fontWeight="semibold"
+                      boxShadow="lg"
+                      _hover={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                    >
+                      Upgrade Now
+                    </Button>
+                  </Flex>
+                ) : (
+                  <ReactPlayer
+                    {...{
+                      url: selectedVideo.videoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                      width: '100%',
+                      height: '100%',
+                      controls: true,
+                      playing: true,
+                      onReady: () => setVideoLoading(false),
+                      onBuffer: () => setVideoLoading(true),
+                      onBufferEnd: () => setVideoLoading(false)
+                    } as React.ComponentProps<typeof ReactPlayer>}
+                  />
+                )}
+              </Box>
+            </Flex>
+
+            {/* Video Info */}
+            <Box
+              px={{ base: 4, sm: 6 }}
+              py={4}
+              borderTop="1px solid"
+              borderColor="primary.400/30"
+              maxW="1200px"
+              mx="auto"
+              w="full"
+            >
+              <Text color="whiteAlpha.700" fontSize="sm" mb={3}>
+                {selectedVideo.description}
+              </Text>
+              <Flex gap={2} flexWrap="wrap">
+                {selectedVideo.topics.map((topic) => (
+                  <Badge
+                    key={topic}
+                    px={2}
+                    py={1}
+                    bg="primary.700/50"
+                    color="whiteAlpha.600"
+                    borderRadius="md"
+                    fontSize="xs"
+                  >
+                    {topic}
+                  </Badge>
+                ))}
+              </Flex>
+            </Box>
+          </Box>
+        </FocusTrap>
+      )}
+
+      <Flex direction="column" gap={{ base: 6, sm: 8 }}>
+        {/* Featured Section */}
+        {!showCollections && activeCategory === 'all' && activeDifficulty === 'all' && (
+          <Box>
+            <Heading as="h2" size={{ base: 'md', sm: 'lg' }} color="white" mb={4}>
+              Featured Videos
+            </Heading>
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
+              {featuredVideos.slice(0, 3).map((video, index) => (
+                <motion.div
+                  key={video.id}
+                  initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.1 }}
+                >
+                  <VideoCard video={video} onClick={() => setSelectedVideo(video)} formatDuration={formatDuration} />
+                </motion.div>
+              ))}
+            </Grid>
+          </Box>
+        )}
+
+        {/* View Toggle */}
+        <Flex
+          bg="primary.700/50"
+          borderRadius="xl"
+          p={1}
+          w="fit-content"
+        >
+          <Button
+            onClick={() => setShowCollections(false)}
+            px={4}
+            py={2}
+            borderRadius="lg"
+            fontSize="sm"
+            fontWeight="medium"
+            bg={!showCollections ? 'accent.500/20' : 'transparent'}
+            color={!showCollections ? 'accent.300' : 'whiteAlpha.600'}
+            _hover={{ color: 'white' }}
+          >
+            All Videos
+          </Button>
+          <Button
+            onClick={() => setShowCollections(true)}
+            px={4}
+            py={2}
+            borderRadius="lg"
+            fontSize="sm"
+            fontWeight="medium"
+            bg={showCollections ? 'accent.500/20' : 'transparent'}
+            color={showCollections ? 'accent.300' : 'whiteAlpha.600'}
+            _hover={{ color: 'white' }}
+          >
+            Collections
+          </Button>
+        </Flex>
+
+        {!showCollections ? (
+          <>
+            {/* Filters */}
+            <Box>
+              <Text color="whiteAlpha.600" fontSize="sm" mb={2} fontWeight="medium">
+                Category
+              </Text>
+              <Flex
+                gap={2}
+                overflowX="auto"
+                pb={2}
+                mb={4}
+                css={{
+                  '&::-webkit-scrollbar': { display: 'none' },
+                  scrollbarWidth: 'none'
+                }}
+              >
+                {categories.map((category) => {
+                  const meta = category !== 'all' ? getCategoryMeta(category) : null;
+                  return (
+                    <Button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      aria-pressed={activeCategory === category}
+                      px={3}
+                      py={2}
+                      borderRadius="full"
+                      fontSize="xs"
+                      whiteSpace="nowrap"
+                      bg={activeCategory === category ? 'accent.500/20' : 'primary.600/50'}
+                      borderWidth="1px"
+                      borderColor={activeCategory === category ? 'accent.500' : 'primary.400'}
+                      color={activeCategory === category ? 'accent.300' : 'whiteAlpha.600'}
+                      _hover={{ bg: activeCategory === category ? 'accent.500/30' : 'primary.600/70' }}
+                      _focus={{ ring: 2, ringColor: 'accent.400' }}
+                    >
+                      {meta && <Text mr={1.5}>{meta.icon}</Text>}
+                      {category === 'all' ? 'All' : meta?.name}
+                    </Button>
+                  );
+                })}
+              </Flex>
+
+              <Text color="whiteAlpha.600" fontSize="sm" mb={2} fontWeight="medium">
+                Difficulty
+              </Text>
+              <Flex gap={2} flexWrap="wrap">
+                {difficulties.map((diff) => (
+                  <Button
+                    key={diff}
+                    onClick={() => setActiveDifficulty(diff)}
+                    aria-pressed={activeDifficulty === diff}
+                    px={3}
+                    py={1.5}
+                    borderRadius="full"
+                    fontSize="xs"
+                    textTransform="capitalize"
+                    bg={activeDifficulty === diff ? 'accent.500/20' : 'transparent'}
+                    borderWidth="1px"
+                    borderColor={activeDifficulty === diff ? 'accent.500' : 'primary.400'}
+                    color={activeDifficulty === diff ? 'accent.300' : 'whiteAlpha.600'}
+                    _hover={{ bg: activeDifficulty === diff ? 'accent.500/30' : 'primary.600/50' }}
+                    _focus={{ ring: 2, ringColor: 'accent.400' }}
+                  >
+                    {diff === 'all' ? 'All Levels' : diff}
+                  </Button>
+                ))}
+              </Flex>
+            </Box>
+
+            {/* Results */}
+            <Text color="whiteAlpha.500" fontSize="sm">
+              Showing {filteredVideos.length} video{filteredVideos.length !== 1 ? 's' : ''}
+            </Text>
+
+            {/* Videos Grid */}
+            <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)', lg: 'repeat(3, 1fr)' }} gap={4}>
+              {filteredVideos.map((video, index) => (
+                <motion.div
+                  key={video.id}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.03, duration: 0.3 }}
+                >
+                  <VideoCard
+                    video={video}
+                    onClick={() => setSelectedVideo(video)}
+                    formatDuration={formatDuration}
+                  />
+                </motion.div>
+              ))}
+            </Grid>
+          </>
+        ) : (
+          /* Collections View */
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={4}>
+            {videoCollections.map((collection, index) => (
+              <motion.div
+                key={collection.id}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.05 }}
+              >
+                <Box
+                  bg="primary.600/50"
+                  borderWidth="1px"
+                  borderColor="primary.400"
+                  borderRadius="2xl"
+                  p={{ base: 5, sm: 6 }}
+                  _hover={{ borderColor: 'primary.300' }}
+                  transition="all 0.3s"
+                >
+                  <Heading as="h3" size="md" color="white" mb={2}>
+                    {collection.name}
+                  </Heading>
+                  <Text color="whiteAlpha.600" fontSize="sm" mb={4}>
+                    {collection.description}
+                  </Text>
+
+                  <Flex direction="column" gap={2}>
+                    {collection.videoIds.slice(0, 3).map((videoId) => {
+                      const video = videos.find(v => v.id === videoId);
+                      if (!video) return null;
+                      return (
+                        <Button
+                          key={videoId}
+                          onClick={() => setSelectedVideo(video)}
+                          w="full"
+                          justifyContent="space-between"
+                          bg="primary.700/50"
+                          borderRadius="lg"
+                          px={3}
+                          py={2}
+                          h="auto"
+                          _hover={{ bg: 'primary.700' }}
+                          _focus={{ ring: 2, ringColor: 'accent.400' }}
+                        >
+                          <Flex align="center" gap={2}>
+                            <Box as={Play} w={4} h={4} color="accent.400" />
+                            <Text color="white" fontSize="sm" fontWeight="medium" lineClamp={1}>
+                              {video.title}
+                            </Text>
+                          </Flex>
+                          <Text color="whiteAlpha.400" fontSize="xs">
+                            {formatDuration(video.duration)}
+                          </Text>
+                        </Button>
+                      );
+                    })}
+                    {collection.videoIds.length > 3 && (
+                      <Button
+                        variant="ghost"
+                        color="accent.300"
+                        fontSize="sm"
+                        fontWeight="medium"
+                        justifyContent="flex-start"
+                        px={3}
+                        _hover={{ color: 'accent.200' }}
+                      >
+                        +{collection.videoIds.length - 3} more videos
+                        <Box as={ChevronRight} w={4} h={4} ml={1} />
+                      </Button>
+                    )}
                   </Flex>
                 </Box>
-
-                {/* Info */}
-                <Box p={{ base: 4, sm: 5 }}>
-                  <Heading
-                    as="h3"
-                    size={{ base: 'sm', sm: 'md' }}
-                    color="white"
-                    mb={1.5}
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                    display="-webkit-box"
-                    css={{
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}
-                  >
-                    {video.title}
-                  </Heading>
-                  <Text
-                    color="whiteAlpha.600"
-                    fontSize={{ base: 'sm', sm: 'base' }}
-                    mb={3}
-                    overflow="hidden"
-                    textOverflow="ellipsis"
-                    display="-webkit-box"
-                    css={{
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                    }}
-                  >
-                    {video.description}
-                  </Text>
-                  <Box mt={2}>
-                    <Badge
-                      fontSize={{ base: 'xs', sm: 'sm' }}
-                      px={2.5}
-                      py={1}
-                      bg="accent.500/30"
-                      color="accent.200"
-                      borderRadius="full"
-                      textTransform="capitalize"
-                      fontWeight="medium"
-                    >
-                      {video.category}
-                    </Badge>
-                  </Box>
-                </Box>
-              </Button>
+              </motion.div>
             ))}
           </Grid>
-        ) : (
-          <Flex direction="column" align="center" justify="center" py={{ base: 16, sm: 20 }} px={4}>
-            <Flex
-              w={{ base: 20, sm: 24 }}
-              h={{ base: 20, sm: 24 }}
-              bg="primary.600/30"
-              borderRadius="full"
-              align="center"
-              justify="center"
-              mb={4}
-            >
-              <Box
-                as={Video}
-                w={{ base: 10, sm: 12 }}
-                h={{ base: 10, sm: 12 }}
-                color="whiteAlpha.400"
-              />
-            </Flex>
-            <Text color="whiteAlpha.600" textAlign="center" mb={2} fontSize={{ base: 'base', sm: 'lg' }}>
-              No videos found
-            </Text>
-            <Text color="whiteAlpha.400" fontSize={{ base: 'sm', sm: 'base' }} textAlign="center">
-              Try selecting a different category
-            </Text>
-          </Flex>
         )}
       </Flex>
     </>
+  );
+}
+
+interface VideoCardProps {
+  video: Video;
+  onClick: () => void;
+  formatDuration: (seconds: number) => string;
+}
+
+function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
+  const getCategoryMeta = (category: string) => {
+    return videoCategories[category as keyof typeof videoCategories] || { name: category, icon: '📹' };
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'green';
+      case 'intermediate': return 'yellow';
+      case 'advanced': return 'red';
+      default: return 'gray';
+    }
+  };
+
+  return (
+    <Button
+      onClick={onClick}
+      w="full"
+      h="auto"
+      p={0}
+      bg="primary.600/50"
+      borderWidth="1px"
+      borderColor="primary.400"
+      borderRadius="xl"
+      overflow="hidden"
+      _hover={{ borderColor: 'primary.300', transform: 'translateY(-2px)' }}
+      _focus={{ ring: 2, ringColor: 'accent.400' }}
+      transition="all 0.3s"
+      textAlign="left"
+      display="block"
+    >
+      {/* Thumbnail */}
+      <Box position="relative" aspectRatio={16/9} bg="primary.800">
+        <Flex
+          position="absolute"
+          inset={0}
+          align="center"
+          justify="center"
+          bg="blackAlpha.600"
+          opacity={0}
+          _groupHover={{ opacity: 1 }}
+          transition="opacity 0.3s"
+        >
+          <Flex
+            w={14}
+            h={14}
+            bg="accent.500"
+            borderRadius="full"
+            align="center"
+            justify="center"
+          >
+            <Box as={Play} w={6} h={6} color="white" ml={1} />
+          </Flex>
+        </Flex>
+
+        {/* Duration Badge */}
+        <Badge
+          position="absolute"
+          bottom={2}
+          right={2}
+          bg="blackAlpha.700"
+          color="white"
+          px={2}
+          py={0.5}
+          borderRadius="md"
+          fontSize="xs"
+        >
+          {formatDuration(video.duration)}
+        </Badge>
+
+        {/* Premium Badge */}
+        {video.premium && (
+          <Badge
+            position="absolute"
+            top={2}
+            left={2}
+            bg="accent.500"
+            color="white"
+            px={2}
+            py={0.5}
+            borderRadius="md"
+            fontSize="xs"
+          >
+            <Flex align="center" gap={1}>
+              <Box as={Lock} w={3} h={3} />
+              Premium
+            </Flex>
+          </Badge>
+        )}
+      </Box>
+
+      {/* Content */}
+      <Box p={4}>
+        <Flex gap={2} mb={2}>
+          <Badge
+            px={2}
+            py={0.5}
+            bg="accent.500/20"
+            color="accent.200"
+            borderRadius="md"
+            fontSize="10px"
+          >
+            {getCategoryMeta(video.category).name}
+          </Badge>
+          <Badge
+            px={2}
+            py={0.5}
+            bg={`${getDifficultyColor(video.difficulty)}.500/20`}
+            color={`${getDifficultyColor(video.difficulty)}.300`}
+            borderRadius="md"
+            fontSize="10px"
+            textTransform="capitalize"
+          >
+            {video.difficulty}
+          </Badge>
+        </Flex>
+
+        <Heading as="h3" size="sm" color="white" mb={1} lineClamp={2}>
+          {video.title}
+        </Heading>
+
+        <Text color="whiteAlpha.500" fontSize="xs" lineClamp={2}>
+          {video.description}
+        </Text>
+
+        <Flex align="center" gap={1} mt={2}>
+          <Box as={User} w={3} h={3} color="whiteAlpha.400" />
+          <Text color="whiteAlpha.400" fontSize="xs">
+            {video.instructor}
+          </Text>
+        </Flex>
+      </Box>
+    </Button>
   );
 }

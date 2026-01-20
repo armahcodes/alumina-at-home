@@ -1,5 +1,8 @@
 @layer reset, base, tokens, recipes, utilities;
 
+/* Neon Auth UI Styles */
+@import "@neondatabase/auth/ui/css";
+
 :root {
   --color-primary: #235B4E;
   --color-accent: #EFC2B3;

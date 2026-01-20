@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useStore } from '@/lib/store';
+import FocusTrap from './FocusTrap';
 import {
   Box,
   Flex,
@@ -33,6 +34,7 @@ export default function Profile() {
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
   const goals = [
     {
@@ -92,9 +94,9 @@ export default function Profile() {
 
       {/* User Info Card */}
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
+        initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
+        transition={shouldReduceMotion ? { duration: 0.1 } : { duration: 0.4 }}
       >
         <Box
           bgGradient="linear(to-br, accent.500/10, accent.600/10)"
@@ -473,43 +475,54 @@ function PersonalInfoModal({
   };
 
   return (
-    <Box
-      position="fixed"
-      inset={0}
-      zIndex={50}
-      bg="primary.900/95"
-      backdropFilter="blur(10px)"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      p={4}
-      onClick={onClose}
+    <FocusTrap
+      active={true}
+      focusTrapOptions={{
+        onDeactivate: onClose,
+        clickOutsideDeactivates: true,
+        escapeDeactivates: true,
+      }}
     >
       <Box
-        maxW="2xl"
-        w="full"
-        maxH="90vh"
-        overflowY="auto"
-        onClick={(e) => e.stopPropagation()}
+        position="fixed"
+        inset={0}
+        zIndex={50}
+        bg="primary.900/95"
+        backdropFilter="blur(10px)"
+        display="flex"
+        alignItems="center"
+        justifyContent="center"
+        p={4}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="personal-info-title"
       >
         <Box
-          bg="primary.600/50"
-          borderWidth="1px"
-          borderColor="primary.400"
-          borderRadius="2xl"
-          overflow="hidden"
-          boxShadow="2xl"
+          maxW="2xl"
+          w="full"
+          maxH="90vh"
+          overflowY="auto"
+          onClick={(e) => e.stopPropagation()}
         >
           <Box
-            bgGradient="linear(to-br, accent.500/10, accent.600/10)"
-            borderBottomWidth="1px"
-            borderColor="accent.500/20"
-            p={{ base: 5, sm: 6 }}
+            bg="primary.600/50"
+            borderWidth="1px"
+            borderColor="primary.400"
+            borderRadius="2xl"
+            overflow="hidden"
+            boxShadow="2xl"
           >
-            <Flex justify="space-between" align="center">
-              <Heading as="h3" size={{ base: "lg", sm: "xl" }} color="white">
-                Personal Information
-              </Heading>
+            <Box
+              bgGradient="linear(to-br, accent.500/10, accent.600/10)"
+              borderBottomWidth="1px"
+              borderColor="accent.500/20"
+              p={{ base: 5, sm: 6 }}
+            >
+              <Flex justify="space-between" align="center">
+                <Heading as="h3" id="personal-info-title" size={{ base: "lg", sm: "xl" }} color="white">
+                  Personal Information
+                </Heading>
               <Button
                 onClick={onClose}
                 aria-label="Close"
@@ -668,6 +681,7 @@ function PersonalInfoModal({
         </Box>
       </Box>
     </Box>
+  </FocusTrap>
   );
 }
 

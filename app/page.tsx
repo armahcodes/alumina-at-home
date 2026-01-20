@@ -98,6 +98,41 @@ export default function Home() {
 
   return (
     <>
+      {/* Skip to main content link for keyboard navigation */}
+      <a
+        href="#main-content"
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: 'auto',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden',
+          zIndex: 9999
+        }}
+        className="skip-link"
+      >
+        Skip to main content
+      </a>
+
+      <style jsx>{`
+        .skip-link:focus {
+          position: fixed !important;
+          top: 16px;
+          left: 16px;
+          width: auto !important;
+          height: auto !important;
+          padding: 8px 16px;
+          background: var(--chakra-colors-accent-500, #EFC2B3);
+          color: white;
+          font-weight: 600;
+          border-radius: 8px;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          overflow: visible !important;
+          z-index: 9999;
+        }
+      `}</style>
+
       {/* Achievements Modal */}
       <AchievementsModal isOpen={showAchievements} onClose={() => setShowAchievements(false)} />
 
@@ -456,7 +491,7 @@ export default function Home() {
         )}
 
         {/* Main Content */}
-        <Box as="main" pl={{ base: 0, lg: 72 }}>
+        <Box as="main" id="main-content" pl={{ base: 0, lg: 72 }} tabIndex={-1}>
           {/* Mobile Header */}
           <Box
             as="header"
@@ -614,8 +649,8 @@ export default function Home() {
               borderRadius="lg"
               transition="all 0.3s"
               bg={activeTab === 'dashboard' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'dashboard' ? 'accent.400' : 'whiteAlpha.400'}
-              _active={{ color: activeTab === 'dashboard' ? 'accent.400' : 'whiteAlpha.600' }}
+              color={activeTab === 'dashboard' ? 'accent.400' : 'whiteAlpha.600'}
+              _active={{ color: activeTab === 'dashboard' ? 'accent.400' : 'whiteAlpha.700' }}
               _focus={{ ring: 2, ringColor: 'accent.400' }}
             >
               <Box as={HomeIcon} w={6} h={6} mb={0.5} aria-hidden="true" />
@@ -635,8 +670,8 @@ export default function Home() {
               borderRadius="lg"
               transition="all 0.3s"
               bg={activeTab === 'protocols' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'protocols' ? 'accent.400' : 'whiteAlpha.400'}
-              _active={{ color: activeTab === 'protocols' ? 'accent.400' : 'whiteAlpha.600' }}
+              color={activeTab === 'protocols' ? 'accent.400' : 'whiteAlpha.600'}
+              _active={{ color: activeTab === 'protocols' ? 'accent.400' : 'whiteAlpha.700' }}
               _focus={{ ring: 2, ringColor: 'accent.400' }}
             >
               <Box as={ClipboardCheck} w={6} h={6} mb={0.5} aria-hidden="true" />
@@ -656,8 +691,8 @@ export default function Home() {
               borderRadius="lg"
               transition="all 0.3s"
               bg={activeTab === 'supplements' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'supplements' ? 'accent.400' : 'whiteAlpha.400'}
-              _active={{ color: activeTab === 'supplements' ? 'accent.400' : 'whiteAlpha.600' }}
+              color={activeTab === 'supplements' ? 'accent.400' : 'whiteAlpha.600'}
+              _active={{ color: activeTab === 'supplements' ? 'accent.400' : 'whiteAlpha.700' }}
               _focus={{ ring: 2, ringColor: 'accent.400' }}
             >
               <Box as={Pill} w={6} h={6} mb={0.5} aria-hidden="true" />
@@ -677,12 +712,12 @@ export default function Home() {
               borderRadius="lg"
               transition="all 0.3s"
               bg={activeTab === 'progress' ? 'accent.500/20' : 'transparent'}
-              color={activeTab === 'progress' ? 'accent.400' : 'whiteAlpha.400'}
-              _active={{ color: activeTab === 'progress' ? 'accent.400' : 'whiteAlpha.600' }}
+              color={activeTab === 'progress' ? 'accent.400' : 'whiteAlpha.600'}
+              _active={{ color: activeTab === 'progress' ? 'accent.400' : 'whiteAlpha.700' }}
               _focus={{ ring: 2, ringColor: 'accent.400' }}
             >
               <Box as={BarChart3} w={6} h={6} mb={0.5} aria-hidden="true" />
-              <Text fontSize="10px" lineHeight="tight" fontWeight="medium">Stats</Text>
+              <Text fontSize="10px" lineHeight="tight" fontWeight="medium">Progress</Text>
             </Button>
 
             <Button
@@ -695,9 +730,9 @@ export default function Home() {
               minH="56px"
               px={3}
               borderRadius="lg"
-              color="whiteAlpha.400"
+              color="whiteAlpha.600"
               bg="transparent"
-              _active={{ color: 'whiteAlpha.600' }}
+              _active={{ color: 'whiteAlpha.700' }}
               transition="all 0.3s"
               _focus={{ ring: 2, ringColor: 'accent.400' }}
             >

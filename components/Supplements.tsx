@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useMemo } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { useStore } from '@/lib/store';
+import { supplements, supplementStacks, supplementCategories, type Supplement } from '@/lib/data/supplements';
 import {
   Box,
   Flex,
@@ -9,403 +11,586 @@ import {
   Text,
   Button,
   Grid,
+  Badge,
 } from '@chakra-ui/react';
-import { Sunrise, Clock, Moon, Lightbulb, Check } from 'lucide-react';
+import { 
+  Check, ChevronDown, Clock, DollarSign, AlertTriangle, 
+  Info, Beaker, Layers, Star, Package
+} from 'lucide-react';
 
 export default function Supplements() {
-  const [completedDoses, setCompletedDoses] = useState<string[]>([]);
+  const [selectedSupplement, setSelectedSupplement] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
+  const [activeTier, setActiveTier] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'supplements' | 'stacks'>('supplements');
+  const { supplements: takenSupplements, toggleSupplement } = useStore();
+  const shouldReduceMotion = useReducedMotion();
 
-  const supplementSchedule = {
-    morning: [
-      { id: 'morning-1', name: 'Vitamin D3 + K2', dose: '5000 IU + 100mcg', time: '8:00 AM', taken: false },
-      { id: 'morning-2', name: 'Omega-3 (Fish Oil)', dose: '2g EPA/DHA', time: '8:00 AM', taken: false },
-      { id: 'morning-3', name: 'Magnesium L-Threonate', dose: '2000mg', time: '8:00 AM', taken: false },
-      { id: 'morning-4', name: 'B-Complex', dose: '1 capsule', time: '8:00 AM', taken: false },
-    ],
-    afternoon: [
-      { id: 'afternoon-1', name: 'NAD+ Precursor (NMN)', dose: '500mg', time: '12:00 PM', taken: false },
-      { id: 'afternoon-2', name: 'Creatine Monohydrate', dose: '5g', time: '12:00 PM', taken: false },
-    ],
-    evening: [
-      { id: 'evening-1', name: 'Magnesium Glycinate', dose: '400mg', time: '7:00 PM', taken: false },
-      { id: 'evening-2', name: 'Zinc', dose: '30mg', time: '7:00 PM', taken: false },
-      { id: 'evening-3', name: 'Ashwagandha', dose: '600mg', time: '7:00 PM', taken: false },
-    ],
-    bedtime: [
-      { id: 'bedtime-1', name: 'Melatonin', dose: '0.5mg', time: '9:30 PM', taken: false },
-      { id: 'bedtime-2', name: 'L-Theanine', dose: '200mg', time: '9:30 PM', taken: false },
-    ],
+  const categories = ['all', ...Object.keys(supplementCategories)];
+  const tiers = ['all', 'essential', 'intermediate', 'advanced'];
+
+  const filteredSupplements = useMemo(() => {
+    return supplements.filter(s => {
+      const categoryMatch = activeCategory === 'all' || s.category === activeCategory;
+      const tierMatch = activeTier === 'all' || s.tier === activeTier;
+      return categoryMatch && tierMatch;
+    });
+  }, [activeCategory, activeTier]);
+
+  const getCategoryMeta = (category: string) => {
+    return supplementCategories[category as keyof typeof supplementCategories] || {
+      name: category,
+      color: 'gray'
+    };
   };
 
-  const toggleDose = (id: string) => {
-    setCompletedDoses(prev =>
-      prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]
-    );
+  const getEvidenceColor = (level: string) => {
+    switch (level) {
+      case 'strong': return 'green';
+      case 'moderate': return 'yellow';
+      case 'emerging': return 'orange';
+      default: return 'gray';
+    }
   };
 
-  const totalDoses = Object.values(supplementSchedule).flat().length;
-  const completionRate = Math.round((completedDoses.length / totalDoses) * 100);
+  const getTierColor = (tier: string) => {
+    switch (tier) {
+      case 'essential': return 'blue';
+      case 'intermediate': return 'purple';
+      case 'advanced': return 'pink';
+      default: return 'gray';
+    }
+  };
 
   return (
     <Flex direction="column" gap={{ base: 6, sm: 8 }}>
-      {/* Progress Card */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-        <Box
-          bg="accent.500/10"
-          borderWidth="1px"
-          borderColor="accent.500/50"
-          borderRadius="2xl"
-          p={{ base: 5, sm: 6, lg: 8 }}
-        >
-          <Flex
-            direction={{ base: 'column', sm: 'row' }}
-            align={{ base: 'flex-start', sm: 'center' }}
-            justify={{ base: 'flex-start', sm: 'space-between' }}
-            gap={3}
-            mb={4}
-          >
-            <Heading as="h3" size={{ base: 'md', sm: 'lg', lg: 'xl' }} color="white">
-              Today&apos;s Progress
-            </Heading>
-            <Text fontSize={{ base: '3xl', sm: '4xl' }} fontWeight="bold" color="accent.400">
-              {completionRate}%
-            </Text>
-          </Flex>
-          <Box h={{ base: 2, sm: 2.5 }} bg="whiteAlpha.100" borderRadius="full" overflow="hidden">
-            <Box
-              h="full"
-              bgGradient="linear(to-r, accent.400, accent.500)"
-              transition="all 0.5s"
-              w={`${completionRate}%`}
-              role="progressbar"
-              aria-valuenow={completionRate}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label="Daily supplement completion"
-            />
-          </Box>
-          <Text color="whiteAlpha.600" fontSize={{ base: 'sm', sm: 'base' }} mt={3}>
-            {completedDoses.length} of {totalDoses} doses taken
-          </Text>
-        </Box>
-      </motion.div>
-
-      <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={{ base: 6, sm: 8 }}>
-        {/* Morning Stack */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.3 }}
-        >
-          <Flex align="center" gap={2.5} mb={4}>
-            <Flex
-              w={{ base: 9, sm: 10 }}
-              h={{ base: 9, sm: 10 }}
-              bg="accent.500/20"
-              borderRadius="lg"
-              align="center"
-              justify="center"
-            >
-              <Box
-                as={Sunrise}
-                w={{ base: 5, sm: 6 }}
-                h={{ base: 5, sm: 6 }}
-                color="accent.400"
-              />
-            </Flex>
-            <Heading as="h3" size={{ base: 'md', sm: 'lg' }} color="white">
-              Morning (8:00 AM)
-            </Heading>
-          </Flex>
-          <Flex direction="column" gap={3}>
-            {supplementSchedule.morning.map((supp, idx) => (
-              <SupplementCard
-                key={supp.id}
-                supplement={supp}
-                completed={completedDoses.includes(supp.id)}
-                onToggle={() => toggleDose(supp.id)}
-                delay={idx * 0.05}
-              />
-            ))}
-          </Flex>
-        </motion.div>
-
-        {/* Afternoon Stack */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.3 }}
-        >
-          <Flex align="center" gap={2.5} mb={4}>
-            <Flex
-              w={{ base: 9, sm: 10 }}
-              h={{ base: 9, sm: 10 }}
-              bg="accent.500/20"
-              borderRadius="lg"
-              align="center"
-              justify="center"
-            >
-              <Box
-                as={Clock}
-                w={{ base: 5, sm: 6 }}
-                h={{ base: 5, sm: 6 }}
-                color="accent.400"
-              />
-            </Flex>
-            <Heading as="h3" size={{ base: 'md', sm: 'lg' }} color="white">
-              Afternoon (12:00 PM)
-            </Heading>
-          </Flex>
-          <Flex direction="column" gap={3}>
-            {supplementSchedule.afternoon.map((supp, idx) => (
-              <SupplementCard
-                key={supp.id}
-                supplement={supp}
-                completed={completedDoses.includes(supp.id)}
-                onToggle={() => toggleDose(supp.id)}
-                delay={idx * 0.05}
-              />
-            ))}
-          </Flex>
-        </motion.div>
-
-        {/* Evening Stack */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.3 }}
-        >
-          <Flex align="center" gap={2.5} mb={4}>
-            <Flex
-              w={{ base: 9, sm: 10 }}
-              h={{ base: 9, sm: 10 }}
-              bg="accent.500/20"
-              borderRadius="lg"
-              align="center"
-              justify="center"
-            >
-              <Box
-                as={Moon}
-                w={{ base: 5, sm: 6 }}
-                h={{ base: 5, sm: 6 }}
-                color="accent.400"
-              />
-            </Flex>
-            <Heading as="h3" size={{ base: 'md', sm: 'lg' }} color="white">
-              Evening (7:00 PM)
-            </Heading>
-          </Flex>
-          <Flex direction="column" gap={3}>
-            {supplementSchedule.evening.map((supp, idx) => (
-              <SupplementCard
-                key={supp.id}
-                supplement={supp}
-                completed={completedDoses.includes(supp.id)}
-                onToggle={() => toggleDose(supp.id)}
-                delay={idx * 0.05}
-              />
-            ))}
-          </Flex>
-        </motion.div>
-
-        {/* Bedtime Stack */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.3 }}
-        >
-          <Flex align="center" gap={2.5} mb={4}>
-            <Flex
-              w={{ base: 9, sm: 10 }}
-              h={{ base: 9, sm: 10 }}
-              bg="accent.500/20"
-              borderRadius="lg"
-              align="center"
-              justify="center"
-            >
-              <Box
-                as={Lightbulb}
-                w={{ base: 5, sm: 6 }}
-                h={{ base: 5, sm: 6 }}
-                color="accent.400"
-              />
-            </Flex>
-            <Heading as="h3" size={{ base: 'md', sm: 'lg' }} color="white">
-              Bedtime (9:30 PM)
-            </Heading>
-          </Flex>
-          <Flex direction="column" gap={3}>
-            {supplementSchedule.bedtime.map((supp, idx) => (
-              <SupplementCard
-                key={supp.id}
-                supplement={supp}
-                completed={completedDoses.includes(supp.id)}
-                onToggle={() => toggleDose(supp.id)}
-                delay={idx * 0.05}
-              />
-            ))}
-          </Flex>
-        </motion.div>
-      </Grid>
-
-      {/* Protocol Info */}
-      <Box
-        bg="accent.500/10"
-        borderWidth="1px"
-        borderColor="accent.500/50"
-        borderRadius="2xl"
-        p={{ base: 5, sm: 6, lg: 8 }}
-      >
-        <Heading as="h3" size={{ base: 'md', sm: 'lg' }} color="white" mb={{ base: 2, sm: 3 }}>
-          About Your Protocol
-        </Heading>
-        <Text
-          color="whiteAlpha.600"
-          fontSize={{ base: 'sm', sm: 'base' }}
-          mb={{ base: 4, sm: 5 }}
-          maxW="3xl"
-        >
-          This supplement stack is optimized for longevity, cellular health, and recovery. All dosages are evidence-based and tailored to your goals.
-        </Text>
-        <Grid templateColumns="repeat(2, 1fr)" gap={{ base: 3, sm: 4 }}>
-          <Button
-            aria-label="Learn more about protocol"
-            bg="accent.500/20"
-            borderWidth="1px"
-            borderColor="accent.500"
-            color="accent.300"
-            py={{ base: 2.5, sm: 3 }}
-            borderRadius="xl"
-            fontSize={{ base: 'sm', sm: 'base' }}
-            fontWeight="semibold"
-            _hover={{
-              bg: 'accent.500/30',
-            }}
-            transition="all 0.3s"
-            _focus={{
-              ring: 2,
-              ringColor: 'accent.400',
-              ringOffset: 2,
-              ringOffsetColor: 'primary.900',
-            }}
-          >
-            Learn More
-          </Button>
-          <Button
-            aria-label="Customize supplement stack"
-            bg="accent.500/20"
-            borderWidth="1px"
-            borderColor="accent.500"
-            color="accent.300"
-            py={{ base: 2.5, sm: 3 }}
-            borderRadius="xl"
-            fontSize={{ base: 'sm', sm: 'base' }}
-            fontWeight="semibold"
-            _hover={{
-              bg: 'accent.500/30',
-            }}
-            transition="all 0.3s"
-            _focus={{
-              ring: 2,
-              ringColor: 'accent.400',
-              ringOffset: 2,
-              ringOffsetColor: 'primary.900',
-            }}
-          >
-            Customize Stack
-          </Button>
-        </Grid>
-      </Box>
-    </Flex>
-  );
-}
-
-function SupplementCard({
-  supplement,
-  completed,
-  onToggle,
-  delay = 0,
-}: {
-  supplement: { name: string; dose: string; time: string };
-  completed: boolean;
-  onToggle: () => void;
-  delay?: number;
-}) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay, duration: 0.3 }}
-    >
-      <Button
-        onClick={onToggle}
-        aria-label={`Mark ${supplement.name} as ${completed ? 'not taken' : 'taken'}`}
-        aria-pressed={completed}
-        w="full"
-        p={{ base: 3.5, sm: 4 }}
+      {/* View Toggle */}
+      <Flex
+        bg="primary.700/50"
         borderRadius="xl"
-        borderWidth="1px"
-        transition="all 0.3s"
-        bg={completed ? 'accent.500/10' : 'primary.600/50'}
-        borderColor={completed ? 'accent.500' : 'primary.400'}
-        h="auto"
-        _hover={{
-          boxShadow: 'lg',
-          bg: completed ? 'accent.500/10' : 'primary.600/60',
-          borderColor: completed ? 'accent.500' : 'primary.400',
-        }}
-        _focus={{
-          ring: 2,
-          ringColor: 'accent.400',
-          ringOffset: 2,
-          ringOffsetColor: 'primary.900',
-        }}
+        p={1}
+        w="fit-content"
       >
-        <Flex align="center" gap={{ base: 3, sm: 3.5 }} w="full">
-          <Flex
-            w={{ base: 7, sm: 8 }}
-            h={{ base: 7, sm: 8 }}
-            borderRadius="full"
-            borderWidth="2px"
-            align="center"
-            justify="center"
-            transition="all 0.3s"
-            flexShrink={0}
-            bg={completed ? 'accent.500' : 'transparent'}
-            borderColor={completed ? 'accent.500' : 'whiteAlpha.300'}
-            _hover={{
-              borderColor: completed ? 'accent.500' : 'whiteAlpha.500',
-            }}
-          >
-            {completed && (
-              <Box
-                as={Check}
-                w={{ base: 4, sm: 5 }}
-                h={{ base: 4, sm: 5 }}
-                color="white"
-              />
-            )}
-          </Flex>
-          <Box flex={1} textAlign="left" minW={0}>
-            <Text
-              fontWeight="medium"
-              fontSize={{ base: 'sm', sm: 'base' }}
-              truncate
-              color={completed ? 'whiteAlpha.600' : 'white'}
-              textDecoration={completed ? 'line-through' : 'none'}
-            >
-              {supplement.name}
+        <Button
+          onClick={() => setViewMode('supplements')}
+          px={4}
+          py={2}
+          borderRadius="lg"
+          fontSize="sm"
+          fontWeight="medium"
+          bg={viewMode === 'supplements' ? 'accent.500/20' : 'transparent'}
+          color={viewMode === 'supplements' ? 'accent.300' : 'whiteAlpha.600'}
+          _hover={{ color: 'white' }}
+        >
+          <Box as={Beaker} w={4} h={4} mr={2} />
+          Supplements
+        </Button>
+        <Button
+          onClick={() => setViewMode('stacks')}
+          px={4}
+          py={2}
+          borderRadius="lg"
+          fontSize="sm"
+          fontWeight="medium"
+          bg={viewMode === 'stacks' ? 'accent.500/20' : 'transparent'}
+          color={viewMode === 'stacks' ? 'accent.300' : 'whiteAlpha.600'}
+          _hover={{ color: 'white' }}
+        >
+          <Box as={Layers} w={4} h={4} mr={2} />
+          Stacks
+        </Button>
+      </Flex>
+
+      {viewMode === 'supplements' ? (
+        <>
+          {/* Filters */}
+          <Box>
+            <Text color="whiteAlpha.600" fontSize="sm" mb={2} fontWeight="medium">
+              Category
             </Text>
-            <Text fontSize={{ base: 'xs', sm: 'sm' }} color="whiteAlpha.400">
-              {supplement.dose}
+            <Flex
+              gap={2}
+              overflowX="auto"
+              pb={2}
+              mb={4}
+              css={{
+                '&::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none'
+              }}
+            >
+              {categories.map((category) => {
+                const meta = category !== 'all' ? getCategoryMeta(category) : null;
+                return (
+                  <Button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    aria-pressed={activeCategory === category}
+                    px={3}
+                    py={2}
+                    borderRadius="full"
+                    fontSize="xs"
+                    whiteSpace="nowrap"
+                    bg={activeCategory === category ? 'accent.500/20' : 'primary.600/50'}
+                    borderWidth="1px"
+                    borderColor={activeCategory === category ? 'accent.500' : 'primary.400'}
+                    color={activeCategory === category ? 'accent.300' : 'whiteAlpha.600'}
+                    _hover={{ bg: activeCategory === category ? 'accent.500/30' : 'primary.600/70' }}
+                    _focus={{ ring: 2, ringColor: 'accent.400' }}
+                  >
+                    {category === 'all' ? 'All' : meta?.name}
+                  </Button>
+                );
+              })}
+            </Flex>
+
+            <Text color="whiteAlpha.600" fontSize="sm" mb={2} fontWeight="medium">
+              Tier
+            </Text>
+            <Flex gap={2} flexWrap="wrap">
+              {tiers.map((tier) => (
+                <Button
+                  key={tier}
+                  onClick={() => setActiveTier(tier)}
+                  aria-pressed={activeTier === tier}
+                  px={3}
+                  py={1.5}
+                  borderRadius="full"
+                  fontSize="xs"
+                  textTransform="capitalize"
+                  bg={activeTier === tier ? 'accent.500/20' : 'transparent'}
+                  borderWidth="1px"
+                  borderColor={activeTier === tier ? 'accent.500' : 'primary.400'}
+                  color={activeTier === tier ? 'accent.300' : 'whiteAlpha.600'}
+                  _hover={{ bg: activeTier === tier ? 'accent.500/30' : 'primary.600/50' }}
+                  _focus={{ ring: 2, ringColor: 'accent.400' }}
+                >
+                  {tier === 'all' ? 'All Tiers' : tier}
+                </Button>
+              ))}
+            </Flex>
+          </Box>
+
+          {/* Results Count */}
+          <Text color="whiteAlpha.500" fontSize="sm">
+            Showing {filteredSupplements.length} supplement{filteredSupplements.length !== 1 ? 's' : ''}
+          </Text>
+
+          {/* Supplements Grid */}
+          <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={4}>
+            {filteredSupplements.map((supplement, index) => {
+              const isTaken = takenSupplements.includes(supplement.id);
+              const isExpanded = selectedSupplement === supplement.id;
+              const categoryMeta = getCategoryMeta(supplement.category);
+
+              return (
+                <motion.div
+                  key={supplement.id}
+                  initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.03, duration: 0.3 }}
+                >
+                  <Box
+                    bg={isTaken ? 'accent.500/10' : 'primary.600/50'}
+                    borderWidth="1px"
+                    borderColor={isTaken ? 'accent.500/30' : 'primary.400'}
+                    borderRadius="2xl"
+                    overflow="hidden"
+                    transition="all 0.3s"
+                    _hover={{ borderColor: isTaken ? 'accent.500/50' : 'primary.300' }}
+                  >
+                    {/* Header */}
+                    <Button
+                      onClick={() => setSelectedSupplement(isExpanded ? null : supplement.id)}
+                      aria-expanded={isExpanded}
+                      w="full"
+                      p={{ base: 4, sm: 5 }}
+                      textAlign="left"
+                      bg="transparent"
+                      _hover={{ bg: 'whiteAlpha.50' }}
+                      _focus={{ ring: 2, ringColor: 'accent.400' }}
+                      borderRadius={0}
+                      h="auto"
+                    >
+                      <Flex align="flex-start" justify="space-between" w="full">
+                        <Flex align="flex-start" gap={3} flex={1} pr={4}>
+                          <Flex
+                            w={12}
+                            h={12}
+                            bg="accent.500/20"
+                            borderRadius="lg"
+                            align="center"
+                            justify="center"
+                            flexShrink={0}
+                            fontSize="xl"
+                          >
+                            {supplement.icon}
+                          </Flex>
+                          <Box flex={1}>
+                            <Flex align="center" gap={2} mb={1} flexWrap="wrap">
+                              <Heading as="h3" size="sm" color={isTaken ? 'whiteAlpha.600' : 'white'}>
+                                {supplement.name}
+                              </Heading>
+                              {isTaken && <Box as={Check} w={4} h={4} color="accent.400" />}
+                            </Flex>
+                            <Flex gap={2} mb={2} flexWrap="wrap">
+                              <Badge
+                                px={2}
+                                py={0.5}
+                                bg={`${getTierColor(supplement.tier)}.500/20`}
+                                color={`${getTierColor(supplement.tier)}.300`}
+                                borderRadius="md"
+                                fontSize="xs"
+                                textTransform="capitalize"
+                              >
+                                {supplement.tier}
+                              </Badge>
+                              <Badge
+                                px={2}
+                                py={0.5}
+                                bg={`${getEvidenceColor(supplement.evidenceLevel)}.500/20`}
+                                color={`${getEvidenceColor(supplement.evidenceLevel)}.300`}
+                                borderRadius="md"
+                                fontSize="xs"
+                              >
+                                {supplement.evidenceLevel} evidence
+                              </Badge>
+                            </Flex>
+                            <Text color="whiteAlpha.600" fontSize="sm" lineClamp={2}>
+                              {supplement.description}
+                            </Text>
+                            <Flex align="center" gap={3} mt={2}>
+                              <Flex align="center" gap={1}>
+                                <Box as={DollarSign} w={3.5} h={3.5} color="whiteAlpha.400" />
+                                <Text color="whiteAlpha.400" fontSize="xs">
+                                  {supplement.monthlyBudget}
+                                </Text>
+                              </Flex>
+                            </Flex>
+                          </Box>
+                        </Flex>
+                        <Box
+                          as={ChevronDown}
+                          w={5}
+                          h={5}
+                          color="whiteAlpha.400"
+                          transition="transform 0.3s"
+                          transform={isExpanded ? 'rotate(180deg)' : undefined}
+                          flexShrink={0}
+                        />
+                      </Flex>
+                    </Button>
+
+                    {/* Expanded Content */}
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                      >
+                        <Box
+                          px={{ base: 4, sm: 5 }}
+                          pb={{ base: 4, sm: 5 }}
+                          borderTop="1px solid"
+                          borderColor="primary.400/30"
+                          pt={{ base: 4, sm: 5 }}
+                        >
+                          {/* Dosage */}
+                          <Box mb={5}>
+                            <Heading as="h4" size="xs" color="white" mb={2}>
+                              Dosage
+                            </Heading>
+                            <Box bg="primary.700/50" borderRadius="lg" p={3}>
+                              <Text color="accent.300" fontWeight="semibold" fontSize="lg">
+                                {supplement.dosage.amount}
+                              </Text>
+                              <Text color="whiteAlpha.600" fontSize="sm">
+                                {supplement.dosage.frequency} • Best taken {supplement.dosage.timing.replace('-', ' ')}
+                              </Text>
+                              {supplement.dosage.notes && (
+                                <Text color="whiteAlpha.500" fontSize="xs" mt={2} fontStyle="italic">
+                                  {supplement.dosage.notes}
+                                </Text>
+                              )}
+                            </Box>
+                          </Box>
+
+                          {/* Benefits */}
+                          <Box mb={5}>
+                            <Heading as="h4" size="xs" color="white" mb={2}>
+                              Benefits
+                            </Heading>
+                            <Flex direction="column" gap={1.5}>
+                              {supplement.benefits.map((benefit, idx) => (
+                                <Flex key={idx} align="center" gap={2}>
+                                  <Box as={Check} w={4} h={4} color="accent.400" flexShrink={0} />
+                                  <Text color="whiteAlpha.700" fontSize="sm">{benefit}</Text>
+                                </Flex>
+                              ))}
+                            </Flex>
+                          </Box>
+
+                          {/* Mechanisms */}
+                          <Box mb={5}>
+                            <Heading as="h4" size="xs" color="white" mb={2}>
+                              How It Works
+                            </Heading>
+                            <Flex direction="column" gap={1.5}>
+                              {supplement.mechanisms.map((mechanism, idx) => (
+                                <Flex key={idx} align="flex-start" gap={2}>
+                                  <Box as={Info} w={4} h={4} color="blue.400" mt={0.5} flexShrink={0} />
+                                  <Text color="whiteAlpha.600" fontSize="sm">{mechanism}</Text>
+                                </Flex>
+                              ))}
+                            </Flex>
+                          </Box>
+
+                          {/* Interactions & Side Effects */}
+                          {(supplement.interactions?.length || supplement.sideEffects?.length) && (
+                            <Box
+                              bg="yellow.900/30"
+                              borderRadius="lg"
+                              p={4}
+                              mb={5}
+                              borderLeft="3px solid"
+                              borderColor="yellow.500"
+                            >
+                              {supplement.interactions && supplement.interactions.length > 0 && (
+                                <Box mb={supplement.sideEffects?.length ? 3 : 0}>
+                                  <Text color="yellow.300" fontSize="sm" fontWeight="medium" mb={1}>
+                                    ⚠️ Interactions
+                                  </Text>
+                                  <Text color="yellow.200" fontSize="sm">
+                                    {supplement.interactions.join(', ')}
+                                  </Text>
+                                </Box>
+                              )}
+                              {supplement.sideEffects && supplement.sideEffects.length > 0 && (
+                                <Box>
+                                  <Text color="yellow.300" fontSize="sm" fontWeight="medium" mb={1}>
+                                    Side Effects
+                                  </Text>
+                                  <Text color="yellow.200" fontSize="sm">
+                                    {supplement.sideEffects.join(', ')}
+                                  </Text>
+                                </Box>
+                              )}
+                            </Box>
+                          )}
+
+                          {/* Contraindications */}
+                          {supplement.contraindications && supplement.contraindications.length > 0 && (
+                            <Box
+                              bg="red.900/30"
+                              borderRadius="lg"
+                              p={4}
+                              mb={5}
+                              borderLeft="3px solid"
+                              borderColor="red.500"
+                            >
+                              <Text color="red.300" fontSize="sm" fontWeight="medium" mb={1}>
+                                🚫 Contraindications
+                              </Text>
+                              <Text color="red.200" fontSize="sm">
+                                {supplement.contraindications.join(', ')}
+                              </Text>
+                            </Box>
+                          )}
+
+                          {/* Stacks Well With */}
+                          {supplement.stacksWith && supplement.stacksWith.length > 0 && (
+                            <Box mb={5}>
+                              <Heading as="h4" size="xs" color="white" mb={2}>
+                                Stacks Well With
+                              </Heading>
+                              <Flex gap={2} flexWrap="wrap">
+                                {supplement.stacksWith.map((stackId) => {
+                                  const stackSupplement = supplements.find(s => s.id === stackId);
+                                  return stackSupplement ? (
+                                    <Badge
+                                      key={stackId}
+                                      px={3}
+                                      py={1}
+                                      bg="accent.500/20"
+                                      color="accent.300"
+                                      borderRadius="full"
+                                      fontSize="xs"
+                                    >
+                                      {stackSupplement.icon} {stackSupplement.name}
+                                    </Badge>
+                                  ) : null;
+                                })}
+                              </Flex>
+                            </Box>
+                          )}
+
+                          {/* Action Button */}
+                          <Button
+                            onClick={() => toggleSupplement(supplement.id)}
+                            w="full"
+                            bgGradient={isTaken ? undefined : 'linear(to-r, accent.500, accent.600)'}
+                            bg={isTaken ? 'accent.500/20' : undefined}
+                            borderWidth={isTaken ? '1px' : 0}
+                            borderColor="accent.500"
+                            color={isTaken ? 'accent.300' : 'white'}
+                            fontWeight="semibold"
+                            py={3}
+                            borderRadius="xl"
+                            boxShadow={isTaken ? 'none' : 'lg'}
+                            _hover={{
+                              bgGradient: isTaken ? undefined : 'linear(to-r, accent.600, accent.700)',
+                              bg: isTaken ? 'accent.500/30' : undefined
+                            }}
+                            _focus={{ ring: 2, ringColor: 'accent.400' }}
+                          >
+                            <Box as={isTaken ? Check : Clock} w={5} h={5} mr={2} />
+                            {isTaken ? 'Taken Today' : 'Mark as Taken'}
+                          </Button>
+                        </Box>
+                      </motion.div>
+                    )}
+                  </Box>
+                </motion.div>
+              );
+            })}
+          </Grid>
+        </>
+      ) : (
+        /* Stacks View */
+        <Grid templateColumns={{ base: '1fr', lg: 'repeat(2, 1fr)' }} gap={4}>
+          {supplementStacks.map((stack, index) => (
+            <motion.div
+              key={stack.id}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.05 }}
+            >
+              <Box
+                bg="primary.600/50"
+                borderWidth="1px"
+                borderColor="primary.400"
+                borderRadius="2xl"
+                p={{ base: 5, sm: 6 }}
+                _hover={{ borderColor: 'primary.300' }}
+                transition="all 0.3s"
+              >
+                <Flex align="center" gap={3} mb={3}>
+                  <Flex
+                    w={12}
+                    h={12}
+                    bg="accent.500/20"
+                    borderRadius="lg"
+                    align="center"
+                    justify="center"
+                  >
+                    <Box as={Package} w={6} h={6} color="accent.400" />
+                  </Flex>
+                  <Box flex={1}>
+                    <Heading as="h3" size="md" color="white">
+                      {stack.name}
+                    </Heading>
+                    <Flex gap={2} mt={1}>
+                      <Badge
+                        px={2}
+                        py={0.5}
+                        bg={`${getTierColor(stack.tier)}.500/20`}
+                        color={`${getTierColor(stack.tier)}.300`}
+                        borderRadius="md"
+                        fontSize="xs"
+                        textTransform="capitalize"
+                      >
+                        {stack.tier}
+                      </Badge>
+                      <Badge
+                        px={2}
+                        py={0.5}
+                        bg="green.500/20"
+                        color="green.300"
+                        borderRadius="md"
+                        fontSize="xs"
+                      >
+                        {stack.monthlyBudget}
+                      </Badge>
+                    </Flex>
+                  </Box>
+                </Flex>
+
+                <Text color="whiteAlpha.600" fontSize="sm" mb={4}>
+                  {stack.description}
+                </Text>
+
+                <Box>
+                  <Text color="whiteAlpha.500" fontSize="xs" fontWeight="medium" mb={2}>
+                    INCLUDES
+                  </Text>
+                  <Flex direction="column" gap={2}>
+                    {stack.supplements.map((item) => {
+                      const supp = supplements.find(s => s.id === item.supplementId);
+                      if (!supp) return null;
+                      return (
+                        <Flex
+                          key={item.supplementId}
+                          align="center"
+                          justify="space-between"
+                          bg="primary.700/50"
+                          borderRadius="lg"
+                          px={3}
+                          py={2}
+                        >
+                          <Flex align="center" gap={2}>
+                            <Text>{supp.icon}</Text>
+                            <Text color="white" fontSize="sm" fontWeight="medium">
+                              {supp.name}
+                            </Text>
+                          </Flex>
+                          <Flex align="center" gap={2}>
+                            <Text color="whiteAlpha.500" fontSize="xs">
+                              {item.timing}
+                            </Text>
+                            <Badge
+                              px={2}
+                              py={0.5}
+                              bg={item.priority === 'required' ? 'accent.500/20' : item.priority === 'recommended' ? 'blue.500/20' : 'whiteAlpha.100'}
+                              color={item.priority === 'required' ? 'accent.300' : item.priority === 'recommended' ? 'blue.300' : 'whiteAlpha.500'}
+                              borderRadius="md"
+                              fontSize="10px"
+                              textTransform="capitalize"
+                            >
+                              {item.priority}
+                            </Badge>
+                          </Flex>
+                        </Flex>
+                      );
+                    })}
+                  </Flex>
+                </Box>
+              </Box>
+            </motion.div>
+          ))}
+        </Grid>
+      )}
+
+      {/* Disclaimer */}
+      <Box
+        bg="yellow.900/20"
+        borderWidth="1px"
+        borderColor="yellow.500/30"
+        borderRadius="xl"
+        p={4}
+      >
+        <Flex align="flex-start" gap={3}>
+          <Box as={AlertTriangle} w={5} h={5} color="yellow.400" flexShrink={0} mt={0.5} />
+          <Box>
+            <Text color="yellow.300" fontSize="sm" fontWeight="medium" mb={1}>
+              Important Disclaimer
+            </Text>
+            <Text color="yellow.200/70" fontSize="xs">
+              This information is for educational purposes only and is not medical advice. 
+              Consult a healthcare provider before starting any supplement regimen, especially 
+              if you have health conditions or take medications.
             </Text>
           </Box>
         </Flex>
-      </Button>
-    </motion.div>
+      </Box>
+    </Flex>
   );
 }

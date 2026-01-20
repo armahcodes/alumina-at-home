@@ -28,7 +28,7 @@ interface Achievement {
   unlockedAt?: string;
 }
 
-interface AppState {
+export interface AppState {
   // User & Auth
   isAuthenticated: boolean;
   hasCompletedOnboarding: boolean;
@@ -42,6 +42,7 @@ interface AppState {
 
   // Daily Tracking
   completedTasks: string[];
+  supplements: string[]; // Track taken supplements
   dailyMetrics: DailyMetrics[];
 
   // Actions
@@ -50,6 +51,7 @@ interface AppState {
   completeOnboarding: (profile: UserProfile) => void;
   updateUser: (profile: Partial<UserProfile>) => void;
   toggleTask: (taskId: string) => void;
+  toggleSupplement: (supplementId: string) => void;
   addDailyMetric: (metric: DailyMetrics) => void;
   unlockAchievement: (achievementId: string) => void;
   incrementStreak: () => void;
@@ -69,6 +71,7 @@ export const useStore = create<AppState>()(
       totalPoints: 0,
       achievements: [],
       completedTasks: [],
+      supplements: [],
       dailyMetrics: [],
 
       // Actions
@@ -119,6 +122,20 @@ export const useStore = create<AppState>()(
         }
       },
 
+      toggleSupplement: (supplementId: string) => {
+        const current = get().supplements;
+        const newSupplements = current.includes(supplementId)
+          ? current.filter(s => s !== supplementId)
+          : [...current, supplementId];
+
+        set({ supplements: newSupplements });
+
+        // Award points for taking supplements
+        if (newSupplements.length > current.length) {
+          get().addPoints(5);
+        }
+      },
+
       addDailyMetric: (metric: DailyMetrics) => {
         set({
           dailyMetrics: [...get().dailyMetrics, metric]
@@ -163,7 +180,7 @@ export const useStore = create<AppState>()(
       },
 
       resetDay: () => {
-        set({ completedTasks: [] });
+        set({ completedTasks: [], supplements: [] });
       }
     }),
     {

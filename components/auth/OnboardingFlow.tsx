@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useStore } from '@/lib/store';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import {
   Box,
   Flex,
@@ -17,6 +17,7 @@ import {
 export default function OnboardingFlow() {
   const [step, setStep] = useState(1);
   const completeOnboarding = useStore((state) => state.completeOnboarding);
+  const shouldReduceMotion = useReducedMotion();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -107,9 +108,9 @@ export default function OnboardingFlow() {
                 background: 'linear-gradient(to right, var(--chakra-colors-accent-400), var(--chakra-colors-accent-500))',
                 width: `${(step / totalSteps) * 100}%`
               }}
-              initial={{ width: 0 }}
+              initial={shouldReduceMotion ? false : { width: 0 }}
               animate={{ width: `${(step / totalSteps) * 100}%` }}
-              transition={{ duration: 0.3 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : { duration: 0.3 }}
             />
           </Box>
         </Box>
@@ -119,9 +120,10 @@ export default function OnboardingFlow() {
           {step === 1 && (
             <motion.div
               key="step1"
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : undefined}
             >
               <Box
                 bg="primary.600/50"
@@ -163,9 +165,10 @@ export default function OnboardingFlow() {
           {step === 2 && (
             <motion.div
               key="step2"
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : undefined}
             >
               <Box
                 bg="primary.600/50"
@@ -264,9 +267,10 @@ export default function OnboardingFlow() {
           {step === 3 && (
             <motion.div
               key="step3"
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : undefined}
             >
               <Box
                 bg="primary.600/50"
@@ -342,9 +346,10 @@ export default function OnboardingFlow() {
           {step === 4 && (
             <motion.div
               key="step4"
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : undefined}
             >
               <Box
                 bg="primary.600/50"
@@ -399,9 +404,10 @@ export default function OnboardingFlow() {
           {step === 5 && (
             <motion.div
               key="step5"
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? false : { opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
+              transition={shouldReduceMotion ? { duration: 0.1 } : undefined}
             >
               <Box
                 bg="primary.600/50"
