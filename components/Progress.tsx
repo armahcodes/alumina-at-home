@@ -322,7 +322,7 @@ export default function Progress() {
             textAlign="center"
           >
             <Text color="accent.300" fontSize="lg" fontWeight="semibold" mb={1}>
-              🎉 You&apos;ve reversed 7 years!
+              You&apos;ve reversed 7 years!
             </Text>
             <Text color="whiteAlpha.600" fontSize="sm">
               Based on biomarker analysis from your last bloodwork

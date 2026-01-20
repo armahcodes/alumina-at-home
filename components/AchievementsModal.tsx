@@ -190,7 +190,7 @@ export default function AchievementsModal({ isOpen, onClose }: AchievementsModal
                 {/* Header */}
                 <Box p={{ base: 4, sm: 6 }} borderBottomWidth="1px" borderColor="primary.500">
                   <Heading as="h2" id="achievements-modal-title" size={{ base: "xl", sm: "2xl" }} color="white" mb={2}>
-                    🏆 Achievements
+                    Achievements
                   </Heading>
                   <Flex align="center" gap={{ base: 3, sm: 4 }} fontSize={{ base: "xs", sm: "sm" }}>
                     <Flex align="center" gap={2}>

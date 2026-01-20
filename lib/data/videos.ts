@@ -458,37 +458,37 @@ export const videoCategories = {
   'protocol-guides': {
     name: 'Protocol Guides',
     description: 'In-depth guides to longevity protocols',
-    icon: '📚'
+    icon: 'BookOpen'
   },
   'science-deep-dives': {
     name: 'Science Deep Dives',
     description: 'Detailed explanations of the science behind longevity',
-    icon: '🔬'
+    icon: 'FlaskConical'
   },
   'breathwork-sessions': {
     name: 'Breathwork Sessions',
     description: 'Guided breathing exercises and practices',
-    icon: '🌬️'
+    icon: 'Wind'
   },
   'movement-routines': {
     name: 'Movement Routines',
     description: 'Follow-along exercise and mobility content',
-    icon: '🏃'
+    icon: 'Dumbbell'
   },
   'expert-interviews': {
     name: 'Expert Interviews',
     description: 'Conversations with leading researchers and practitioners',
-    icon: '🎙️'
+    icon: 'Mic'
   },
   'quick-tips': {
     name: 'Quick Tips',
     description: 'Short, actionable tips you can apply today',
-    icon: '💡'
+    icon: 'Lightbulb'
   },
   meditation: {
     name: 'Meditation',
     description: 'Guided meditation and mindfulness practices',
-    icon: '🧘'
+    icon: 'Brain'
   }
 };
 

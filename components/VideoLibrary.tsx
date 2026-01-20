@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { videos, videoCategories, videoCollections, type Video } from '@/lib/data/videos';
 import FocusTrap from './FocusTrap';
@@ -16,23 +17,64 @@ import {
 } from '@chakra-ui/react';
 import { 
   Play, Clock, User, X, ChevronRight, Lock, 
-  BookOpen, Mic, Dumbbell, Lightbulb, Brain
+  BookOpen, Mic, Dumbbell, Lightbulb, Brain, Wind, FlaskConical,
+  type LucideIcon
 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const ReactPlayer = dynamic(() => import('react-player'), { ssr: false });
 
-// Category icons mapping for future use
-const _categoryIcons: Record<string, typeof Play> = {
+// Category icons mapping
+const categoryIcons: Record<string, LucideIcon> = {
   'protocol-guides': BookOpen,
-  'science-deep-dives': Brain,
-  'breathwork-sessions': BookOpen,
+  'science-deep-dives': FlaskConical,
+  'breathwork-sessions': Wind,
   'movement-routines': Dumbbell,
   'expert-interviews': Mic,
   'quick-tips': Lightbulb,
   'meditation': Brain,
 };
-void _categoryIcons; // Suppress unused warning
+
+// Unsplash thumbnail images for video categories
+const categoryThumbnails: Record<string, string> = {
+  'protocol-guides': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
+  'science-deep-dives': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
+  'breathwork-sessions': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80',
+  'movement-routines': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
+  'expert-interviews': 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80',
+  'quick-tips': 'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=800&q=80',
+  'meditation': 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800&q=80',
+};
+
+// Additional specific thumbnails for variety
+const videoThumbnails: Record<string, string> = {
+  'cold-exposure': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+  'circadian': 'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&q=80',
+  'sauna': 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80',
+  'fasting': 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80',
+  'sleep': 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&q=80',
+  'breathwork': 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=800&q=80',
+  'mobility': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80',
+  'meditation': 'https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?w=800&q=80',
+  'aging': 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80',
+  'nad': 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80',
+  'autophagy': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
+  'mitochondria': 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80',
+  'telomeres': 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80',
+  'interview': 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80',
+};
+
+function getVideoThumbnail(video: Video): string {
+  // Check for specific video keywords
+  const titleLower = video.title.toLowerCase();
+  for (const [key, url] of Object.entries(videoThumbnails)) {
+    if (titleLower.includes(key)) {
+      return url;
+    }
+  }
+  // Fall back to category thumbnail
+  return categoryThumbnails[video.category] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80';
+}
 
 export default function VideoLibrary() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
@@ -65,8 +107,12 @@ export default function VideoLibrary() {
   const getCategoryMeta = (category: string) => {
     return videoCategories[category as keyof typeof videoCategories] || {
       name: category,
-      icon: '📹'
+      icon: 'Play'
     };
+  };
+
+  const getCategoryIcon = (category: string): LucideIcon => {
+    return categoryIcons[category] || Play;
   };
 
   return (
@@ -85,7 +131,7 @@ export default function VideoLibrary() {
             position="fixed"
             inset={0}
             zIndex={50}
-            bg="primary.900/98"
+            bg="rgba(7, 18, 16, 0.98)"
             backdropFilter="blur(20px)"
             display="flex"
             flexDir="column"
@@ -100,7 +146,7 @@ export default function VideoLibrary() {
               px={{ base: 4, sm: 6 }}
               py={4}
               borderBottom="1px solid"
-              borderColor="primary.400/30"
+              borderColor="whiteAlpha.100"
             >
               <Box>
                 <Heading as="h2" id="video-player-title" size={{ base: 'sm', md: 'md' }} color="white" lineClamp={1}>
@@ -123,9 +169,9 @@ export default function VideoLibrary() {
                 w={10}
                 h={10}
                 borderRadius="full"
-                bg="primary.700/50"
+                bg="whiteAlpha.100"
                 color="whiteAlpha.700"
-                _hover={{ bg: 'primary.700', color: 'white' }}
+                _hover={{ bg: 'whiteAlpha.200', color: 'white' }}
                 _focus={{ ring: 2, ringColor: 'accent.400' }}
               >
                 <Box as={X} w={5} h={5} />
@@ -214,7 +260,7 @@ export default function VideoLibrary() {
               px={{ base: 4, sm: 6 }}
               py={4}
               borderTop="1px solid"
-              borderColor="primary.400/30"
+              borderColor="whiteAlpha.100"
               maxW="1200px"
               mx="auto"
               w="full"
@@ -228,7 +274,7 @@ export default function VideoLibrary() {
                     key={topic}
                     px={2}
                     py={1}
-                    bg="primary.700/50"
+                    bg="whiteAlpha.100"
                     color="whiteAlpha.600"
                     borderRadius="md"
                     fontSize="xs"
@@ -257,7 +303,12 @@ export default function VideoLibrary() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={shouldReduceMotion ? { duration: 0.1 } : { delay: index * 0.1 }}
                 >
-                  <VideoCard video={video} onClick={() => setSelectedVideo(video)} formatDuration={formatDuration} />
+                  <VideoCard 
+                    video={video} 
+                    onClick={() => setSelectedVideo(video)} 
+                    formatDuration={formatDuration}
+                    getCategoryIcon={getCategoryIcon}
+                  />
                 </motion.div>
               ))}
             </Grid>
@@ -325,6 +376,7 @@ export default function VideoLibrary() {
               >
                 {categories.map((category) => {
                   const meta = category !== 'all' ? getCategoryMeta(category) : null;
+                  const IconComponent = category !== 'all' ? getCategoryIcon(category) : null;
                   return (
                     <Button
                       key={category}
@@ -341,8 +393,9 @@ export default function VideoLibrary() {
                       color={activeCategory === category ? 'accent.300' : 'whiteAlpha.600'}
                       _hover={{ bg: activeCategory === category ? 'accent.500/30' : 'primary.600/70' }}
                       _focus={{ ring: 2, ringColor: 'accent.400' }}
+                      gap={1.5}
                     >
-                      {meta && <Text mr={1.5}>{meta.icon}</Text>}
+                      {IconComponent && <Box as={IconComponent} w={3.5} h={3.5} />}
                       {category === 'all' ? 'All' : meta?.name}
                     </Button>
                   );
@@ -394,6 +447,7 @@ export default function VideoLibrary() {
                     video={video}
                     onClick={() => setSelectedVideo(video)}
                     formatDuration={formatDuration}
+                    getCategoryIcon={getCategoryIcon}
                   />
                 </motion.div>
               ))}
@@ -484,11 +538,12 @@ interface VideoCardProps {
   video: Video;
   onClick: () => void;
   formatDuration: (seconds: number) => string;
+  getCategoryIcon: (category: string) => LucideIcon;
 }
 
-function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
+function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCardProps) {
   const getCategoryMeta = (category: string) => {
-    return videoCategories[category as keyof typeof videoCategories] || { name: category, icon: '📹' };
+    return videoCategories[category as keyof typeof videoCategories] || { name: category, icon: 'Play' };
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -499,6 +554,9 @@ function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
       default: return 'gray';
     }
   };
+
+  const IconComponent = getCategoryIcon(video.category);
+  const thumbnailUrl = getVideoThumbnail(video);
 
   return (
     <Button
@@ -511,20 +569,29 @@ function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
       borderColor="primary.400"
       borderRadius="xl"
       overflow="hidden"
-      _hover={{ borderColor: 'primary.300', transform: 'translateY(-2px)' }}
+      _hover={{ borderColor: 'accent.500/50', transform: 'translateY(-2px)', boxShadow: 'lg' }}
       _focus={{ ring: 2, ringColor: 'accent.400' }}
       transition="all 0.3s"
       textAlign="left"
       display="block"
     >
       {/* Thumbnail */}
-      <Box position="relative" aspectRatio={16/9} bg="primary.800">
+      <Box position="relative" aspectRatio={16/9} bg="primary.800" overflow="hidden">
+        <Image
+          src={thumbnailUrl}
+          alt={video.title}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          style={{ objectFit: 'cover' }}
+        />
+        
+        {/* Play overlay */}
         <Flex
           position="absolute"
           inset={0}
           align="center"
           justify="center"
-          bg="blackAlpha.600"
+          bg="blackAlpha.400"
           opacity={0}
           _groupHover={{ opacity: 1 }}
           transition="opacity 0.3s"
@@ -536,6 +603,7 @@ function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
             borderRadius="full"
             align="center"
             justify="center"
+            boxShadow="0 4px 20px rgba(239, 194, 179, 0.4)"
           >
             <Box as={Play} w={6} h={6} color="white" ml={1} />
           </Flex>
@@ -552,6 +620,7 @@ function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
           py={0.5}
           borderRadius="md"
           fontSize="xs"
+          backdropFilter="blur(4px)"
         >
           {formatDuration(video.duration)}
         </Badge>
@@ -562,7 +631,7 @@ function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
             position="absolute"
             top={2}
             left={2}
-            bg="accent.500"
+            bgGradient="linear(to-r, accent.500, accent.600)"
             color="white"
             px={2}
             py={0.5}
@@ -588,7 +657,10 @@ function VideoCard({ video, onClick, formatDuration }: VideoCardProps) {
             borderRadius="md"
             fontSize="10px"
           >
-            {getCategoryMeta(video.category).name}
+            <Flex align="center" gap={1}>
+              <Box as={IconComponent} w={3} h={3} />
+              {getCategoryMeta(video.category).name}
+            </Flex>
           </Badge>
           <Badge
             px={2}

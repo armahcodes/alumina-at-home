@@ -15,6 +15,7 @@ import {
   Badge,
   Spinner
 } from '@chakra-ui/react';
+import { Flame, Star, Trophy, CheckCircle, type LucideIcon } from 'lucide-react';
 
 export default function DashboardWithQuery() {
   const { userId } = useStoreDb();
@@ -168,10 +169,10 @@ export default function DashboardWithQuery() {
         {/* Quick Stats */}
         <Grid templateColumns={{ base: '1fr', sm: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' }} gap={{ base: 4, sm: 5 }}>
           {[
-            { label: 'Current Streak', value: `${stats?.currentStreak || 0} days`, icon: '🔥', color: 'orange.400' },
-            { label: 'Total Points', value: (stats?.totalPoints || 0).toLocaleString(), icon: '⭐', color: 'yellow.400' },
-            { label: 'Level', value: `${stats?.level || 1}`, icon: '🏆', color: 'accent.400' },
-            { label: 'Completed', value: `${completedTaskIds.length}/${todayProtocols.length}`, icon: '✅', color: 'green.400' },
+            { label: 'Current Streak', value: `${stats?.currentStreak || 0} days`, icon: Flame, color: 'orange.400' },
+            { label: 'Total Points', value: (stats?.totalPoints || 0).toLocaleString(), icon: Star, color: 'yellow.400' },
+            { label: 'Level', value: `${stats?.level || 1}`, icon: Trophy, color: 'accent.400' },
+            { label: 'Completed', value: `${completedTaskIds.length}/${todayProtocols.length}`, icon: CheckCircle, color: 'green.400' },
           ].map((stat, idx) => (
             <motion.div
               key={stat.label}
@@ -181,7 +182,6 @@ export default function DashboardWithQuery() {
             >
               <Box
                 bg="primary.800"
-                opacity={0.5}
                 borderWidth="1px"
                 borderColor="primary.700"
                 borderRadius="xl"
@@ -191,7 +191,7 @@ export default function DashboardWithQuery() {
                   {stat.label}
                 </Text>
                 <Flex align="center" gap={2}>
-                  <Text fontSize="2xl">{stat.icon}</Text>
+                  <Box as={stat.icon} w={6} h={6} color={stat.color} />
                   <Text color="white" fontSize={{ base: "xl", sm: "2xl" }} fontWeight="bold">
                     {stat.value}
                   </Text>

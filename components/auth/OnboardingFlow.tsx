@@ -584,7 +584,7 @@ export default function OnboardingFlow() {
             minH="48px"
             transition="all 0.2s"
           >
-            {step === totalSteps ? 'Complete Setup ✨' : 'Next →'}
+            {step === totalSteps ? 'Complete Setup' : 'Next'}
           </Button>
         </Flex>
       </Box>
