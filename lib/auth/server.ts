@@ -5,6 +5,11 @@ import * as schema from "@/lib/db/schema";
 import { sendResetPasswordEmail, sendVerificationEmail } from "@/lib/email";
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: [
+    "https://aluminawellness.com",
+    "https://www.aluminawellness.com",
+  ],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
