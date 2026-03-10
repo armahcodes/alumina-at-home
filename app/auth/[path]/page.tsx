@@ -16,108 +16,73 @@ export function generateStaticParams() {
 export default async function AuthPage({ params }: { params: Promise<{ path: string }> }) {
   const { path } = await params;
 
-  const getPageTitle = (p: string) => {
-    switch (p) {
-      case 'sign-in': return 'Welcome Back';
-      case 'sign-up': return 'Start Your Journey';
-      case 'forgot-password': return 'Reset Password';
-      case 'reset-password': return 'Create New Password';
-      case 'sign-out': return 'Sign Out';
-      default: return 'Authentication';
-    }
-  };
-
-  const getPageSubtitle = (p: string) => {
-    switch (p) {
-      case 'sign-in': return 'Sign in to continue your longevity journey';
-      case 'sign-up': return 'Create an account to optimize your health';
-      case 'forgot-password': return 'Enter your email to reset your password';
-      case 'reset-password': return 'Choose a new secure password';
-      case 'sign-out': return 'See you soon!';
-      default: return '';
-    }
-  };
-
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, #071210 0%, #0a1a17 50%, #071210 100%)',
-      }}
-    >
-      {/* Background decorative elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div
-          className="absolute -top-40 -right-40 w-96 h-96 rounded-full opacity-20"
-          style={{
-            background: 'radial-gradient(circle, rgba(239, 194, 179, 0.3) 0%, transparent 70%)',
-          }}
-        />
-        <div
-          className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full opacity-15"
-          style={{
-            background: 'radial-gradient(circle, rgba(239, 194, 179, 0.2) 0%, transparent 70%)',
-          }}
-        />
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-10"
-          style={{
-            background: 'radial-gradient(circle, rgba(239, 194, 179, 0.15) 0%, transparent 60%)',
-          }}
-        />
+    <main className="auth-page">
+      {/* Atmospheric background layers */}
+      <div className="auth-bg">
+        <div className="auth-bg-grain" />
+        <div className="auth-bg-glow auth-bg-glow--top" />
+        <div className="auth-bg-glow auth-bg-glow--bottom" />
+        <div className="auth-bg-line auth-bg-line--1" />
+        <div className="auth-bg-line auth-bg-line--2" />
+        <div className="auth-bg-line auth-bg-line--3" />
       </div>
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Logo Section */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center shadow-xl"
-              style={{
-                background: 'linear-gradient(135deg, rgba(239, 194, 179, 0.15) 0%, rgba(239, 194, 179, 0.05) 100%)',
-                border: '1px solid rgba(239, 194, 179, 0.2)',
-                backdropFilter: 'blur(10px)',
-              }}
-            >
+      <div className="auth-layout">
+        {/* Left panel - brand & atmosphere (desktop only) */}
+        <div className="auth-brand-panel">
+          <div className="auth-brand-content">
+            <div className="auth-brand-logo">
               <Image
                 src="/alumina-isotipo.webp"
-                alt="Alumina Logo"
-                width={48}
-                height={48}
-                className="object-contain"
+                alt="Alumina"
+                width={56}
+                height={70}
+                className="auth-brand-logo-img"
               />
             </div>
+            <h1 className="auth-brand-title">ALUMINA</h1>
+            <p className="auth-brand-subtitle">At Home</p>
+            <div className="auth-brand-divider" />
+            <p className="auth-brand-tagline">
+              Longevity in your<br />personal sanctuary
+            </p>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1 tracking-tight">
-            Alumina <span style={{ color: '#EFC2B3' }}>At Home</span>
-          </h1>
-
-          <h2 className="text-lg sm:text-xl font-medium text-white/90 mb-2">
-            {getPageTitle(path)}
-          </h2>
-
-          <p className="text-sm text-white/50">
-            {getPageSubtitle(path)}
-          </p>
+          {/* Decorative botanical element */}
+          <div className="auth-brand-decoration">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="auth-brand-svg">
+              <circle cx="100" cy="100" r="80" stroke="rgba(239,194,179,0.08)" strokeWidth="0.5" />
+              <circle cx="100" cy="100" r="60" stroke="rgba(239,194,179,0.06)" strokeWidth="0.5" />
+              <circle cx="100" cy="100" r="40" stroke="rgba(239,194,179,0.04)" strokeWidth="0.5" />
+              <path d="M100 20 Q120 60 100 100 Q80 60 100 20" stroke="rgba(239,194,179,0.12)" strokeWidth="0.75" fill="none" />
+              <path d="M100 100 Q120 140 100 180 Q80 140 100 100" stroke="rgba(239,194,179,0.12)" strokeWidth="0.75" fill="none" />
+              <path d="M20 100 Q60 80 100 100 Q60 120 20 100" stroke="rgba(239,194,179,0.12)" strokeWidth="0.75" fill="none" />
+              <path d="M100 100 Q140 80 180 100 Q140 120 100 100" stroke="rgba(239,194,179,0.12)" strokeWidth="0.75" fill="none" />
+            </svg>
+          </div>
         </div>
 
-        {/* Auth Form Container */}
-        <div
-          className="rounded-2xl p-6 sm:p-8 shadow-2xl"
-          style={{
-            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(20px)',
-          }}
-        >
-          <AuthForms path={path} />
-        </div>
+        {/* Right panel - form */}
+        <div className="auth-form-panel">
+          {/* Mobile logo */}
+          <div className="auth-mobile-logo">
+            <Image
+              src="/alumina-isotipo.webp"
+              alt="Alumina"
+              width={40}
+              height={50}
+            />
+            <span className="auth-mobile-logo-text">ALUMINA</span>
+          </div>
 
-        {/* Footer */}
-        <div className="text-center mt-6">
-          <p className="text-xs text-white/30">
-            By continuing, you agree to our Terms of Service and Privacy Policy
-          </p>
+          <div className="auth-form-container">
+            <AuthForms path={path} />
+          </div>
+
+          <footer className="auth-footer">
+            <p>By continuing, you agree to our Terms of Service and Privacy Policy</p>
+          </footer>
         </div>
       </div>
     </main>
