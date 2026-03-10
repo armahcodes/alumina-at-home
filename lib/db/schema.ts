@@ -14,15 +14,56 @@ export const equipmentTierEnum = pgEnum('equipment_tier', ['essential', 'interme
 // TABLES
 // ============================================================================
 
-// Users table - Core user information
+// Users table - Core user information (also serves as Better Auth user table)
 export const users = pgTable('users', {
   id: varchar('id', { length: 255 }).primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   name: varchar('name', { length: 255 }).notNull(),
+  emailVerified: boolean('email_verified').default(false),
+  image: text('image'),
   hasCompletedOnboarding: boolean('has_completed_onboarding').default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true })
+});
+
+// Better Auth: Session table
+export const session = pgTable('session', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  token: varchar('token', { length: 255 }).notNull().unique(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  ipAddress: varchar('ip_address', { length: 255 }),
+  userAgent: text('user_agent'),
+  userId: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+});
+
+// Better Auth: Account table
+export const account = pgTable('account', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  accountId: varchar('account_id', { length: 255 }).notNull(),
+  providerId: varchar('provider_id', { length: 255 }).notNull(),
+  userId: varchar('user_id', { length: 255 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  accessToken: text('access_token'),
+  refreshToken: text('refresh_token'),
+  idToken: text('id_token'),
+  accessTokenExpiresAt: timestamp('access_token_expires_at', { withTimezone: true }),
+  refreshTokenExpiresAt: timestamp('refresh_token_expires_at', { withTimezone: true }),
+  scope: text('scope'),
+  password: text('password'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+});
+
+// Better Auth: Verification table
+export const verification = pgTable('verification', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  identifier: varchar('identifier', { length: 255 }).notNull(),
+  value: text('value').notNull(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
 });
 
 // User profiles table - Onboarding data and preferences
@@ -172,6 +213,9 @@ export type ProtocolTimer = InferSelectModel<typeof protocolTimers>;
 export type UserEquipment = InferSelectModel<typeof userEquipment>;
 export type VideoProgress = InferSelectModel<typeof videoProgress>;
 export type Profile = InferSelectModel<typeof profiles>;
+export type Session = InferSelectModel<typeof session>;
+export type Account = InferSelectModel<typeof account>;
+export type Verification = InferSelectModel<typeof verification>;
 
 // Insert types (when writing to DB)
 export type NewUser = InferInsertModel<typeof users>;

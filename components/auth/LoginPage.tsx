@@ -15,10 +15,10 @@ import {
 import { LogIn, UserPlus } from 'lucide-react';
 
 /**
- * LoginPage component that redirects to Neon Auth
- * 
- * This page serves as a landing/splash screen that checks auth state
- * and redirects appropriately to Neon Auth pages
+ * LoginPage component - landing/splash screen
+ *
+ * Checks auth state and redirects authenticated users to dashboard,
+ * or shows sign in / create account options.
  */
 export default function LoginPage() {
   const router = useRouter();

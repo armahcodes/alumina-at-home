@@ -1,21 +1,6 @@
-/**
- * Auth exports for Alumina At Home
- * 
- * Re-exports from Neon Auth for easy access throughout the app.
- */
+// Server exports (only import in server components/API routes)
+export { auth } from './server';
+export type { Auth } from './server';
 
 // Client exports
-export { authClient } from './client';
-
-// Server exports
-export { authServer } from './server';
-
-// Re-export useful components from Neon Auth
-export { 
-  UserButton,
-  AuthView,
-  AccountView
-} from '@neondatabase/auth/react';
-
-// Re-export server utilities
-export { neonAuth } from '@neondatabase/auth/next/server';
+export { authClient, signIn, signUp, signOut, useSession } from './client';

@@ -45,3 +45,4 @@ next-env.d.ts
 *.db-shm
 *.db-wal
 mastra-memory.db*
+.env*.local
