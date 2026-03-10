@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Box, Flex, Text, Spinner } from '@chakra-ui/react';
 import { authClient } from '@/lib/auth/client';
-import { useStore } from '@/lib/store';
+import { useSignOut } from '@/lib/hooks/useAuth';
 import Link from 'next/link';
 import { Settings, LogOut, ChevronDown } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export function UserMenu() {
   const { data, isPending } = authClient.useSession();
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const zustandLogout = useStore((state) => state.logout);
+  const { signOut } = useSignOut();
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -29,9 +29,7 @@ export function UserMenu() {
 
   const handleSignOut = async () => {
     setOpen(false);
-    await authClient.signOut();
-    zustandLogout();
-    window.location.href = '/auth/sign-in';
+    await signOut();
   };
 
   if (isPending) {

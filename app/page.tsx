@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { authClient } from '@/lib/auth/client';
+import { useSignOut } from '@/lib/hooks/useAuth';
 import LoginPage from '@/components/auth/LoginPage';
 import OnboardingFlow from '@/components/auth/OnboardingFlow';
 import Dashboard from '@/components/Dashboard';
@@ -56,28 +56,28 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [showAchievements, setShowAchievements] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const router = useRouter();
   
-  // Use Neon Auth session
+  // Auth session
   const { data: sessionData, isPending: isSessionLoading } = authClient.useSession();
   
   // Zustand store for app-specific state
-  const { hasCompletedOnboarding, currentStreak, totalPoints, user, completeOnboarding, logout } = useStore();
+  const { hasCompletedOnboarding, currentStreak, totalPoints, user } = useStore();
+  const { signOut: handleSignOut } = useSignOut();
 
-  // Sync Neon Auth user with Zustand store
+  // Sync auth session user data with Zustand store
+  const updateUser = useStore((state) => state.updateUser);
+  const login = useStore((state) => state.login);
   useEffect(() => {
-    if (sessionData?.user && !user) {
-      // If we have a Neon Auth user but no Zustand user, we need onboarding
-      // The user info from Neon Auth can be used to pre-fill
+    if (sessionData?.user) {
+      if (!user) {
+        // First login - seed Zustand with auth session data
+        login(sessionData.user.email || '', '');
+      } else if (sessionData.user.name && user.name !== sessionData.user.name) {
+        // Keep Zustand name in sync if it changed on the auth side
+        updateUser({ name: sessionData.user.name });
+      }
     }
-  }, [sessionData, user]);
-
-  // Handle sign out
-  const handleSignOut = async () => {
-    await authClient.signOut();
-    logout();
-    window.location.href = '/auth/sign-in';
-  };
+  }, [sessionData, user, login, updateUser]);
 
   // Show loading state while checking auth
   if (isSessionLoading) {
@@ -101,12 +101,13 @@ export default function Home() {
     return <LoginPage />;
   }
 
-  // Show onboarding if not completed
-  if (!hasCompletedOnboarding) {
+  // Show onboarding if not completed (check both Zustand and DB-persisted flag)
+  const dbOnboarded = (sessionData?.user as Record<string, unknown>)?.hasCompletedOnboarding;
+  if (!hasCompletedOnboarding && !dbOnboarded) {
     return <OnboardingFlow />;
   }
 
-  // Get display name from Neon Auth or Zustand
+  // Get display name from auth session or Zustand
   const displayName = sessionData?.user?.name || user?.name || 'User';
   const displayEmail = sessionData?.user?.email || user?.email || '';
 

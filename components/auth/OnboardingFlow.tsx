@@ -23,12 +23,12 @@ export default function OnboardingFlow() {
   const completeOnboarding = useStore((state) => state.completeOnboarding);
   const shouldReduceMotion = useReducedMotion();
   
-  // Get user data from Neon Auth session
+  // Get user data from auth session
   const { data: sessionData } = authClient.useSession();
-  const neonUser = sessionData?.user;
+  const authUser = sessionData?.user;
 
   const [formData, setFormData] = useState({
-    name: neonUser?.name || '',
+    name: authUser?.name || '',
     goals: [] as string[],
     experienceLevel: 'beginner' as 'beginner' | 'intermediate' | 'advanced',
     availableTime: 30,
@@ -38,13 +38,23 @@ export default function OnboardingFlow() {
 
   const totalSteps = 5;
 
+  const persistOnboarding = async (profile: Parameters<typeof completeOnboarding>[0]) => {
+    completeOnboarding(profile);
+    // Persist to database so it survives across sessions
+    try {
+      await fetch('/api/onboarding/complete', { method: 'POST' });
+    } catch {
+      // Zustand already updated, DB sync will retry on next login
+    }
+  };
+
   const handleNext = () => {
     if (step < totalSteps) {
       setStep(step + 1);
     } else {
-      completeOnboarding({
+      persistOnboarding({
         ...formData,
-        email: neonUser?.email || ''
+        email: authUser?.email || ''
       });
     }
   };
@@ -54,9 +64,9 @@ export default function OnboardingFlow() {
   };
 
   const handleSkip = () => {
-    completeOnboarding({
-      name: formData.name || neonUser?.name || 'Friend',
-      email: neonUser?.email || '',
+    persistOnboarding({
+      name: formData.name || authUser?.name || 'Friend',
+      email: authUser?.email || '',
       goals: formData.goals.length > 0 ? formData.goals : ['Increase energy'],
       experienceLevel: formData.experienceLevel,
       availableTime: formData.availableTime,

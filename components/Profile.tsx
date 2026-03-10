@@ -18,6 +18,7 @@ import {
   Input,
   Textarea,
 } from '@chakra-ui/react';
+import { useSignOut } from '@/lib/hooks/useAuth';
 import { Check, Zap, CheckCircle, Bell, User, Lock, FileText, HelpCircle, ChevronRight, X, LogOut, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -30,7 +31,8 @@ interface Goal {
 }
 
 export default function Profile() {
-  const { user, logout, updateUser, currentStreak, longestStreak } = useStore();
+  const { user, updateUser, currentStreak, longestStreak } = useStore();
+  const { signOut } = useSignOut();
   const [showPersonalInfoModal, setShowPersonalInfoModal] = useState(false);
   const [showGoalsModal, setShowGoalsModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
@@ -39,13 +41,13 @@ export default function Profile() {
   const shouldReduceMotion = useReducedMotion();
   const router = useRouter();
   
-  // Get Neon Auth session
+  // Auth session
   const { data: sessionData } = authClient.useSession();
-  const neonUser = sessionData?.user;
-  
-  // Use Neon Auth user data with fallback to Zustand store
-  const displayName = neonUser?.name || user?.name || 'User';
-  const displayEmail = neonUser?.email || user?.email || '';
+  const authUser = sessionData?.user;
+
+  // Use auth session data with fallback to Zustand store
+  const displayName = authUser?.name || user?.name || 'User';
+  const displayEmail = authUser?.email || user?.email || '';
 
   const goals = [
     {
@@ -71,15 +73,12 @@ export default function Profile() {
     },
   ];
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
     if (confirm('Are you sure you want to sign out?')) {
-      logout();
-      // Use window.location for a full page redirect to ensure session is cleared
-      window.location.href = '/auth/sign-out';
+      await signOut();
     }
   };
   
-  // Navigate to Neon Auth account settings
   const handleAccountSettings = () => {
     router.push('/account/settings');
   };
@@ -140,14 +139,14 @@ export default function Profile() {
               color="white"
               boxShadow="lg"
             >
-              {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase() || 'U'}
+              {displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
             </Flex>
             <Box flex={1} textAlign={{ base: 'center', sm: 'left' }}>
               <Heading as="h3" size={{ base: 'lg', sm: 'xl' }} color="white" mb={{ base: 1, sm: 2 }}>
-                {user?.name || 'User'}
+                {displayName}
               </Heading>
               <Text color="whiteAlpha.600" fontSize={{ base: 'sm', sm: 'base' }} mb={{ base: 3, sm: 4 }}>
-                {user?.email || 'user@alumina.com'}
+                {displayEmail || 'user@alumina.com'}
               </Text>
               <Flex gap={2} justify={{ base: 'center', sm: 'flex-start' }} flexWrap="wrap">
                 <Badge
