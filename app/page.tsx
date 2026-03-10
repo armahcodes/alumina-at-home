@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { authClient } from '@/lib/auth/client';
 import { useSignOut } from '@/lib/hooks/useAuth';
-import LoginPage from '@/components/auth/LoginPage';
 import OnboardingFlow from '@/components/auth/OnboardingFlow';
 import Dashboard from '@/components/Dashboard';
 import Protocols from '@/components/Protocols';
@@ -56,7 +56,8 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [showAchievements, setShowAchievements] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
+  const router = useRouter();
+
   // Auth session
   const { data: sessionData, isPending: isSessionLoading } = authClient.useSession();
   
@@ -79,26 +80,21 @@ export default function Home() {
     }
   }, [sessionData, user, login, updateUser]);
 
-  // Show loading state while checking auth
-  if (isSessionLoading) {
-    return (
-      <Flex
-        minH="100vh"
-        bgGradient="linear(to-br, primary.900, primary.700, primary.900)"
-        align="center"
-        justify="center"
-      >
-        <Flex direction="column" align="center" gap={4}>
-          <Spinner size="xl" color="accent.400" borderWidth="4px" />
-          <Text color="whiteAlpha.700">Loading your sanctuary...</Text>
-        </Flex>
-      </Flex>
-    );
-  }
+  // Redirect to sign-in if not authenticated
+  useEffect(() => {
+    if (!isSessionLoading && !sessionData?.session) {
+      router.replace('/auth/sign-in');
+    }
+  }, [isSessionLoading, sessionData, router]);
 
-  // Show login if not authenticated
-  if (!sessionData?.session) {
-    return <LoginPage />;
+  // Show loading state while checking auth
+  if (isSessionLoading || !sessionData?.session) {
+    return (
+      <div className="app-loading">
+        <Image src="/alumina-isotipo.webp" alt="Alumina" width={48} height={60} priority />
+        <div className="app-loading-spinner" />
+      </div>
+    );
   }
 
   // Show onboarding if not completed (check both Zustand and DB-persisted flag)
@@ -185,7 +181,7 @@ export default function Home() {
       {/* Achievements Modal */}
       <AchievementsModal isOpen={showAchievements} onClose={() => setShowAchievements(false)} />
 
-      <Box minH="100vh" bgGradient="linear(to-br, primary.900, primary.700, primary.900)">
+      <Box minH="100vh" bg="primary.900">
         {/* Desktop Sidebar */}
         <Box
           as="aside"
@@ -199,10 +195,10 @@ export default function Home() {
           <Flex
             flexDir="column"
             flexGrow={1}
-            bg="primary.800"
-            backdropFilter="blur(10px)"
+            bg="primary.800/95"
+            backdropFilter="blur(20px)"
             borderRight="1px solid"
-            borderColor="accent.500"
+            borderColor="whiteAlpha.50"
             overflowY="auto"
           >
             {/* Logo */}
@@ -210,20 +206,23 @@ export default function Home() {
               align="center"
               justify="center"
               px={6}
-              py={5}
+              py={6}
               borderBottom="1px solid"
-              borderColor="accent.500"
+              borderColor="whiteAlpha.50"
             >
-              <Flex flexDir="column" align="center">
-                <Image src="/alumina-isotipo.webp" alt="Alumina" width={64} height={80} />
-                <Text fontSize="xs" color="accent.200" opacity={0.6} lineHeight="tight" mt={2}>
+              <Flex flexDir="column" align="center" gap={1}>
+                <Image src="/alumina-isotipo.webp" alt="Alumina" width={48} height={60} />
+                <Text fontFamily="var(--font-display)" fontSize="lg" fontWeight="300" letterSpacing="0.3em" color="accent.400" mt={1}>
+                  ALUMINA
+                </Text>
+                <Text fontSize="2xs" fontWeight="400" letterSpacing="0.15em" color="whiteAlpha.400" textTransform="uppercase">
                   At Home
                 </Text>
               </Flex>
             </Flex>
 
             {/* User Profile Card */}
-            <Box px={4} py={4} borderBottom="1px solid" borderColor="accent.500/20">
+            <Box px={4} py={4} borderBottom="1px solid" borderColor="whiteAlpha.50">
               <Flex align="center" gap={3} p={3} bg="primary.700/50" borderRadius="xl">
                 <Flex
                   w={12}
@@ -249,7 +248,7 @@ export default function Home() {
             </Box>
 
             {/* Stats */}
-            <Box px={4} py={4} borderBottom="1px solid" borderColor="accent.500/20">
+            <Box px={4} py={4} borderBottom="1px solid" borderColor="whiteAlpha.50">
               <Grid templateColumns="repeat(2, 1fr)" gap={3}>
                 <Button
                   onClick={() => setShowAchievements(true)}
@@ -322,7 +321,7 @@ export default function Home() {
             </Box>
 
             {/* Bottom Actions */}
-            <Box px={4} py={4} borderTop="1px solid" borderColor="accent.500/20">
+            <Box px={4} py={4} borderTop="1px solid" borderColor="whiteAlpha.50">
               <Flex direction="column" gap={2}>
                 <Button
                   onClick={() => setShowAchievements(true)}
@@ -385,20 +384,23 @@ export default function Home() {
               insetY={0}
               left={0}
               w="72"
-              bg="primary.800"
-              backdropFilter="blur(10px)"
+              bg="primary.800/98"
+              backdropFilter="blur(20px)"
               borderRight="1px solid"
-              borderColor="accent.500"
+              borderColor="whiteAlpha.50"
               zIndex={50}
               display={{ base: 'block', lg: 'none' }}
               overflowY="auto"
             >
               <Flex flexDir="column" h="full">
                 {/* Close Button & Logo */}
-                <Flex align="center" justify="space-between" px={6} py={5} borderBottom="1px solid" borderColor="accent.500/20">
-                  <Flex flexDir="column" align="center" flex={1}>
-                    <Image src="/alumina-isotipo.webp" alt="Alumina" width={64} height={80} />
-                    <Text fontSize="xs" color="accent.200" opacity={0.6} lineHeight="tight" mt={2}>
+                <Flex align="center" justify="space-between" px={6} py={5} borderBottom="1px solid" borderColor="whiteAlpha.50">
+                  <Flex flexDir="column" align="center" flex={1} gap={1}>
+                    <Image src="/alumina-isotipo.webp" alt="Alumina" width={48} height={60} />
+                    <Text fontFamily="var(--font-display)" fontSize="lg" fontWeight="300" letterSpacing="0.3em" color="accent.400" mt={1}>
+                      ALUMINA
+                    </Text>
+                    <Text fontSize="2xs" fontWeight="400" letterSpacing="0.15em" color="whiteAlpha.400" textTransform="uppercase">
                       At Home
                     </Text>
                   </Flex>
@@ -419,7 +421,7 @@ export default function Home() {
                 </Flex>
 
                 {/* User Profile Card - Mobile */}
-                <Box px={4} py={4} borderBottom="1px solid" borderColor="accent.500/20">
+                <Box px={4} py={4} borderBottom="1px solid" borderColor="whiteAlpha.50">
                   <Flex align="center" gap={3} p={3} bg="primary.700/50" borderRadius="xl">
                     <Flex
                       w={12}
@@ -445,7 +447,7 @@ export default function Home() {
                 </Box>
 
                 {/* Stats - Mobile */}
-                <Box px={4} py={4} borderBottom="1px solid" borderColor="accent.500/20">
+                <Box px={4} py={4} borderBottom="1px solid" borderColor="whiteAlpha.50">
                   <Grid templateColumns="repeat(2, 1fr)" gap={3}>
                     <Button
                       onClick={() => {
@@ -521,7 +523,7 @@ export default function Home() {
                 </Box>
 
                 {/* Bottom Actions - Mobile */}
-                <Box px={4} py={4} borderTop="1px solid" borderColor="accent.500/20">
+                <Box px={4} py={4} borderTop="1px solid" borderColor="whiteAlpha.50">
                   <Flex direction="column" gap={2}>
                     <Button
                       onClick={() => {
@@ -580,10 +582,10 @@ export default function Home() {
             position="sticky"
             top={0}
             zIndex={30}
-            bg="primary.700/80"
-            backdropFilter="blur(10px)"
+            bg="primary.800/80"
+            backdropFilter="blur(20px)"
             borderBottom="1px solid"
-            borderColor="accent.500/20"
+            borderColor="whiteAlpha.50"
             display={{ base: 'block', lg: 'none' }}
           >
             <Box px={4} py={3}>
@@ -636,15 +638,15 @@ export default function Home() {
             position="sticky"
             top={0}
             zIndex={30}
-            bg="primary.700/80"
-            backdropFilter="blur(10px)"
+            bg="primary.800/80"
+            backdropFilter="blur(20px)"
             borderBottom="1px solid"
-            borderColor="accent.500/20"
+            borderColor="whiteAlpha.50"
           >
             <Box maxW="7xl" mx="auto" px={{ base: 4, sm: 6, lg: 8 }} py={4}>
               <Flex align="center" justify="space-between">
                 <Box>
-                  <Heading as="h2" size={{ base: 'xl', sm: '2xl' }} color="white">
+                  <Heading as="h2" size={{ base: 'xl', sm: '2xl' }} color="white" fontFamily="var(--font-display)" fontWeight="400" letterSpacing="-0.01em">
                     {navigationItems.find(item => item.id === activeTab)?.label || 'Dashboard'}
                   </Heading>
                   <Text fontSize={{ base: 'sm', sm: 'base' }} color="whiteAlpha.600" mt={1}>
@@ -704,7 +706,7 @@ export default function Home() {
           bg="primary.800/98"
           backdropFilter="blur(20px)"
           borderTop="1px solid"
-          borderColor="accent.500/10"
+          borderColor="whiteAlpha.50"
           display={{ base: 'block', lg: 'none' }}
           role="navigation"
           aria-label="Mobile navigation"
