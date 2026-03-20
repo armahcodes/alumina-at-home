@@ -46,7 +46,7 @@ export interface AppState {
   dailyMetrics: DailyMetrics[];
 
   // Actions
-  login: (email: string, password: string) => void;
+  login: (email: string, name?: string) => void;
   logout: () => void;
   completeOnboarding: (profile: UserProfile) => void;
   updateUser: (profile: Partial<UserProfile>) => void;
@@ -75,12 +75,21 @@ export const useStore = create<AppState>()(
       dailyMetrics: [],
 
       // Actions
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      login: (email: string, _password: string) => {
-        // Simple auth for MVP - replace with real auth later
+      login: (email: string, name?: string) => {
+        const currentUser = get().user;
         set({
           isAuthenticated: true,
-          user: { ...get().user!, email }
+          user: currentUser
+            ? { ...currentUser, email, ...(name ? { name } : {}) }
+            : {
+                name: name || '',
+                email,
+                goals: [],
+                experienceLevel: 'beginner',
+                availableTime: 30,
+                healthConditions: [],
+                budget: 'essential',
+              },
         });
       },
 
@@ -88,7 +97,9 @@ export const useStore = create<AppState>()(
         set({
           isAuthenticated: false,
           user: null,
-          hasCompletedOnboarding: false
+          hasCompletedOnboarding: false,
+          completedTasks: [],
+          supplements: [],
         });
       },
 

@@ -1,27 +1,50 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/lib/auth/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from '@/lib/auth/session';
 import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
+import { users, userProfiles } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import { headers } from 'next/headers';
 
-export async function POST() {
+export async function POST(request: NextRequest) {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
+    const session = await getServerSession();
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const body = await request.json().catch(() => ({}));
+    const userId = session.user.id;
+
+    // Mark onboarding as complete on the user record
     await db
       .update(users)
       .set({ hasCompletedOnboarding: true, updatedAt: new Date() })
-      .where(eq(users.id, session.user.id));
+      .where(eq(users.id, userId));
+
+    // If profile data was sent, persist it to user_profiles table
+    if (body.goals || body.experienceLevel || body.availableTime || body.budget) {
+      await db
+        .insert(userProfiles)
+        .values({
+          userId,
+          goals: body.goals || [],
+          experienceLevel: body.experienceLevel || 'beginner',
+          availableTime: body.availableTime || 30,
+          healthConditions: body.healthConditions || [],
+          budget: body.budget || 'essential',
+        })
+        .onConflictDoUpdate({
+          target: userProfiles.userId,
+          set: {
+            goals: body.goals || [],
+            experienceLevel: body.experienceLevel || 'beginner',
+            availableTime: body.availableTime || 30,
+            healthConditions: body.healthConditions || [],
+            budget: body.budget || 'essential',
+            updatedAt: new Date(),
+          },
+        });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

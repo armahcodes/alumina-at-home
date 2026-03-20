@@ -5,21 +5,29 @@ import { authClient } from '@/lib/auth/client';
 import { useStore } from '@/lib/store';
 
 /**
- * Hook to sync Better Auth session with Zustand store
+ * Hook to sync Better Auth session with Zustand store.
+ * This is the single source of truth for auth state sync.
  */
 export function useAuth() {
   const { data, isPending, error } = authClient.useSession();
-  const { login, logout, user, isAuthenticated } = useStore();
+  const { login, logout, isAuthenticated, user, updateUser } = useStore();
 
   useEffect(() => {
+    if (isPending) return;
+
     if (data?.session && data?.user) {
-      if (!isAuthenticated || user?.email !== data.user.email) {
-        login(data.user.email || '', '');
+      const authUser = data.user;
+      // Sync session to Zustand if not yet authenticated or email changed
+      if (!isAuthenticated || user?.email !== authUser.email) {
+        login(authUser.email || '', authUser.name || '');
+      } else if (authUser.name && user?.name !== authUser.name) {
+        // Keep name in sync if changed on the auth side
+        updateUser({ name: authUser.name });
       }
-    } else if (!isPending && !data?.session && isAuthenticated) {
+    } else if (!data?.session && isAuthenticated) {
       logout();
     }
-  }, [data, isPending, isAuthenticated, user?.email, login, logout]);
+  }, [data, isPending, isAuthenticated, user?.email, user?.name, login, logout, updateUser]);
 
   return {
     session: data?.session ?? null,
@@ -31,7 +39,7 @@ export function useAuth() {
 }
 
 /**
- * Hook to get the current user
+ * Hook to get the current user from Better Auth session
  */
 export function useUser() {
   const { data, isPending } = authClient.useSession();

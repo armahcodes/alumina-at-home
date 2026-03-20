@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import { authClient } from '@/lib/auth/client';
-import { useSignOut } from '@/lib/hooks/useAuth';
+import { useAuth, useSignOut } from '@/lib/hooks/useAuth';
 import OnboardingFlow from '@/components/auth/OnboardingFlow';
 import Dashboard from '@/components/Dashboard';
 import Protocols from '@/components/Protocols';
@@ -56,39 +54,26 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [showAchievements, setShowAchievements] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const router = useRouter();
 
-  // Auth session
-  const { data: sessionData, isPending: isSessionLoading } = authClient.useSession();
-  
+  // Auth session (syncs with Zustand automatically via useAuth hook)
+  const { user: authUser, isLoading: isSessionLoading, isAuthenticated } = useAuth();
+
   // Zustand store for app-specific state
   const { hasCompletedOnboarding, currentStreak, totalPoints, user } = useStore();
   const { signOut: handleSignOut } = useSignOut();
 
-  // Sync auth session user data with Zustand store
-  const updateUser = useStore((state) => state.updateUser);
-  const login = useStore((state) => state.login);
-  useEffect(() => {
-    if (sessionData?.user) {
-      if (!user) {
-        // First login - seed Zustand with auth session data
-        login(sessionData.user.email || '', '');
-      } else if (sessionData.user.name && user.name !== sessionData.user.name) {
-        // Keep Zustand name in sync if it changed on the auth side
-        updateUser({ name: sessionData.user.name });
-      }
-    }
-  }, [sessionData, user, login, updateUser]);
-
-  // Redirect to sign-in if not authenticated
-  useEffect(() => {
-    if (!isSessionLoading && !sessionData?.session) {
-      router.replace('/auth/sign-in');
-    }
-  }, [isSessionLoading, sessionData, router]);
-
   // Show loading state while checking auth
-  if (isSessionLoading || !sessionData?.session) {
+  if (isSessionLoading) {
+    return (
+      <div className="app-loading">
+        <Image src="/alumina-isotipo.webp" alt="Alumina" width={48} height={60} priority />
+        <div className="app-loading-spinner" />
+      </div>
+    );
+  }
+
+  // Middleware handles redirect, but show loading if somehow not authenticated
+  if (!isAuthenticated) {
     return (
       <div className="app-loading">
         <Image src="/alumina-isotipo.webp" alt="Alumina" width={48} height={60} priority />
@@ -98,14 +83,14 @@ export default function Home() {
   }
 
   // Show onboarding if not completed (check both Zustand and DB-persisted flag)
-  const dbOnboarded = (sessionData?.user as Record<string, unknown>)?.hasCompletedOnboarding;
+  const dbOnboarded = (authUser as Record<string, unknown> | null)?.hasCompletedOnboarding;
   if (!hasCompletedOnboarding && !dbOnboarded) {
     return <OnboardingFlow />;
   }
 
   // Get display name from auth session or Zustand
-  const displayName = sessionData?.user?.name || user?.name || 'User';
-  const displayEmail = sessionData?.user?.email || user?.email || '';
+  const displayName = authUser?.name || user?.name || 'User';
+  const displayEmail = authUser?.email || user?.email || '';
 
   const renderContent = () => {
     switch (activeTab) {

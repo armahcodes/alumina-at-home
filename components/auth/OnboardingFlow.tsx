@@ -42,7 +42,17 @@ export default function OnboardingFlow() {
     completeOnboarding(profile);
     // Persist to database so it survives across sessions
     try {
-      await fetch('/api/onboarding/complete', { method: 'POST' });
+      await fetch('/api/onboarding/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          goals: profile.goals,
+          experienceLevel: profile.experienceLevel,
+          availableTime: profile.availableTime,
+          healthConditions: profile.healthConditions,
+          budget: profile.budget,
+        }),
+      });
     } catch {
       // Zustand already updated, DB sync will retry on next login
     }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { verifyUserAccess } from '@/lib/auth/session';
 import { getTodayCompletedTasks, addCompletedTask } from '@/lib/db';
 
 export async function GET(
@@ -7,30 +8,21 @@ export async function GET(
 ) {
   try {
     const { userId } = await params;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
+    const { error: authError } = await verifyUserAccess(userId);
+    if (authError) {
+      return NextResponse.json({ error: authError.message }, { status: authError.status });
     }
 
     const { data, error } = await getTodayCompletedTasks(userId);
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Failed to fetch tasks' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fetch tasks' }, { status: 500 });
     }
 
     return NextResponse.json({ data });
   } catch (error) {
     console.error('Error in GET /api/user/[userId]/tasks/today:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -40,34 +32,25 @@ export async function POST(
 ) {
   try {
     const { userId } = await params;
-    const body = await request.json();
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'User ID is required' },
-        { status: 400 }
-      );
+    const { error: authError } = await verifyUserAccess(userId);
+    if (authError) {
+      return NextResponse.json({ error: authError.message }, { status: authError.status });
     }
+
+    const body = await request.json();
 
     const { data, error } = await addCompletedTask({
       userId,
-      ...body
+      ...body,
     });
 
     if (error) {
-      return NextResponse.json(
-        { error: 'Failed to add task' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to add task' }, { status: 500 });
     }
 
     return NextResponse.json({ data });
   } catch (error) {
     console.error('Error in POST /api/user/[userId]/tasks/today:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-
