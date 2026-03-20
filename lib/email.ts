@@ -130,3 +130,62 @@ export async function sendVerificationEmail(email: string, url: string) {
     html,
   });
 }
+
+export async function sendOTPEmail(
+  email: string,
+  otp: string,
+  type: 'sign-in' | 'email-verification' | 'forget-password' | 'change-email'
+) {
+  const subjectMap: Record<string, string> = {
+    'sign-in': 'Your Alumina At Home sign-in code',
+    'email-verification': 'Verify your Alumina At Home email',
+    'forget-password': 'Your Alumina At Home password reset code',
+    'change-email': 'Confirm your new email address',
+  };
+
+  const headingMap: Record<string, string> = {
+    'sign-in': 'Your Sign-In Code',
+    'email-verification': 'Verify Your Email',
+    'forget-password': 'Password Reset Code',
+    'change-email': 'Confirm Email Change',
+  };
+
+  const descriptionMap: Record<string, string> = {
+    'sign-in': 'Enter this code to sign in to your Alumina At Home account.',
+    'email-verification': 'Enter this code to verify your email address.',
+    'forget-password': 'Enter this code to reset your password.',
+    'change-email': 'Enter this code to confirm your new email address.',
+  };
+
+  const formattedOTP = otp.split('').join(' &nbsp; ');
+
+  const html = baseLayout(`
+    <h1 style="margin: 0 0 8px; font-size: 22px; font-weight: 700; color: #ffffff;">
+      ${headingMap[type]}
+    </h1>
+    <p style="margin: 0 0 24px; font-size: 14px; color: rgba(255,255,255,0.6); line-height: 1.5;">
+      ${descriptionMap[type]}
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding: 20px 0;">
+          <div style="display: inline-block; padding: 16px 32px; background: rgba(239, 194, 179, 0.1); border: 1px solid rgba(239, 194, 179, 0.2); border-radius: 12px;">
+            <span style="font-family: 'Courier New', monospace; font-size: 32px; font-weight: 700; letter-spacing: 0.3em; color: #EFC2B3;">
+              ${formattedOTP}
+            </span>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <p style="margin: 24px 0 0; font-size: 13px; color: rgba(255,255,255,0.4); line-height: 1.5;">
+      This code expires in 5 minutes. If you didn&rsquo;t request this, you can safely ignore this email.
+    </p>
+  `);
+
+  await resend.emails.send({
+    from: FROM_EMAIL,
+    to: email,
+    subject: subjectMap[type],
+    html,
+  });
+}

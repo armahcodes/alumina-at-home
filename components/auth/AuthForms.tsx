@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { authClient } from '@/lib/auth/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -173,16 +173,170 @@ function PasswordStrength({ password }: { password: string }) {
   );
 }
 
-/* ─── Sign In ─── */
+/* ─── OTP Input ─── */
+
+function OTPInput({
+  value,
+  onChange,
+  length = 6,
+  disabled = false,
+}: {
+  value: string;
+  onChange: (val: string) => void;
+  length?: number;
+  disabled?: boolean;
+}) {
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const digits = value.padEnd(length, '').slice(0, length).split('');
+
+  const focusInput = (index: number) => {
+    inputRefs.current[index]?.focus();
+  };
+
+  const handleChange = (index: number, char: string) => {
+    if (!/^\d?$/.test(char)) return;
+    const newDigits = [...digits];
+    newDigits[index] = char;
+    const newValue = newDigits.join('').replace(/\s/g, '');
+    onChange(newValue);
+    if (char && index < length - 1) {
+      focusInput(index + 1);
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && !digits[index] && index > 0) {
+      focusInput(index - 1);
+    }
+    if (e.key === 'ArrowLeft' && index > 0) {
+      focusInput(index - 1);
+    }
+    if (e.key === 'ArrowRight' && index < length - 1) {
+      focusInput(index + 1);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, length);
+    if (pasted) {
+      onChange(pasted);
+      focusInput(Math.min(pasted.length, length - 1));
+    }
+  };
+
+  return (
+    <div className="af-otp-group" onPaste={handlePaste}>
+      {digits.map((digit, i) => (
+        <input
+          key={i}
+          ref={(el) => { inputRefs.current[i] = el; }}
+          type="text"
+          inputMode="numeric"
+          maxLength={1}
+          value={digit || ''}
+          onChange={(e) => handleChange(i, e.target.value)}
+          onKeyDown={(e) => handleKeyDown(i, e)}
+          onFocus={(e) => e.target.select()}
+          disabled={disabled}
+          className="af-otp-input"
+          autoComplete={i === 0 ? 'one-time-code' : 'off'}
+          aria-label={`Digit ${i + 1}`}
+        />
+      ))}
+    </div>
+  );
+}
+
+/* ─── Sign In (OTP-first) ─── */
+
+type SignInStep = 'email' | 'otp' | 'password';
 
 function SignInForm() {
+  const [step, setStep] = useState<SignInStep>('email');
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Cooldown timer
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  // Auto-submit when OTP is complete
+  const submittingRef = useRef(false);
+  useEffect(() => {
+    if (otp.length === 6 && !loading && !submittingRef.current) {
+      submittingRef.current = true;
+      handleVerifyOTP();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [otp]);
+
+  const handleSendOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email,
+      type: 'sign-in',
+    });
+
+    if (error) {
+      setError(error.message || 'Could not send verification code. Make sure you have an account.');
+      setLoading(false);
+    } else {
+      setStep('otp');
+      setResendCooldown(60);
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    setError('');
+    setLoading(true);
+
+    const { error } = await authClient.signIn.emailOtp({
+      email,
+      otp,
+    });
+
+    submittingRef.current = false;
+
+    if (error) {
+      setError(error.message || 'Invalid or expired code.');
+      setLoading(false);
+    } else {
+      router.push('/');
+    }
+  };
+
+  const handleResend = async () => {
+    setError('');
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email,
+      type: 'sign-in',
+    });
+
+    if (error) {
+      setError(error.message || 'Could not resend code.');
+    } else {
+      setResendCooldown(60);
+      setOtp('');
+    }
+  };
+
+  const handlePasswordSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -197,8 +351,104 @@ function SignInForm() {
     }
   };
 
+  // Step: OTP verification
+  if (step === 'otp') {
+    return (
+      <form onSubmit={handleVerifyOTP} className="af-form">
+        <FormHeader title="Check your email" subtitle={`We sent a 6-digit code to ${email}`} />
+
+        <ErrorBanner message={error} />
+
+        <div className="af-fields">
+          <OTPInput value={otp} onChange={setOtp} disabled={loading} />
+        </div>
+
+        <SubmitButton loading={loading} loadingText="Verifying...">
+          Verify & Sign In
+        </SubmitButton>
+
+        <div className="af-resend">
+          {resendCooldown > 0 ? (
+            <span>Resend code in {resendCooldown}s</span>
+          ) : (
+            <>
+              <span>Didn&apos;t receive a code?</span>
+              <button type="button" className="af-resend-btn" onClick={handleResend}>
+                Resend
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="af-method-toggle">
+          <button type="button" onClick={() => { setStep('email'); setOtp(''); setError(''); }}>
+            Use a different email
+          </button>
+        </div>
+      </form>
+    );
+  }
+
+  // Step: Password fallback
+  if (step === 'password') {
+    return (
+      <form onSubmit={handlePasswordSignIn} className="af-form">
+        <FormHeader title="Welcome back" subtitle="Sign in with your password" />
+
+        <ErrorBanner message={error} />
+
+        <div className="af-fields">
+          <FormField label="Email">
+            <TextInput
+              id="signin-email"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="you@example.com"
+              autoComplete="email"
+              icon={Mail}
+            />
+          </FormField>
+
+          <FormField
+            label="Password"
+            labelRight={
+              <Link href="/auth/forgot-password" className="af-link-subtle">
+                Forgot?
+              </Link>
+            }
+          >
+            <PasswordInput
+              id="signin-password"
+              value={password}
+              onChange={setPassword}
+              placeholder="Your password"
+              autoComplete="current-password"
+            />
+          </FormField>
+        </div>
+
+        <SubmitButton loading={loading} loadingText="Signing in...">
+          Sign In
+        </SubmitButton>
+
+        <div className="af-method-toggle">
+          <button type="button" onClick={() => { setStep('email'); setError(''); }}>
+            Sign in with email code instead
+          </button>
+        </div>
+
+        <p className="af-switch">
+          New to Alumina?{' '}
+          <Link href="/auth/sign-up" className="af-link">Create an account</Link>
+        </p>
+      </form>
+    );
+  }
+
+  // Step: Email (default — OTP-first)
   return (
-    <form onSubmit={handleSubmit} className="af-form">
+    <form onSubmit={handleSendOTP} className="af-form">
       <FormHeader title="Welcome back" subtitle="Sign in to your sanctuary" />
 
       <ErrorBanner message={error} />
@@ -215,28 +465,17 @@ function SignInForm() {
             icon={Mail}
           />
         </FormField>
-
-        <FormField
-          label="Password"
-          labelRight={
-            <Link href="/auth/forgot-password" className="af-link-subtle">
-              Forgot?
-            </Link>
-          }
-        >
-          <PasswordInput
-            id="signin-password"
-            value={password}
-            onChange={setPassword}
-            placeholder="Your password"
-            autoComplete="current-password"
-          />
-        </FormField>
       </div>
 
-      <SubmitButton loading={loading} loadingText="Signing in...">
-        Sign In
+      <SubmitButton loading={loading} loadingText="Sending code...">
+        Continue
       </SubmitButton>
+
+      <div className="af-method-toggle">
+        <button type="button" onClick={() => { setStep('password'); setError(''); }}>
+          Sign in with password instead
+        </button>
+      </div>
 
       <p className="af-switch">
         New to Alumina?{' '}
