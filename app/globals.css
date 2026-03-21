@@ -1135,8 +1135,8 @@ body {
 .af-otp-input {
   width: 48px;
   height: 56px;
-  background: var(--c-input-bg);
-  border: 1px solid var(--c-border);
+  background: rgba(240, 237, 232, 0.06);
+  border: 1.5px solid rgba(240, 237, 232, 0.15);
   color: var(--c-text);
   font-family: 'Courier New', monospace;
   font-size: 1.5rem;
@@ -1148,12 +1148,12 @@ body {
 }
 
 .af-otp-input:hover {
-  background: var(--c-input-hover);
-  border-color: rgba(240, 237, 232, 0.1);
+  background: rgba(240, 237, 232, 0.08);
+  border-color: rgba(240, 237, 232, 0.25);
 }
 
 .af-otp-input:focus {
-  background: var(--c-input-hover);
+  background: rgba(240, 237, 232, 0.08);
   border-color: var(--c-border-focus);
   box-shadow: 0 0 0 3px var(--c-accent-glow), 0 2px 8px rgba(0, 0, 0, 0.2);
   outline: none;
