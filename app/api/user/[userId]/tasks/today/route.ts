@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyUserAccess } from '@/lib/auth/session';
 import { getTodayCompletedTasks, addCompletedTask } from '@/lib/db';
+import { completedTaskSchema } from '@/lib/validations';
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +22,6 @@ export async function GET(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error in GET /api/user/[userId]/tasks/today:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -37,11 +37,15 @@ export async function POST(
       return NextResponse.json({ error: authError.message }, { status: authError.status });
     }
 
-    const body = await request.json();
+    const raw = await request.json();
+    const parsed = completedTaskSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 });
+    }
 
     const { data, error } = await addCompletedTask({
       userId,
-      ...body,
+      ...parsed.data,
     });
 
     if (error) {
@@ -50,7 +54,6 @@ export async function POST(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error in POST /api/user/[userId]/tasks/today:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

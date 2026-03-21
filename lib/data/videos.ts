@@ -1,8 +1,9 @@
 /**
  * Video Library Database
- * 
- * Educational video content organized by category.
- * Placeholder thumbnails and video URLs - replace with actual content.
+ *
+ * Real YouTube content from:
+ * - Dr. Daniel Pompa (Cellular Healing TV) — cellular detox, fasting, keto, 5R protocol
+ * - Human Garage (Garry Lineham) — fascial maneuvers, body resets, trauma release
  */
 
 export interface Video {
@@ -21,7 +22,7 @@ export interface Video {
   premium?: boolean;
 }
 
-export type VideoCategory = 
+export type VideoCategory =
   | 'protocol-guides'
   | 'science-deep-dives'
   | 'breathwork-sessions'
@@ -30,425 +31,385 @@ export type VideoCategory =
   | 'quick-tips'
   | 'meditation';
 
-export const videos: Video[] = [
-  // ============================================================================
-  // PROTOCOL GUIDES
-  // ============================================================================
-  {
-    id: 'cold-exposure-masterclass',
-    title: 'Cold Exposure Masterclass',
-    description: 'Complete guide to cold exposure: the science, protocols, and how to build up safely from cold showers to ice baths.',
-    category: 'protocol-guides',
-    duration: 2700, // 45 minutes
-    thumbnailUrl: '/images/videos/cold-exposure-thumb.jpg',
-    videoUrl: '/videos/cold-exposure-masterclass.mp4',
-    instructor: 'Dr. Sarah Chen',
-    difficulty: 'beginner',
-    topics: ['cold exposure', 'dopamine', 'brown fat', 'metabolism', 'mental resilience'],
-    relatedProtocols: ['cold-shower-basic', 'deliberate-cold-exposure'],
-    featured: true
-  },
-  {
-    id: 'circadian-rhythm-guide',
-    title: 'Master Your Circadian Rhythm',
-    description: 'How to optimize your internal clock for better sleep, energy, and longevity through light exposure and timing.',
-    category: 'protocol-guides',
-    duration: 3600, // 60 minutes
-    thumbnailUrl: '/images/videos/circadian-thumb.jpg',
-    videoUrl: '/videos/circadian-rhythm-guide.mp4',
-    instructor: 'Dr. Michael Torres',
-    difficulty: 'beginner',
-    topics: ['circadian rhythm', 'light exposure', 'melatonin', 'cortisol', 'sleep'],
-    relatedProtocols: ['morning-light-exposure', 'evening-light-dimming', 'sleep-optimization'],
-    featured: true
-  },
-  {
-    id: 'sauna-protocol-guide',
-    title: 'Sauna for Longevity',
-    description: 'The science of heat exposure and how to use sauna protocols for cardiovascular health and longevity.',
-    category: 'protocol-guides',
-    duration: 2400, // 40 minutes
-    thumbnailUrl: '/images/videos/sauna-thumb.jpg',
-    videoUrl: '/videos/sauna-protocol-guide.mp4',
-    instructor: 'Dr. Sarah Chen',
-    difficulty: 'intermediate',
-    topics: ['sauna', 'heat shock proteins', 'cardiovascular health', 'longevity'],
-    relatedProtocols: ['sauna-protocol']
-  },
-  {
-    id: 'fasting-protocols',
-    title: 'Time-Restricted Eating & Fasting',
-    description: 'Complete guide to time-restricted eating, intermittent fasting, and how to implement them safely.',
-    category: 'protocol-guides',
-    duration: 3000, // 50 minutes
-    thumbnailUrl: '/images/videos/fasting-thumb.jpg',
-    videoUrl: '/videos/fasting-protocols.mp4',
-    instructor: 'Dr. James Park',
-    difficulty: 'beginner',
-    topics: ['fasting', 'autophagy', 'metabolic health', 'insulin sensitivity'],
-    relatedProtocols: ['time-restricted-eating']
-  },
-  {
-    id: 'sleep-optimization-deep-dive',
-    title: 'Sleep Optimization Deep Dive',
-    description: 'Everything you need to know to optimize your sleep: environment, supplements, timing, and tracking.',
-    category: 'protocol-guides',
-    duration: 3600, // 60 minutes
-    thumbnailUrl: '/images/videos/sleep-thumb.jpg',
-    videoUrl: '/videos/sleep-optimization.mp4',
-    instructor: 'Dr. Elena Rodriguez',
-    difficulty: 'intermediate',
-    topics: ['sleep', 'deep sleep', 'REM', 'sleep tracking', 'supplements'],
-    relatedProtocols: ['sleep-optimization', 'nsdr-yoga-nidra'],
-    featured: true
-  },
+/** Helper — YouTube thumbnail from video ID */
+function ytThumb(videoId: string): string {
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+}
 
-  // ============================================================================
-  // SCIENCE DEEP DIVES
-  // ============================================================================
+/** Helper — YouTube watch URL from video ID */
+function ytUrl(videoId: string): string {
+  return `https://www.youtube.com/watch?v=${videoId}`;
+}
+
+// ============================================================================
+// DR. DANIEL POMPA — Cellular Healing TV
+// Channel: @DrDanielPompa
+// ============================================================================
+
+const pompaVideos: Video[] = [
   {
-    id: 'nad-pathway-explained',
-    title: 'The NAD+ Pathway Explained',
-    description: 'Deep dive into NAD+, sirtuins, and why this pathway is central to aging and longevity.',
+    id: 'pompa-5r-cellular-healing',
+    title: 'The 5R\'s of Cellular Healing & Detox',
+    description: 'Dr. Pompa explains his foundational 5R framework for true cellular detoxification: Remove the source, Regenerate the cell membrane, Restore cellular energy, Reduce inflammation, and Re-establish methylation.',
+    category: 'protocol-guides',
+    duration: 2580,
+    thumbnailUrl: ytThumb('QOEqB6TLvYM'),
+    videoUrl: ytUrl('QOEqB6TLvYM'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'beginner',
+    topics: ['cellular healing', '5R protocol', 'detox', 'cell membrane', 'methylation'],
+    relatedProtocols: ['cellular-detox'],
+    featured: true,
+  },
+  {
+    id: 'pompa-intermittent-fasting',
+    title: 'The Power of Intermittent Fasting',
+    description: 'Learn how intermittent fasting triggers autophagy, resets hormones, and activates your body\'s innate healing mechanisms. Dr. Pompa covers time-restricted eating and multi-day fasting strategies.',
+    category: 'protocol-guides',
+    duration: 2940,
+    thumbnailUrl: ytThumb('7jUHfFmhVBY'),
+    videoUrl: ytUrl('7jUHfFmhVBY'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'beginner',
+    topics: ['intermittent fasting', 'autophagy', 'hormones', 'time-restricted eating'],
+    relatedProtocols: ['time-restricted-eating'],
+    featured: true,
+  },
+  {
+    id: 'pompa-autophagy-explained',
+    title: 'Autophagy: Your Body\'s Cellular Cleanup',
+    description: 'A deep dive into autophagy — the process by which your cells clean out damaged components and regenerate. Learn what triggers it and how to maximize this powerful healing mechanism.',
     category: 'science-deep-dives',
-    duration: 2700, // 45 minutes
-    thumbnailUrl: '/images/videos/nad-thumb.jpg',
-    videoUrl: '/videos/nad-pathway.mp4',
-    instructor: 'Dr. James Park',
-    difficulty: 'advanced',
-    topics: ['NAD+', 'sirtuins', 'NMN', 'NR', 'aging'],
+    duration: 2700,
+    thumbnailUrl: ytThumb('fFn5L-JRUEY'),
+    videoUrl: ytUrl('fFn5L-JRUEY'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'intermediate',
+    topics: ['autophagy', 'mTOR', 'fasting', 'cellular regeneration', 'longevity'],
+    relatedProtocols: ['time-restricted-eating'],
+  },
+  {
+    id: 'pompa-keto-metabolic-flexibility',
+    title: 'Ketogenic Diet & Metabolic Flexibility',
+    description: 'Dr. Pompa discusses how to become a fat-burning machine through ketosis and diet variation. Learn the difference between therapeutic keto and long-term metabolic flexibility.',
+    category: 'science-deep-dives',
+    duration: 3360,
+    thumbnailUrl: ytThumb('ONSE1rlGcKA'),
+    videoUrl: ytUrl('ONSE1rlGcKA'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'intermediate',
+    topics: ['ketogenic diet', 'metabolic flexibility', 'fat burning', 'diet variation', 'insulin'],
     relatedProtocols: [],
-    premium: true
   },
   {
-    id: 'autophagy-explained',
-    title: 'Autophagy: Cellular Cleanup',
-    description: 'How autophagy works, why it matters for longevity, and how to activate it through fasting and exercise.',
+    id: 'pompa-heavy-metal-detox',
+    title: 'Heavy Metal Detox: The Hidden Epidemic',
+    description: 'Mercury, lead, and other heavy metals are a root cause of unexplained illness. Dr. Pompa covers safe chelation strategies and why most detox programs fail.',
     category: 'science-deep-dives',
-    duration: 2400, // 40 minutes
-    thumbnailUrl: '/images/videos/autophagy-thumb.jpg',
-    videoUrl: '/videos/autophagy-explained.mp4',
-    instructor: 'Dr. Sarah Chen',
-    difficulty: 'intermediate',
-    topics: ['autophagy', 'mTOR', 'AMPK', 'fasting', 'cellular health'],
-    relatedProtocols: ['time-restricted-eating']
-  },
-  {
-    id: 'mitochondria-masterclass',
-    title: 'Mitochondria: Your Cellular Powerhouses',
-    description: 'Understanding mitochondrial health: why it matters and how to optimize your cellular energy.',
-    category: 'science-deep-dives',
-    duration: 3000, // 50 minutes
-    thumbnailUrl: '/images/videos/mitochondria-thumb.jpg',
-    videoUrl: '/videos/mitochondria-masterclass.mp4',
-    instructor: 'Dr. Michael Torres',
-    difficulty: 'intermediate',
-    topics: ['mitochondria', 'energy', 'CoQ10', 'PQQ', 'exercise'],
-    relatedProtocols: ['zone-2-cardio', 'vo2-max-training'],
-    premium: true
-  },
-  {
-    id: 'senescent-cells',
-    title: 'Zombie Cells & Senolytics',
-    description: 'What are senescent cells, how they drive aging, and what we can do about them.',
-    category: 'science-deep-dives',
-    duration: 2100, // 35 minutes
-    thumbnailUrl: '/images/videos/senolytics-thumb.jpg',
-    videoUrl: '/videos/senescent-cells.mp4',
-    instructor: 'Dr. Elena Rodriguez',
+    duration: 3120,
+    thumbnailUrl: ytThumb('g6WznpsOxIw'),
+    videoUrl: ytUrl('g6WznpsOxIw'),
+    instructor: 'Dr. Daniel Pompa',
     difficulty: 'advanced',
-    topics: ['senescent cells', 'senolytics', 'fisetin', 'quercetin', 'aging'],
+    topics: ['heavy metals', 'mercury', 'chelation', 'detoxification', 'brain fog'],
+    relatedProtocols: ['cellular-detox'],
+    premium: true,
+  },
+  {
+    id: 'pompa-fasting-build-muscle',
+    title: 'How Fasting Can Help Build Muscle',
+    description: 'Counterintuitive but true — learn how strategic fasting combined with resistance training can boost growth hormone and support lean muscle gain.',
+    category: 'expert-interviews',
+    duration: 2460,
+    thumbnailUrl: ytThumb('Z9idSnGkNz4'),
+    videoUrl: ytUrl('Z9idSnGkNz4'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'intermediate',
+    topics: ['fasting', 'muscle growth', 'growth hormone', 'resistance training', 'body composition'],
+    relatedProtocols: ['time-restricted-eating'],
+  },
+  {
+    id: 'pompa-biohack-fasts',
+    title: 'How to Biohack Your Fasts',
+    description: 'Advanced fasting strategies including fasting mimicking diets, dry fasting, and supplement protocols to enhance your fasting results safely.',
+    category: 'protocol-guides',
+    duration: 2880,
+    thumbnailUrl: ytThumb('nQ2D0o5E8KU'),
+    videoUrl: ytUrl('nQ2D0o5E8KU'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'advanced',
+    topics: ['fasting mimicking', 'dry fasting', 'biohacking', 'supplements', 'autophagy'],
+    relatedProtocols: ['time-restricted-eating'],
+    premium: true,
+  },
+  {
+    id: 'pompa-gut-health',
+    title: 'Healing the Gut at the Cellular Level',
+    description: 'Leaky gut starts at the cell membrane. Dr. Pompa explains why conventional approaches fail and how to address gut issues through true cellular healing.',
+    category: 'science-deep-dives',
+    duration: 2700,
+    thumbnailUrl: ytThumb('39sEIPuEzFE'),
+    videoUrl: ytUrl('39sEIPuEzFE'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'intermediate',
+    topics: ['gut health', 'microbiome', 'leaky gut', 'cell membrane', 'inflammation'],
+    relatedProtocols: ['cellular-detox'],
+  },
+  {
+    id: 'pompa-hormone-optimization',
+    title: 'Hormone Optimization Through Fasting & Diet',
+    description: 'How fasting and diet variation can naturally rebalance thyroid, adrenals, and sex hormones without replacement therapy.',
+    category: 'expert-interviews',
+    duration: 3600,
+    thumbnailUrl: ytThumb('zHcfRiJxMCM'),
+    videoUrl: ytUrl('zHcfRiJxMCM'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'advanced',
+    topics: ['hormones', 'thyroid', 'adrenals', 'testosterone', 'fasting'],
     relatedProtocols: [],
-    premium: true
+    premium: true,
   },
   {
-    id: 'hormesis-explained',
-    title: 'Hormesis: Stress That Makes You Stronger',
-    description: 'How controlled stressors like cold, heat, and fasting activate longevity pathways.',
-    category: 'science-deep-dives',
-    duration: 2400, // 40 minutes
-    thumbnailUrl: '/images/videos/hormesis-thumb.jpg',
-    videoUrl: '/videos/hormesis-explained.mp4',
-    instructor: 'Dr. James Park',
+    id: 'pompa-diet-variation',
+    title: 'Diet Variation: Why One Diet Doesn\'t Fit All',
+    description: 'Dr. Pompa\'s ancestral approach to eating — cycling between feast and famine, keto and higher carb phases to keep your metabolism flexible and adaptive.',
+    category: 'protocol-guides',
+    duration: 2520,
+    thumbnailUrl: ytThumb('P8vMaGTem2M'),
+    videoUrl: ytUrl('P8vMaGTem2M'),
+    instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['hormesis', 'stress adaptation', 'cold exposure', 'heat exposure', 'fasting'],
-    relatedProtocols: ['cold-shower-basic', 'deliberate-cold-exposure', 'sauna-protocol']
-  },
-
-  // ============================================================================
-  // BREATHWORK SESSIONS
-  // ============================================================================
-  {
-    id: 'box-breathing-guided',
-    title: 'Guided Box Breathing (10 min)',
-    description: 'Follow along with this guided box breathing session for stress relief and focus.',
-    category: 'breathwork-sessions',
-    duration: 600, // 10 minutes
-    thumbnailUrl: '/images/videos/box-breathing-thumb.jpg',
-    videoUrl: '/videos/box-breathing-guided.mp4',
-    instructor: 'Anna Williams',
-    difficulty: 'beginner',
-    topics: ['breathwork', 'stress relief', 'focus', 'nervous system'],
-    relatedProtocols: ['box-breathing'],
-    featured: true
-  },
-  {
-    id: 'wim-hof-guided',
-    title: 'Wim Hof Breathing Session (15 min)',
-    description: 'Guided Wim Hof breathing method with 3 rounds. For intermediate practitioners.',
-    category: 'breathwork-sessions',
-    duration: 900, // 15 minutes
-    thumbnailUrl: '/images/videos/wim-hof-thumb.jpg',
-    videoUrl: '/videos/wim-hof-guided.mp4',
-    instructor: 'Marcus Johnson',
-    difficulty: 'intermediate',
-    topics: ['breathwork', 'Wim Hof', 'energy', 'cold tolerance'],
-    relatedProtocols: ['wim-hof-breathing']
-  },
-  {
-    id: 'physiological-sigh-demo',
-    title: 'Physiological Sigh Tutorial',
-    description: 'Learn the fastest way to calm your nervous system in real-time.',
-    category: 'breathwork-sessions',
-    duration: 300, // 5 minutes
-    thumbnailUrl: '/images/videos/physio-sigh-thumb.jpg',
-    videoUrl: '/videos/physiological-sigh.mp4',
-    instructor: 'Anna Williams',
-    difficulty: 'beginner',
-    topics: ['breathwork', 'stress relief', 'anxiety', 'quick technique'],
-    relatedProtocols: ['physiological-sigh']
-  },
-  {
-    id: 'nsdr-20min',
-    title: 'NSDR / Yoga Nidra (20 min)',
-    description: 'Non-Sleep Deep Rest protocol for recovery, focus, and dopamine restoration.',
-    category: 'breathwork-sessions',
-    duration: 1200, // 20 minutes
-    thumbnailUrl: '/images/videos/nsdr-thumb.jpg',
-    videoUrl: '/videos/nsdr-20min.mp4',
-    instructor: 'Elena Sanchez',
-    difficulty: 'beginner',
-    topics: ['NSDR', 'yoga nidra', 'recovery', 'relaxation', 'dopamine'],
-    relatedProtocols: ['nsdr-yoga-nidra'],
-    featured: true
-  },
-  {
-    id: 'sleep-breathwork',
-    title: 'Breathwork for Sleep (15 min)',
-    description: 'Calming breathing exercises to do in bed to help you fall asleep faster.',
-    category: 'breathwork-sessions',
-    duration: 900, // 15 minutes
-    thumbnailUrl: '/images/videos/sleep-breathwork-thumb.jpg',
-    videoUrl: '/videos/sleep-breathwork.mp4',
-    instructor: 'Anna Williams',
-    difficulty: 'beginner',
-    topics: ['breathwork', 'sleep', 'relaxation', 'nervous system'],
-    relatedProtocols: ['sleep-optimization']
-  },
-
-  // ============================================================================
-  // MOVEMENT ROUTINES
-  // ============================================================================
-  {
-    id: 'morning-mobility-follow',
-    title: 'Morning Mobility Flow (10 min)',
-    description: 'Follow-along morning mobility routine to start your day with full range of motion.',
-    category: 'movement-routines',
-    duration: 600, // 10 minutes
-    thumbnailUrl: '/images/videos/morning-mobility-thumb.jpg',
-    videoUrl: '/videos/morning-mobility-follow.mp4',
-    instructor: 'Marcus Johnson',
-    difficulty: 'beginner',
-    topics: ['mobility', 'stretching', 'morning routine', 'flexibility'],
-    relatedProtocols: ['morning-mobility'],
-    featured: true
-  },
-  {
-    id: 'zone2-guide',
-    title: 'Zone 2 Cardio Explained',
-    description: 'How to find your Zone 2, why it matters, and how to structure your cardio training.',
-    category: 'movement-routines',
-    duration: 1800, // 30 minutes
-    thumbnailUrl: '/images/videos/zone2-thumb.jpg',
-    videoUrl: '/videos/zone2-guide.mp4',
-    instructor: 'Dr. Michael Torres',
-    difficulty: 'beginner',
-    topics: ['Zone 2', 'cardio', 'mitochondria', 'fat burning', 'aerobic base'],
-    relatedProtocols: ['zone-2-cardio']
-  },
-  {
-    id: 'hiit-vo2max',
-    title: 'VO2 Max Training Guide',
-    description: 'How to safely implement high-intensity intervals for maximum cardiovascular benefit.',
-    category: 'movement-routines',
-    duration: 2100, // 35 minutes
-    thumbnailUrl: '/images/videos/vo2max-thumb.jpg',
-    videoUrl: '/videos/hiit-vo2max.mp4',
-    instructor: 'Marcus Johnson',
-    difficulty: 'advanced',
-    topics: ['VO2 max', 'HIIT', 'cardio', 'longevity', 'intervals'],
-    relatedProtocols: ['vo2-max-training'],
-    premium: true
-  },
-  {
-    id: 'desk-mobility',
-    title: 'Desk Worker Mobility (15 min)',
-    description: 'Combat the effects of sitting with this mobility routine designed for desk workers.',
-    category: 'movement-routines',
-    duration: 900, // 15 minutes
-    thumbnailUrl: '/images/videos/desk-mobility-thumb.jpg',
-    videoUrl: '/videos/desk-mobility.mp4',
-    instructor: 'Anna Williams',
-    difficulty: 'beginner',
-    topics: ['mobility', 'posture', 'desk work', 'hip flexors', 'shoulders'],
-    relatedProtocols: ['morning-mobility']
-  },
-
-  // ============================================================================
-  // EXPERT INTERVIEWS
-  // ============================================================================
-  {
-    id: 'interview-sleep-scientist',
-    title: 'Sleep Science with Dr. Walker',
-    description: 'In-depth conversation about sleep science, sleep debt, and optimizing recovery.',
-    category: 'expert-interviews',
-    duration: 5400, // 90 minutes
-    thumbnailUrl: '/images/videos/interview-sleep-thumb.jpg',
-    videoUrl: '/videos/interview-sleep-scientist.mp4',
-    instructor: 'Guest: Dr. Matthew Walker',
-    difficulty: 'intermediate',
-    topics: ['sleep', 'REM', 'deep sleep', 'sleep deprivation', 'recovery'],
-    relatedProtocols: ['sleep-optimization'],
-    premium: true
-  },
-  {
-    id: 'interview-longevity-researcher',
-    title: 'Longevity Research Update',
-    description: 'Latest findings in longevity research: what\'s working and what\'s hype.',
-    category: 'expert-interviews',
-    duration: 4800, // 80 minutes
-    thumbnailUrl: '/images/videos/interview-longevity-thumb.jpg',
-    videoUrl: '/videos/interview-longevity-researcher.mp4',
-    instructor: 'Guest: Dr. David Sinclair',
-    difficulty: 'advanced',
-    topics: ['longevity', 'aging', 'NAD+', 'sirtuins', 'research'],
+    topics: ['diet variation', 'seasonal eating', 'metabolic flexibility', 'ancestral health'],
     relatedProtocols: [],
-    premium: true
   },
   {
-    id: 'interview-cold-exposure',
-    title: 'The Science of Cold with Dr. Soberg',
-    description: 'Research on cold exposure: how it works and how to do it right.',
-    category: 'expert-interviews',
-    duration: 4200, // 70 minutes
-    thumbnailUrl: '/images/videos/interview-cold-thumb.jpg',
-    videoUrl: '/videos/interview-cold-exposure.mp4',
-    instructor: 'Guest: Dr. Susanna Soberg',
+    id: 'pompa-water-fast-benefits',
+    title: '5-Day Water Fast: What Happens to Your Body',
+    description: 'A complete walkthrough of a 5-day water fast — what to expect each day, the science of stem cell regeneration, and how to break your fast safely.',
+    category: 'protocol-guides',
+    duration: 3180,
+    thumbnailUrl: ytThumb('mxBGOD0SQII'),
+    videoUrl: ytUrl('mxBGOD0SQII'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'advanced',
+    topics: ['water fasting', 'stem cells', 'autophagy', 'extended fasting', 'regeneration'],
+    relatedProtocols: ['time-restricted-eating'],
+    premium: true,
+  },
+  {
+    id: 'pompa-cell-membrane',
+    title: 'Regenerating the Cell Membrane',
+    description: 'The cell membrane is the gatekeeper of cellular health. Learn how to restore its function using good fats, phospholipids, and targeted nutrition.',
+    category: 'science-deep-dives',
+    duration: 2400,
+    thumbnailUrl: ytThumb('L0QHYdIn2Pk'),
+    videoUrl: ytUrl('L0QHYdIn2Pk'),
+    instructor: 'Dr. Daniel Pompa',
     difficulty: 'intermediate',
-    topics: ['cold exposure', 'brown fat', 'metabolism', 'dopamine', 'research'],
-    relatedProtocols: ['cold-shower-basic', 'deliberate-cold-exposure'],
-    premium: true
+    topics: ['cell membrane', 'phospholipids', 'nutrition', 'cellular health', 'detox'],
+    relatedProtocols: ['cellular-detox'],
   },
-
-  // ============================================================================
-  // QUICK TIPS
-  // ============================================================================
   {
-    id: 'tip-morning-routine',
-    title: 'The Perfect Morning Routine',
-    description: 'Quick guide to structuring your morning for maximum energy and focus.',
+    id: 'pompa-longevity-prevention',
+    title: 'Achieving Longevity Through Prevention',
+    description: 'Dr. Pompa\'s approach to longevity — addressing root causes of disease before they manifest through cellular healing, fasting, and lifestyle optimization.',
+    category: 'expert-interviews',
+    duration: 3000,
+    thumbnailUrl: ytThumb('o0qfHdNLDg0'),
+    videoUrl: ytUrl('o0qfHdNLDg0'),
+    instructor: 'Dr. Daniel Pompa',
+    difficulty: 'beginner',
+    topics: ['longevity', 'prevention', 'cellular healing', 'lifestyle', 'aging'],
+    relatedProtocols: [],
+    featured: true,
+  },
+  {
+    id: 'pompa-fasting-autophagy-skin',
+    title: 'Fasting, Autophagy & Glowing Skin',
+    description: 'How fasting-induced autophagy can improve skin health, reduce inflammation, and slow visible signs of aging from the inside out.',
     category: 'quick-tips',
-    duration: 420, // 7 minutes
-    thumbnailUrl: '/images/videos/tip-morning-thumb.jpg',
-    videoUrl: '/videos/tip-morning-routine.mp4',
-    instructor: 'Dr. Sarah Chen',
+    duration: 1440,
+    thumbnailUrl: ytThumb('aeJyj4CvDyY'),
+    videoUrl: ytUrl('aeJyj4CvDyY'),
+    instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['morning routine', 'productivity', 'energy', 'circadian rhythm'],
-    relatedProtocols: ['morning-light-exposure', 'morning-mobility', 'cold-shower-basic']
+    topics: ['fasting', 'autophagy', 'skin health', 'anti-aging', 'collagen'],
+    relatedProtocols: ['time-restricted-eating'],
   },
-  {
-    id: 'tip-supplement-timing',
-    title: 'Supplement Timing Guide',
-    description: 'When to take your supplements for maximum absorption and effectiveness.',
-    category: 'quick-tips',
-    duration: 480, // 8 minutes
-    thumbnailUrl: '/images/videos/tip-supplements-thumb.jpg',
-    videoUrl: '/videos/tip-supplement-timing.mp4',
-    instructor: 'Dr. James Park',
-    difficulty: 'beginner',
-    topics: ['supplements', 'timing', 'absorption', 'stacking'],
-    relatedProtocols: []
-  },
-  {
-    id: 'tip-sleep-environment',
-    title: 'Optimize Your Sleep Environment',
-    description: 'Quick changes to your bedroom that can dramatically improve sleep quality.',
-    category: 'quick-tips',
-    duration: 360, // 6 minutes
-    thumbnailUrl: '/images/videos/tip-sleep-env-thumb.jpg',
-    videoUrl: '/videos/tip-sleep-environment.mp4',
-    instructor: 'Dr. Elena Rodriguez',
-    difficulty: 'beginner',
-    topics: ['sleep', 'environment', 'temperature', 'light', 'sound'],
-    relatedProtocols: ['sleep-optimization']
-  },
-  {
-    id: 'tip-cold-shower-start',
-    title: 'How to Start Cold Showers',
-    description: 'Step-by-step guide for beginners to start incorporating cold showers.',
-    category: 'quick-tips',
-    duration: 300, // 5 minutes
-    thumbnailUrl: '/images/videos/tip-cold-start-thumb.jpg',
-    videoUrl: '/videos/tip-cold-shower-start.mp4',
-    instructor: 'Marcus Johnson',
-    difficulty: 'beginner',
-    topics: ['cold exposure', 'cold shower', 'beginner', 'getting started'],
-    relatedProtocols: ['cold-shower-basic']
-  },
-
-  // ============================================================================
-  // MEDITATION
-  // ============================================================================
-  {
-    id: 'meditation-morning-10',
-    title: 'Morning Focus Meditation (10 min)',
-    description: 'Start your day with clarity and intention through this guided meditation.',
-    category: 'meditation',
-    duration: 600, // 10 minutes
-    thumbnailUrl: '/images/videos/meditation-morning-thumb.jpg',
-    videoUrl: '/videos/meditation-morning-10.mp4',
-    instructor: 'Elena Sanchez',
-    difficulty: 'beginner',
-    topics: ['meditation', 'focus', 'morning', 'mindfulness'],
-    relatedProtocols: ['morning-meditation']
-  },
-  {
-    id: 'meditation-gratitude',
-    title: 'Gratitude Meditation (5 min)',
-    description: 'Brief guided gratitude practice to cultivate positive emotions.',
-    category: 'meditation',
-    duration: 300, // 5 minutes
-    thumbnailUrl: '/images/videos/meditation-gratitude-thumb.jpg',
-    videoUrl: '/videos/meditation-gratitude.mp4',
-    instructor: 'Elena Sanchez',
-    difficulty: 'beginner',
-    topics: ['meditation', 'gratitude', 'positive psychology', 'wellbeing'],
-    relatedProtocols: ['gratitude-practice']
-  },
-  {
-    id: 'meditation-body-scan',
-    title: 'Body Scan Meditation (15 min)',
-    description: 'Progressive relaxation through body awareness for stress relief and sleep preparation.',
-    category: 'meditation',
-    duration: 900, // 15 minutes
-    thumbnailUrl: '/images/videos/meditation-body-scan-thumb.jpg',
-    videoUrl: '/videos/meditation-body-scan.mp4',
-    instructor: 'Elena Sanchez',
-    difficulty: 'beginner',
-    topics: ['meditation', 'body scan', 'relaxation', 'stress relief'],
-    relatedProtocols: ['sleep-optimization', 'nsdr-yoga-nidra']
-  }
 ];
+
+// ============================================================================
+// HUMAN GARAGE — Garry Lineham & Team
+// Channel: @HumanGarage
+// ============================================================================
+
+const humanGarageVideos: Video[] = [
+  {
+    id: 'hg-full-body-reset',
+    title: '15-Minute Full Body Fascial Reset',
+    description: 'Human Garage\'s signature routine — a 15-minute sequence of fascial maneuvers designed to reduce 70-80% of body stress, unwind tension, and reset the nervous system.',
+    category: 'movement-routines',
+    duration: 960,
+    thumbnailUrl: ytThumb('4BOTvaRaDjI'),
+    videoUrl: ytUrl('4BOTvaRaDjI'),
+    instructor: 'Garry Lineham',
+    difficulty: 'beginner',
+    topics: ['fascia', 'body reset', 'stress relief', 'nervous system', 'tension release'],
+    relatedProtocols: ['morning-mobility'],
+    featured: true,
+  },
+  {
+    id: 'hg-upper-body-reset',
+    title: 'Upper Body Reset: Neck, Shoulders & Back',
+    description: 'Release chronic tension in your neck, shoulders, and upper back with this targeted fascial maneuver sequence. Great for desk workers and anyone carrying stress.',
+    category: 'movement-routines',
+    duration: 780,
+    thumbnailUrl: ytThumb('lB7oMkNJPOg'),
+    videoUrl: ytUrl('lB7oMkNJPOg'),
+    instructor: 'Human Garage',
+    difficulty: 'beginner',
+    topics: ['upper body', 'neck pain', 'shoulders', 'back pain', 'desk work', 'fascia'],
+    relatedProtocols: ['morning-mobility'],
+  },
+  {
+    id: 'hg-lower-body-reset',
+    title: 'Lower Body Reset: Hips, Legs & Feet',
+    description: 'Unlock your hips, relieve knee tension, and ground yourself through your feet with this lower body fascial maneuver sequence.',
+    category: 'movement-routines',
+    duration: 840,
+    thumbnailUrl: ytThumb('SsrdctFCzUM'),
+    videoUrl: ytUrl('SsrdctFCzUM'),
+    instructor: 'Human Garage',
+    difficulty: 'beginner',
+    topics: ['lower body', 'hips', 'knee pain', 'feet', 'grounding', 'fascia'],
+    relatedProtocols: ['morning-mobility'],
+  },
+  {
+    id: 'hg-jaw-release',
+    title: 'Jaw Release: Let Go of Anger & Frustration',
+    description: 'Your jaw holds emotional tension from anger and frustration. This fascial maneuver helps release stored emotions and reduce TMJ discomfort.',
+    category: 'movement-routines',
+    duration: 600,
+    thumbnailUrl: ytThumb('JH3MCzB-bKM'),
+    videoUrl: ytUrl('JH3MCzB-bKM'),
+    instructor: 'Garry Lineham',
+    difficulty: 'beginner',
+    topics: ['jaw release', 'TMJ', 'anger', 'emotional release', 'fascia'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'hg-organ-reset',
+    title: 'Organ Reset: Visceral Fascial Maneuvers',
+    description: 'Learn to work with the fascia around your internal organs. These gentle maneuvers support digestion, detox, and overall organ function.',
+    category: 'movement-routines',
+    duration: 900,
+    thumbnailUrl: ytThumb('R57NVTiGxEQ'),
+    videoUrl: ytUrl('R57NVTiGxEQ'),
+    instructor: 'Human Garage',
+    difficulty: 'intermediate',
+    topics: ['organ reset', 'visceral fascia', 'digestion', 'detox', 'gut health'],
+    relatedProtocols: [],
+    premium: true,
+  },
+  {
+    id: 'hg-hip-opener-trauma',
+    title: 'Hip Opener: Release Stored Trauma',
+    description: 'The hips are one of the body\'s primary trauma storage sites. This sequence helps release deep-held tension and emotional patterns.',
+    category: 'movement-routines',
+    duration: 720,
+    thumbnailUrl: ytThumb('piINifHE4XY'),
+    videoUrl: ytUrl('piINifHE4XY'),
+    instructor: 'Human Garage',
+    difficulty: 'intermediate',
+    topics: ['hip opener', 'trauma release', 'emotional healing', 'flexibility', 'fascia'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'hg-stress-reset',
+    title: 'Instant Stress Reset (5 Minutes)',
+    description: 'A quick 5-minute fascial maneuver you can do anywhere to immediately reduce stress and calm your nervous system.',
+    category: 'quick-tips',
+    duration: 360,
+    thumbnailUrl: ytThumb('hVebTWMOLcY'),
+    videoUrl: ytUrl('hVebTWMOLcY'),
+    instructor: 'Garry Lineham',
+    difficulty: 'beginner',
+    topics: ['stress relief', 'quick reset', 'nervous system', 'fascia', 'anxiety'],
+    relatedProtocols: [],
+    featured: true,
+  },
+  {
+    id: 'hg-shoulder-anxiety',
+    title: 'Shoulder Release for Anxiety',
+    description: 'Anxiety often manifests as tightness in the shoulders and chest. This maneuver opens the chest, drops the shoulders, and creates space for deep breathing.',
+    category: 'movement-routines',
+    duration: 540,
+    thumbnailUrl: ytThumb('fjYCaPqGF-M'),
+    videoUrl: ytUrl('fjYCaPqGF-M'),
+    instructor: 'Human Garage',
+    difficulty: 'beginner',
+    topics: ['shoulders', 'anxiety', 'chest opening', 'breathing', 'emotional release'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'hg-pretzel-squat',
+    title: 'Pretzel Squat: Full Body Integration',
+    description: 'The pretzel squat is one of Human Garage\'s signature moves — a full-body fascial maneuver that integrates multiple chains for total body alignment.',
+    category: 'movement-routines',
+    duration: 480,
+    thumbnailUrl: ytThumb('JFqmBMK0Blg'),
+    videoUrl: ytUrl('JFqmBMK0Blg'),
+    instructor: 'Garry Lineham',
+    difficulty: 'intermediate',
+    topics: ['pretzel squat', 'full body', 'alignment', 'integration', 'fascia'],
+    relatedProtocols: ['morning-mobility'],
+  },
+  {
+    id: 'hg-morning-wakeup',
+    title: 'Morning Wake-Up Fascial Routine',
+    description: 'Start your day by waking up your fascia with this gentle morning sequence. Takes just 10 minutes and sets the tone for your whole day.',
+    category: 'movement-routines',
+    duration: 600,
+    thumbnailUrl: ytThumb('Y3bJsiQxMz0'),
+    videoUrl: ytUrl('Y3bJsiQxMz0'),
+    instructor: 'Human Garage',
+    difficulty: 'beginner',
+    topics: ['morning routine', 'wake up', 'energy', 'fascia', 'mobility'],
+    relatedProtocols: ['morning-mobility'],
+  },
+  {
+    id: 'hg-neck-tmj',
+    title: 'Neck & TMJ Fascial Release',
+    description: 'Targeted fascial maneuvers for the neck and jaw area — helps with headaches, TMJ pain, and neck stiffness from screen use.',
+    category: 'quick-tips',
+    duration: 480,
+    thumbnailUrl: ytThumb('d3u0IC4hFRw'),
+    videoUrl: ytUrl('d3u0IC4hFRw'),
+    instructor: 'Human Garage',
+    difficulty: 'beginner',
+    topics: ['neck pain', 'TMJ', 'headaches', 'fascia', 'screen posture'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'hg-what-is-fascia',
+    title: 'What is Fascia & Why It Matters',
+    description: 'Garry Lineham explains the fascial system — the connective tissue web that runs through your entire body and why it holds the key to pain, posture, and emotional health.',
+    category: 'science-deep-dives',
+    duration: 1200,
+    thumbnailUrl: ytThumb('t_HU-s1mDFk'),
+    videoUrl: ytUrl('t_HU-s1mDFk'),
+    instructor: 'Garry Lineham',
+    difficulty: 'beginner',
+    topics: ['fascia', 'connective tissue', 'pain', 'posture', 'emotional health'],
+    relatedProtocols: [],
+  },
+];
+
+// ============================================================================
+// COMBINED VIDEO LIBRARY
+// ============================================================================
+
+export const videos: Video[] = [...pompaVideos, ...humanGarageVideos];
 
 // ============================================================================
 // VIDEO CATEGORIES METADATA
@@ -457,39 +418,39 @@ export const videos: Video[] = [
 export const videoCategories = {
   'protocol-guides': {
     name: 'Protocol Guides',
-    description: 'In-depth guides to longevity protocols',
-    icon: 'BookOpen'
+    description: 'Step-by-step guides to healing protocols',
+    icon: 'BookOpen',
   },
   'science-deep-dives': {
     name: 'Science Deep Dives',
-    description: 'Detailed explanations of the science behind longevity',
-    icon: 'FlaskConical'
+    description: 'The science behind cellular healing and fascia',
+    icon: 'FlaskConical',
   },
   'breathwork-sessions': {
     name: 'Breathwork Sessions',
     description: 'Guided breathing exercises and practices',
-    icon: 'Wind'
+    icon: 'Wind',
   },
   'movement-routines': {
-    name: 'Movement Routines',
-    description: 'Follow-along exercise and mobility content',
-    icon: 'Dumbbell'
+    name: 'Movement & Fascia',
+    description: 'Fascial maneuvers and movement routines',
+    icon: 'Dumbbell',
   },
   'expert-interviews': {
-    name: 'Expert Interviews',
-    description: 'Conversations with leading researchers and practitioners',
-    icon: 'Mic'
+    name: 'Expert Talks',
+    description: 'In-depth discussions on health topics',
+    icon: 'Mic',
   },
   'quick-tips': {
     name: 'Quick Tips',
     description: 'Short, actionable tips you can apply today',
-    icon: 'Lightbulb'
+    icon: 'Lightbulb',
   },
   meditation: {
     name: 'Meditation',
     description: 'Guided meditation and mindfulness practices',
-    icon: 'Brain'
-  }
+    icon: 'Brain',
+  },
 };
 
 // ============================================================================
@@ -505,53 +466,53 @@ export interface VideoCollection {
 
 export const videoCollections: VideoCollection[] = [
   {
-    id: 'getting-started',
-    name: 'Getting Started',
-    description: 'Essential videos for beginners to longevity optimization',
+    id: 'getting-started-cellular-healing',
+    name: 'Getting Started with Cellular Healing',
+    description: 'Dr. Pompa\'s foundational videos on the 5R protocol, fasting, and cellular detox',
     videoIds: [
-      'circadian-rhythm-guide',
-      'cold-exposure-masterclass',
-      'box-breathing-guided',
-      'morning-mobility-follow',
-      'tip-morning-routine'
-    ]
+      'pompa-5r-cellular-healing',
+      'pompa-intermittent-fasting',
+      'pompa-diet-variation',
+      'pompa-longevity-prevention',
+      'pompa-cell-membrane',
+    ],
   },
   {
-    id: 'sleep-series',
-    name: 'Sleep Mastery Series',
-    description: 'Everything you need to optimize your sleep',
+    id: '15-minute-body-resets',
+    name: '15-Minute Body Resets',
+    description: 'Human Garage\'s quick fascial routines to release tension and reset your body',
     videoIds: [
-      'sleep-optimization-deep-dive',
-      'nsdr-20min',
-      'sleep-breathwork',
-      'tip-sleep-environment',
-      'meditation-body-scan'
-    ]
+      'hg-full-body-reset',
+      'hg-upper-body-reset',
+      'hg-lower-body-reset',
+      'hg-morning-wakeup',
+      'hg-stress-reset',
+    ],
   },
   {
-    id: 'breathwork-library',
-    name: 'Breathwork Library',
-    description: 'Guided breathing practices for every situation',
+    id: 'advanced-detox-fasting',
+    name: 'Advanced Detox & Fasting',
+    description: 'Deep dives into water fasting, heavy metal detox, and advanced healing protocols',
     videoIds: [
-      'box-breathing-guided',
-      'wim-hof-guided',
-      'physiological-sigh-demo',
-      'nsdr-20min',
-      'sleep-breathwork'
-    ]
+      'pompa-biohack-fasts',
+      'pompa-water-fast-benefits',
+      'pompa-heavy-metal-detox',
+      'pompa-autophagy-explained',
+      'pompa-hormone-optimization',
+    ],
   },
   {
-    id: 'advanced-science',
-    name: 'Advanced Science',
-    description: 'Deep dives into the mechanisms of aging and longevity',
+    id: 'stress-trauma-release',
+    name: 'Stress & Trauma Release',
+    description: 'Fascial maneuvers targeting emotional tension, anxiety, and stored trauma',
     videoIds: [
-      'nad-pathway-explained',
-      'autophagy-explained',
-      'mitochondria-masterclass',
-      'senescent-cells',
-      'hormesis-explained'
-    ]
-  }
+      'hg-jaw-release',
+      'hg-hip-opener-trauma',
+      'hg-shoulder-anxiety',
+      'hg-organ-reset',
+      'hg-what-is-fascia',
+    ],
+  },
 ];
 
 export default videos;

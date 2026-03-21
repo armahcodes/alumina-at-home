@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyUserAccess } from '@/lib/auth/session';
 import { getUser, updateUserOnboarding } from '@/lib/db';
+import { userPatchSchema } from '@/lib/validations';
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +22,6 @@ export async function GET(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error in GET /api/user/[userId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -37,7 +37,13 @@ export async function PATCH(
       return NextResponse.json({ error: authError.message }, { status: authError.status });
     }
 
-    const body = await request.json();
+    const raw = await request.json();
+    const parsed = userPatchSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const body = parsed.data;
 
     if (body.hasCompletedOnboarding !== undefined) {
       const { data, error } = await updateUserOnboarding(userId, body.hasCompletedOnboarding);
@@ -51,7 +57,6 @@ export async function PATCH(
 
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
   } catch (error) {
-    console.error('Error in PATCH /api/user/[userId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

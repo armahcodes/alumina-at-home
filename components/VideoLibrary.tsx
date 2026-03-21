@@ -35,45 +35,9 @@ const categoryIcons: Record<string, LucideIcon> = {
   'meditation': Brain,
 };
 
-// Unsplash thumbnail images for video categories
-const categoryThumbnails: Record<string, string> = {
-  'protocol-guides': 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80',
-  'science-deep-dives': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
-  'breathwork-sessions': 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&q=80',
-  'movement-routines': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80',
-  'expert-interviews': 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80',
-  'quick-tips': 'https://images.unsplash.com/photo-1493836512294-502baa1986e2?w=800&q=80',
-  'meditation': 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?w=800&q=80',
-};
-
-// Additional specific thumbnails for variety
-const videoThumbnails: Record<string, string> = {
-  'cold-exposure': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'circadian': 'https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&q=80',
-  'sauna': 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80',
-  'fasting': 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800&q=80',
-  'sleep': 'https://images.unsplash.com/photo-1541781774459-bb2af2f05b55?w=800&q=80',
-  'breathwork': 'https://images.unsplash.com/photo-1588286840104-8957b019727f?w=800&q=80',
-  'mobility': 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800&q=80',
-  'meditation': 'https://images.unsplash.com/photo-1593811167562-9cef47bfc4d7?w=800&q=80',
-  'aging': 'https://images.unsplash.com/photo-1559757175-5700dde675bc?w=800&q=80',
-  'nad': 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80',
-  'autophagy': 'https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&q=80',
-  'mitochondria': 'https://images.unsplash.com/photo-1576086213369-97a306d36557?w=800&q=80',
-  'telomeres': 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=800&q=80',
-  'interview': 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=800&q=80',
-};
-
+/** Use the video's own thumbnail URL (YouTube auto-thumbnails from video data) */
 function getVideoThumbnail(video: Video): string {
-  // Check for specific video keywords
-  const titleLower = video.title.toLowerCase();
-  for (const [key, url] of Object.entries(videoThumbnails)) {
-    if (titleLower.includes(key)) {
-      return url;
-    }
-  }
-  // Fall back to category thumbnail
-  return categoryThumbnails[video.category] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=800&q=80';
+  return video.thumbnailUrl;
 }
 
 export default function VideoLibrary() {
@@ -569,7 +533,7 @@ function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCar
       borderColor="primary.400"
       borderRadius="xl"
       overflow="hidden"
-      _hover={{ borderColor: 'accent.500/50', transform: 'translateY(-2px)', boxShadow: 'lg' }}
+      _hover={{ borderColor: 'accent.500/40', transform: 'translateY(-3px)', boxShadow: '0 12px 32px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(239, 194, 179, 0.1)' }}
       _focus={{ ring: 2, ringColor: 'accent.400' }}
       transition="all 0.3s"
       textAlign="left"

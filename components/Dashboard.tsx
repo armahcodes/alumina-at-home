@@ -184,7 +184,7 @@ export default function Dashboard() {
               borderColor="primary.400"
               borderRadius="xl"
               p={{ base: 3.5, sm: 4 }}
-              _hover={{ bg: "primary.600/60" }}
+              _hover={{ bg: "primary.600/60", borderColor: "accent.500/20", transform: "translateY(-1px)" }}
               transition="all 0.2s"
             >
               <Flex align="center" gap={2} mb={2}>
@@ -241,7 +241,7 @@ export default function Dashboard() {
                   borderWidth="1px"
                   bg={completedTasks.includes(protocol.id) ? "accent.500/10" : "primary.600/50"}
                   borderColor={completedTasks.includes(protocol.id) ? "accent.500/20" : "primary.400"}
-                  _hover={{ shadow: "lg" }}
+                  _hover={{ shadow: "lg", borderColor: completedTasks.includes(protocol.id) ? "accent.500/30" : "accent.500/15", transform: "translateY(-1px)" }}
                   transition="all 0.2s"
                 >
                 <Flex align="center" gap={{ base: 2.5, sm: 3 }}>
@@ -412,7 +412,6 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
 
   const onSubmit = (data: ConsultationFormData) => {
     // Here you would typically send to an API
-    console.log('Consultation booking:', data);
     setSubmitted(true);
     setTimeout(() => {
       onClose();

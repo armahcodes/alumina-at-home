@@ -9,7 +9,7 @@ import type { NewUser, NewUserProfile, NewDailyMetric, NewCompletedTask, NewAchi
 
 export async function createUser(userData: NewUser) {
   try {
-    const [user] = await db
+    const rows = await db
       .insert(schema.users)
       .values(userData)
       .onConflictDoUpdate({
@@ -17,36 +17,33 @@ export async function createUser(userData: NewUser) {
         set: { lastLoginAt: sql`CURRENT_TIMESTAMP` }
       })
       .returning();
-    return { data: user, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error creating user:', error);
     return { data: null, error };
   }
 }
 
 export async function getUser(userId: string) {
   try {
-    const [user] = await db
+    const rows = await db
       .select()
       .from(schema.users)
       .where(eq(schema.users.id, userId));
-    return { data: user || null, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error fetching user:', error);
     return { data: null, error };
   }
 }
 
 export async function updateUserOnboarding(userId: string, completed: boolean) {
   try {
-    const [user] = await db
+    const rows = await db
       .update(schema.users)
       .set({ hasCompletedOnboarding: completed })
       .where(eq(schema.users.id, userId))
       .returning();
-    return { data: user, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error updating user onboarding:', error);
     return { data: null, error };
   }
 }
@@ -57,7 +54,7 @@ export async function updateUserOnboarding(userId: string, completed: boolean) {
 
 export async function upsertUserProfile(userId: string, profileData: Omit<NewUserProfile, 'userId'>) {
   try {
-    const [profile] = await db
+    const rows = await db
       .insert(schema.userProfiles)
       .values({ userId, ...profileData })
       .onConflictDoUpdate({
@@ -68,22 +65,20 @@ export async function upsertUserProfile(userId: string, profileData: Omit<NewUse
         }
       })
       .returning();
-    return { data: profile, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error upserting user profile:', error);
     return { data: null, error };
   }
 }
 
 export async function getUserProfile(userId: string) {
   try {
-    const [profile] = await db
+    const rows = await db
       .select()
       .from(schema.userProfiles)
       .where(eq(schema.userProfiles.userId, userId));
-    return { data: profile || null, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error fetching user profile:', error);
     return { data: null, error };
   }
 }
@@ -94,29 +89,31 @@ export async function getUserProfile(userId: string) {
 
 export async function getUserStats(userId: string) {
   try {
-    let [stats] = await db
+    const rows = await db
       .select()
       .from(schema.userStats)
       .where(eq(schema.userStats.userId, userId));
 
+    let stats = rows[0];
+
     // Initialize stats if they don't exist
     if (!stats) {
-      [stats] = await db
+      const inserted = await db
         .insert(schema.userStats)
         .values({ userId })
         .returning();
+      stats = inserted[0];
     }
 
-    return { data: stats, error: null };
+    return { data: stats || null, error: null };
   } catch (error) {
-    console.error('Error fetching user stats:', error);
     return { data: null, error };
   }
 }
 
 export async function updateUserStats(userId: string, statsData: Partial<Omit<schema.UserStats, 'userId'>>) {
   try {
-    const [stats] = await db
+    const rows = await db
       .insert(schema.userStats)
       .values({ userId, ...statsData })
       .onConflictDoUpdate({
@@ -127,16 +124,15 @@ export async function updateUserStats(userId: string, statsData: Partial<Omit<sc
         }
       })
       .returning();
-    return { data: stats, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error updating user stats:', error);
     return { data: null, error };
   }
 }
 
 export async function incrementStreak(userId: string) {
   try {
-    const [stats] = await db
+    const rows = await db
       .insert(schema.userStats)
       .values({ userId, currentStreak: 1, longestStreak: 1, lastActivityDate: sql`CURRENT_DATE` })
       .onConflictDoUpdate({
@@ -149,16 +145,15 @@ export async function incrementStreak(userId: string) {
         }
       })
       .returning();
-    return { data: stats, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error incrementing streak:', error);
     return { data: null, error };
   }
 }
 
 export async function addPoints(userId: string, points: number) {
   try {
-    const [stats] = await db
+    const rows = await db
       .insert(schema.userStats)
       .values({ userId, totalPoints: points })
       .onConflictDoUpdate({
@@ -169,9 +164,8 @@ export async function addPoints(userId: string, points: number) {
         }
       })
       .returning();
-    return { data: stats, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error adding points:', error);
     return { data: null, error };
   }
 }
@@ -182,7 +176,7 @@ export async function addPoints(userId: string, points: number) {
 
 export async function addDailyMetric(metric: NewDailyMetric) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.dailyMetrics)
       .values(metric)
       .onConflictDoUpdate({
@@ -196,9 +190,8 @@ export async function addDailyMetric(metric: NewDailyMetric) {
         }
       })
       .returning();
-    return { data: result, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error adding daily metric:', error);
     return { data: null, error };
   }
 }
@@ -213,7 +206,6 @@ export async function getDailyMetrics(userId: string, limit: number = 30) {
       .limit(limit);
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching daily metrics:', error);
     return { data: [], error };
   }
 }
@@ -224,13 +216,12 @@ export async function getDailyMetrics(userId: string, limit: number = 30) {
 
 export async function addCompletedTask(task: NewCompletedTask) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.completedTasks)
       .values(task)
       .returning();
-    return { data: result, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error adding completed task:', error);
     return { data: null, error };
   }
 }
@@ -254,7 +245,6 @@ export async function getCompletedTasks(userId: string, date?: string) {
           .limit(100);
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching completed tasks:', error);
     return { data: [], error };
   }
 }
@@ -271,7 +261,6 @@ export async function getTodayCompletedTasks(userId: string) {
       .orderBy(desc(schema.completedTasks.completedAt));
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching today completed tasks:', error);
     return { data: [], error };
   }
 }
@@ -282,20 +271,20 @@ export async function getTodayCompletedTasks(userId: string) {
 
 export async function unlockAchievement(achievement: NewAchievement) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.achievements)
       .values(achievement)
       .onConflictDoNothing()
       .returning();
 
+    const result = rows[0] || null;
+
     if (result) {
-      // Add points to user stats
       await addPoints(achievement.userId, achievement.pointsEarned || 0);
     }
 
-    return { data: result || null, error: null };
+    return { data: result, error: null };
   } catch (error) {
-    console.error('Error unlocking achievement:', error);
     return { data: null, error };
   }
 }
@@ -309,7 +298,6 @@ export async function getUserAchievements(userId: string) {
       .orderBy(desc(schema.achievements.unlockedAt));
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching achievements:', error);
     return { data: [], error };
   }
 }
@@ -320,13 +308,12 @@ export async function getUserAchievements(userId: string) {
 
 export async function addSupplementTracking(supplement: NewSupplementTracking) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.supplementsTracking)
       .values(supplement)
       .returning();
-    return { data: result, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error adding supplement tracking:', error);
     return { data: null, error };
   }
 }
@@ -343,7 +330,6 @@ export async function getTodaySupplements(userId: string) {
       .orderBy(desc(schema.supplementsTracking.takenAt));
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching today supplements:', error);
     return { data: [], error };
   }
 }
@@ -354,27 +340,25 @@ export async function getTodaySupplements(userId: string) {
 
 export async function startProtocolTimer(timer: NewProtocolTimer) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.protocolTimers)
       .values(timer)
       .returning();
-    return { data: result, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error starting protocol timer:', error);
     return { data: null, error };
   }
 }
 
 export async function completeProtocolTimer(timerId: number) {
   try {
-    const [result] = await db
+    const rows = await db
       .update(schema.protocolTimers)
       .set({ completed: true, completedAt: sql`CURRENT_TIMESTAMP` })
       .where(eq(schema.protocolTimers.id, timerId))
       .returning();
-    return { data: result, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error completing protocol timer:', error);
     return { data: null, error };
   }
 }
@@ -385,14 +369,13 @@ export async function completeProtocolTimer(timerId: number) {
 
 export async function markEquipmentOwned(equipment: NewUserEquipment) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.userEquipment)
       .values(equipment)
       .onConflictDoNothing()
       .returning();
-    return { data: result || null, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error marking equipment owned:', error);
     return { data: null, error };
   }
 }
@@ -406,7 +389,6 @@ export async function getUserEquipment(userId: string) {
       .orderBy(desc(schema.userEquipment.markedOwnedAt));
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching user equipment:', error);
     return { data: [], error };
   }
 }
@@ -417,7 +399,7 @@ export async function getUserEquipment(userId: string) {
 
 export async function markVideoWatched(video: NewVideoProgress) {
   try {
-    const [result] = await db
+    const rows = await db
       .insert(schema.videoProgress)
       .values(video)
       .onConflictDoUpdate({
@@ -425,9 +407,8 @@ export async function markVideoWatched(video: NewVideoProgress) {
         set: { watchedAt: sql`CURRENT_TIMESTAMP` }
       })
       .returning();
-    return { data: result, error: null };
+    return { data: rows[0] || null, error: null };
   } catch (error) {
-    console.error('Error marking video watched:', error);
     return { data: null, error };
   }
 }
@@ -441,71 +422,6 @@ export async function getWatchedVideos(userId: string) {
       .orderBy(desc(schema.videoProgress.watchedAt));
     return { data: results, error: null };
   } catch (error) {
-    console.error('Error fetching watched videos:', error);
     return { data: [], error };
   }
 }
-
-// ============================================================================
-// LEGACY PROFILE OPERATIONS (for backwards compatibility)
-// ============================================================================
-
-export async function upsertProfile(userId: string, profileData: Partial<schema.Profile>) {
-  try {
-    // Create or update user
-    if (profileData.email && profileData.name) {
-      await createUser({
-        id: userId,
-        email: profileData.email,
-        name: profileData.name
-      });
-    }
-
-    // Upsert profile data if provided
-    if (profileData.goals || profileData.experienceLevel || profileData.availableTime !== undefined || 
-        profileData.healthConditions || profileData.budget) {
-      await upsertUserProfile(userId, {
-        goals: profileData.goals,
-        experienceLevel: profileData.experienceLevel as 'beginner' | 'intermediate' | 'advanced' | undefined,
-        availableTime: profileData.availableTime,
-        healthConditions: profileData.healthConditions,
-        budget: profileData.budget as 'essential' | 'intermediate' | 'premium' | undefined
-      });
-    }
-
-    return await getProfile(userId);
-  } catch (error) {
-    console.error('Error upserting profile (legacy):', error);
-    return { data: null, error };
-  }
-}
-
-export async function getProfile(userId: string) {
-  try {
-    const userResult = await getUser(userId);
-    const profileResult = await getUserProfile(userId);
-
-    if (!userResult.data) {
-      return { data: null, error: null };
-    }
-
-    const combinedProfile: schema.Profile = {
-      id: userResult.data.id,
-      email: userResult.data.email,
-      name: userResult.data.name,
-      goals: profileResult.data?.goals || [],
-      experienceLevel: (profileResult.data?.experienceLevel || 'beginner') as string,
-      availableTime: profileResult.data?.availableTime || 0,
-      healthConditions: profileResult.data?.healthConditions || [],
-      budget: (profileResult.data?.budget || 'essential') as string,
-      createdAt: userResult.data.createdAt,
-      updatedAt: profileResult.data?.updatedAt || userResult.data.updatedAt
-    };
-
-    return { data: combinedProfile, error: null };
-  } catch (error) {
-    console.error('Error fetching profile (legacy):', error);
-    return { data: null, error };
-  }
-}
-

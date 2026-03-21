@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Box, Flex, Heading, Text, Button, Center } from '@chakra-ui/react';
 import { X, RotateCcw, Play, Pause, CheckCircle } from 'lucide-react';
@@ -17,7 +17,6 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
@@ -29,10 +28,6 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
           if (prev <= 1) {
             setIsRunning(false);
             setShowCelebration(true);
-            // Play completion sound
-            if (audioRef.current) {
-              audioRef.current.play().catch(() => {});
-            }
             setTimeout(() => {
               onComplete();
             }, 2000);
@@ -266,6 +261,7 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
                 _active={{ transform: "scale(0.98)" }}
                 transition="all 0.2s"
                 aria-label={isRunning ? "Pause timer" : "Start timer"}
+                className={isRunning && !shouldReduceMotion ? 'animate-pulse-ring' : undefined}
               >
                 {isRunning ? (
                   <Box as={Pause} w={{ base: 8, sm: 10 }} h={{ base: 8, sm: 10 }} />
@@ -302,8 +298,6 @@ export default function ProtocolTimer({ protocolName, duration, onComplete, onCl
           </Box>
         </Box>
 
-        {/* Audio element for completion sound */}
-        <audio ref={audioRef} src="/sounds/complete.mp3" />
       </Flex>
     </FocusTrap>
   );

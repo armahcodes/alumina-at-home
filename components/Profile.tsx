@@ -832,7 +832,6 @@ function NotificationsModal({ onClose }: { onClose: () => void }) {
   });
 
   const handleSave = () => {
-    console.log('Saving notification settings:', settings);
     onClose();
   };
 
@@ -978,7 +977,6 @@ function SupportModal({ onClose }: { onClose: () => void }) {
   const [submitted, setSubmitted] = useState(false);
 
   const onSubmit = (data: SupportFormData) => {
-    console.log('Support request:', data);
     setSubmitted(true);
     setTimeout(() => {
       onClose();

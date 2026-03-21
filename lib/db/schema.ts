@@ -182,20 +182,6 @@ export const videoProgress = pgTable('video_progress', {
   watchedAt: timestamp('watched_at', { withTimezone: true }).defaultNow()
 });
 
-// Legacy profiles table (for backwards compatibility)
-export const profiles = pgTable('profiles', {
-  id: varchar('id', { length: 255 }).primaryKey(),
-  email: varchar('email', { length: 255 }).notNull(),
-  name: varchar('name', { length: 255 }).notNull(),
-  goals: text('goals').array().default([]),
-  experienceLevel: varchar('experience_level', { length: 50 }).default('beginner'),
-  availableTime: integer('available_time').default(0),
-  healthConditions: text('health_conditions').array().default([]),
-  budget: varchar('budget', { length: 50 }).default('essential'),
-  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow()
-});
-
 // ============================================================================
 // TYPE INFERENCE
 // ============================================================================
@@ -212,7 +198,6 @@ export type SupplementTracking = InferSelectModel<typeof supplementsTracking>;
 export type ProtocolTimer = InferSelectModel<typeof protocolTimers>;
 export type UserEquipment = InferSelectModel<typeof userEquipment>;
 export type VideoProgress = InferSelectModel<typeof videoProgress>;
-export type Profile = InferSelectModel<typeof profiles>;
 export type Session = InferSelectModel<typeof session>;
 export type Account = InferSelectModel<typeof account>;
 export type Verification = InferSelectModel<typeof verification>;
@@ -228,5 +213,4 @@ export type NewSupplementTracking = InferInsertModel<typeof supplementsTracking>
 export type NewProtocolTimer = InferInsertModel<typeof protocolTimers>;
 export type NewUserEquipment = InferInsertModel<typeof userEquipment>;
 export type NewVideoProgress = InferInsertModel<typeof videoProgress>;
-export type NewProfile = InferInsertModel<typeof profiles>;
 

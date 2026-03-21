@@ -183,8 +183,9 @@ export default function Home() {
             bg="primary.800/95"
             backdropFilter="blur(20px)"
             borderRight="1px solid"
-            borderColor="whiteAlpha.50"
+            borderColor="whiteAlpha.100"
             overflowY="auto"
+            boxShadow="4px 0 24px rgba(0, 0, 0, 0.15)"
           >
             {/* Logo */}
             <Flex
@@ -273,33 +274,45 @@ export default function Home() {
             </Box>
 
             {/* Navigation */}
-            <Box as="nav" flex={1} px={4} py={4} css={{ '& > *': { marginBottom: '4px' } }} role="navigation" aria-label="Main navigation">
+            <Box as="nav" flex={1} px={4} py={4} css={{ '& > *': { marginBottom: '2px' } }} role="navigation" aria-label="Main navigation">
               {navigationItems.map((item) => {
                 const IconComponent = item.icon;
+                const isActive = activeTab === item.id;
                 return (
                   <Button
                     key={item.id}
                     onClick={() => setActiveTab(item.id as Tab)}
                     aria-label={`Navigate to ${item.label}`}
-                    aria-current={activeTab === item.id ? 'page' : undefined}
+                    aria-current={isActive ? 'page' : undefined}
                     w="full"
                     justifyContent="flex-start"
                     gap={3}
                     px={4}
                     py={3}
                     borderRadius="xl"
-                    transition="all 0.3s"
-                    bg={activeTab === item.id ? 'accent.500/20' : 'transparent'}
-                    color={activeTab === item.id ? 'accent.300' : 'whiteAlpha.700'}
-                    boxShadow={activeTab === item.id ? 'lg' : 'none'}
+                    transition="all 0.2s"
+                    position="relative"
+                    bg={isActive ? 'accent.500/15' : 'transparent'}
+                    color={isActive ? 'accent.300' : 'whiteAlpha.600'}
                     _hover={{
-                      bg: activeTab === item.id ? 'accent.500/30' : 'primary.700/50',
-                      color: activeTab === item.id ? 'accent.300' : 'white',
+                      bg: isActive ? 'accent.500/20' : 'whiteAlpha.50',
+                      color: isActive ? 'accent.300' : 'white',
                     }}
                     _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
+                    _before={isActive ? {
+                      content: '""',
+                      position: 'absolute',
+                      left: 0,
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      w: '3px',
+                      h: '60%',
+                      bg: 'accent.400',
+                      borderRadius: 'full',
+                    } : undefined}
                   >
                     <Box as={IconComponent} w={5} h={5} flexShrink={0} aria-hidden="true" />
-                    <Text fontWeight="medium">{item.label}</Text>
+                    <Text fontWeight={isActive ? 'semibold' : 'medium'}>{item.label}</Text>
                   </Button>
                 );
               })}
@@ -640,7 +653,7 @@ export default function Home() {
                     {activeTab === 'supplements' && 'Optimized supplement stack'}
                     {activeTab === 'environment' && 'Transform your home sanctuary'}
                     {activeTab === 'progress' && 'Track your health metrics'}
-                    {activeTab === 'videos' && 'Master every protocol'}
+                    {activeTab === 'videos' && 'Learn from Dr. Pompa & Human Garage'}
                     {activeTab === 'equipment' && 'Curated longevity tools'}
                     {activeTab === 'profile' && 'Manage your account'}
                   </Text>
@@ -688,15 +701,16 @@ export default function Home() {
           bottom={0}
           left={0}
           right={0}
-          bg="primary.800/98"
-          backdropFilter="blur(20px)"
+          bg="rgba(7, 18, 16, 0.92)"
+          backdropFilter="blur(24px)"
           borderTop="1px solid"
-          borderColor="whiteAlpha.50"
+          borderColor="whiteAlpha.100"
           display={{ base: 'block', lg: 'none' }}
           role="navigation"
           aria-label="Mobile navigation"
           className="safe-area-bottom mobile-nav"
           zIndex={40}
+          boxShadow="0 -4px 24px rgba(0, 0, 0, 0.2)"
         >
           <Flex justify="space-around" align="center" px={1} pt={2} pb={1} maxW="500px" mx="auto">
             {[

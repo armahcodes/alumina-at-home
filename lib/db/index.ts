@@ -31,7 +31,8 @@ export const db = new Proxy({} as NeonHttpDatabase<typeof schema>, {
   }
 });
 
-// Export schema and types
+// Export schema, types, and operations
 export * from './schema';
+export * from './operations';
 export type { InferSelectModel, InferInsertModel } from 'drizzle-orm';
 

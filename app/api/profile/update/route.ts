@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from '@/lib/auth/session';
-import { upsertProfile, getProfile } from '@/lib/db';
+import { upsertUserProfile, getUserProfile } from '@/lib/db';
+import { profileUpdateSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,8 +11,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { userId, ...profileData } = body;
+    const raw = await request.json();
+    const parsed = profileUpdateSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const { userId, ...profileData } = parsed.data;
 
     // Ensure users can only update their own profile
     const targetUserId = userId || session.user.id;
@@ -19,16 +25,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { data, error } = await upsertProfile(session.user.id, profileData);
+    const { data, error } = await upsertUserProfile(session.user.id, profileData);
 
     if (error) {
-      console.error('Database update failed:', error);
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('Profile update error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -49,10 +53,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { data, error } = await getProfile(session.user.id);
+    const { data, error } = await getUserProfile(session.user.id);
 
     if (error) {
-      console.error('Error fetching user profile:', error);
       return NextResponse.json({ error: 'Failed to fetch profile' }, { status: 404 });
     }
 
@@ -62,7 +65,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data });
   } catch (error) {
-    console.error('Profile fetch error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

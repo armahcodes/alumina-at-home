@@ -48,11 +48,10 @@ export async function POST(req: Request) {
         resourceId,
         workingMemory: workingMemoryContent,
       }).catch(() => {
-        // Thread might not exist yet, that's okay
-        console.log('Working memory will be initialized on first message');
+        // Thread might not exist yet — it will be created on first message
       });
-    } catch (error) {
-      console.error('Error updating working memory:', error);
+    } catch {
+      // Working memory update is non-critical; continue with chat
     }
   }
   

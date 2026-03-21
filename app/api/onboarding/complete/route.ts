@@ -3,6 +3,7 @@ import { getServerSession } from '@/lib/auth/session';
 import { db } from '@/lib/db';
 import { users, userProfiles } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
+import { onboardingSchema } from '@/lib/validations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json().catch(() => ({}));
+    const raw = await request.json().catch(() => ({}));
+    const parsed = onboardingSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 });
+    }
+
+    const body = parsed.data;
     const userId = session.user.id;
 
     // Mark onboarding as complete on the user record
@@ -48,7 +55,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Onboarding complete error:', error);
     return NextResponse.json(
       { error: 'Failed to complete onboarding' },
       { status: 500 }

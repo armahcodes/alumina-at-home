@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyUserAccess } from '@/lib/auth/session';
 import { getUserProfile, upsertUserProfile } from '@/lib/db';
+import { profileUpsertSchema } from '@/lib/validations';
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +22,6 @@ export async function GET(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error in GET /api/user/[userId]/profile:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -37,9 +37,13 @@ export async function PUT(
       return NextResponse.json({ error: authError.message }, { status: authError.status });
     }
 
-    const body = await request.json();
+    const raw = await request.json();
+    const parsed = profileUpsertSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid request body', details: parsed.error.flatten() }, { status: 400 });
+    }
 
-    const { data, error } = await upsertUserProfile(userId, body);
+    const { data, error } = await upsertUserProfile(userId, parsed.data);
 
     if (error) {
       return NextResponse.json({ error: 'Failed to update profile' }, { status: 500 });
@@ -47,7 +51,6 @@ export async function PUT(
 
     return NextResponse.json({ data });
   } catch (error) {
-    console.error('Error in PUT /api/user/[userId]/profile:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
