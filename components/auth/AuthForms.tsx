@@ -226,7 +226,10 @@ function OTPInput({
   };
 
   return (
-    <div className="af-otp-group" onPaste={handlePaste}>
+    <div
+      onPaste={handlePaste}
+      style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}
+    >
       {digits.map((digit, i) => (
         <input
           key={i}
@@ -242,6 +245,19 @@ function OTPInput({
           className="af-otp-input"
           autoComplete={i === 0 ? 'one-time-code' : 'off'}
           aria-label={`Digit ${i + 1}`}
+          style={{
+            width: 48,
+            height: 56,
+            background: 'rgba(240, 237, 232, 0.08)',
+            border: '1.5px solid rgba(240, 237, 232, 0.2)',
+            color: '#f0ede8',
+            fontFamily: "'Courier New', monospace",
+            fontSize: '1.5rem',
+            fontWeight: 600,
+            textAlign: 'center',
+            borderRadius: 12,
+            caretColor: '#EFC2B3',
+          }}
         />
       ))}
     </div>
