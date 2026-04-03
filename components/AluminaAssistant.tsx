@@ -162,15 +162,18 @@ export default function AluminaAssistant() {
               w="60px"
               h="60px"
               borderRadius="full"
-              bgGradient="linear(to-br, accent.500, accent.600)"
-              color="white"
-              boxShadow="0 4px 20px rgba(239, 194, 179, 0.4)"
+              variant="plain"
+              bg="accent.500"
+              color="primary.900"
+              borderWidth="1px"
+              borderColor="accent.600"
+              boxShadow="0 4px 18px rgba(7, 18, 16, 0.3)"
               _hover={{
-                bgGradient: 'linear(to-br, accent.600, accent.700)',
+                bg: 'accent.400',
                 transform: 'scale(1.05)',
-                boxShadow: '0 6px 24px rgba(239, 194, 179, 0.5)',
+                boxShadow: '0 6px 22px rgba(7, 18, 16, 0.35)',
               }}
-              _active={{ transform: 'scale(0.95)' }}
+              _active={{ bg: 'accent.600', transform: 'scale(0.95)' }}
               transition="all 0.2s"
             >
               <Box as={Sparkles} w={6} h={6} />
@@ -494,10 +497,13 @@ export default function AluminaAssistant() {
                       w={10}
                       h={10}
                       borderRadius="xl"
+                      variant="plain"
                       bg={inputValue.trim() ? 'accent.500' : 'primary.600'}
-                      color="white"
+                      color={inputValue.trim() ? 'primary.900' : 'whiteAlpha.800'}
+                      borderWidth="1px"
+                      borderColor={inputValue.trim() ? 'accent.600' : 'primary.400'}
                       _hover={{
-                        bg: inputValue.trim() ? 'accent.600' : 'primary.500',
+                        bg: inputValue.trim() ? 'accent.400' : 'primary.500',
                       }}
                       _disabled={{ opacity: 0.5, cursor: 'not-allowed' }}
                       disabled={!inputValue.trim() || isLoading}

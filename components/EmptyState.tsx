@@ -1,6 +1,7 @@
 'use client';
 
-import { Flex, Heading, Text, Button } from '@chakra-ui/react';
+import { Flex, Heading, Text } from '@chakra-ui/react';
+import { AccentButton } from '@/components/ui/AccentButton';
 import { ReactNode } from 'react';
 
 interface EmptyStateProps {
@@ -50,26 +51,9 @@ export default function EmptyState({
         {description}
       </Text>
       {actionLabel && onAction && (
-        <Button
-          onClick={onAction}
-          px={6}
-          py={3}
-          bgGradient="linear(to-r, accent.500, accent.600)"
-          color="white"
-          fontWeight="semibold"
-          borderRadius="xl"
-          _hover={{
-            bgGradient: 'linear(to-r, accent.600, accent.700)',
-          }}
-          _focus={{
-            ring: 2,
-            ringColor: 'accent.400',
-            ringOffset: 2,
-            ringOffsetColor: 'primary.900',
-          }}
-        >
+        <AccentButton onClick={onAction} px={6} py={3} borderRadius="xl">
           {actionLabel}
-        </Button>
+        </AccentButton>
       )}
     </Flex>
   );

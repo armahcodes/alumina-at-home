@@ -474,18 +474,20 @@ export default function Supplements() {
                           <Button
                             onClick={() => toggleSupplement(supplement.id)}
                             w="full"
-                            bgGradient={isTaken ? undefined : 'linear(to-r, accent.500, accent.600)'}
-                            bg={isTaken ? 'accent.500/20' : undefined}
-                            borderWidth={isTaken ? '1px' : 0}
+                            variant="plain"
+                            bg={isTaken ? 'accent.500/20' : 'accent.500'}
+                            borderWidth="1px"
                             borderColor="accent.500"
-                            color={isTaken ? 'accent.300' : 'white'}
+                            color={isTaken ? 'accent.300' : 'primary.900'}
                             fontWeight="semibold"
                             py={3}
                             borderRadius="xl"
-                            boxShadow={isTaken ? 'none' : 'lg'}
+                            boxShadow={isTaken ? 'none' : '0 4px 18px rgba(7, 18, 16, 0.25)'}
                             _hover={{
-                              bgGradient: isTaken ? undefined : 'linear(to-r, accent.600, accent.700)',
-                              bg: isTaken ? 'accent.500/30' : undefined
+                              bg: isTaken ? 'accent.500/30' : 'accent.400',
+                            }}
+                            _active={{
+                              bg: isTaken ? 'accent.500/40' : 'accent.600',
                             }}
                             _focus={{ ring: 2, ringColor: 'accent.400' }}
                           >

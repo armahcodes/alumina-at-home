@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { useProtocolCompletion } from '@/lib/hooks/useProtocolCompletion';
 import ProtocolTimer from './ProtocolTimer';
 import FocusTrap from './FocusTrap';
+import { AccentButton } from '@/components/ui/AccentButton';
 import {
   Box,
   Flex,
@@ -358,28 +359,26 @@ export default function Dashboard() {
               key={idx}
               onClick={() => handleQuickAction(idx)}
               aria-label={action.label}
-              bgGradient={action.gradient ? "linear(to-br, accent.500, accent.600)" : undefined}
-              bg={action.gradient ? undefined : "primary.600/50"}
-              borderWidth={action.gradient ? 0 : "1px"}
-              borderColor="primary.400"
+              bg={action.gradient ? "accent.500" : "primary.600/50"}
+              borderWidth="1px"
+              borderColor={action.gradient ? "accent.600" : "primary.400"}
               borderRadius="xl"
               p={{ base: 4, sm: 5 }}
               textAlign="left"
               minH={{ base: "100px", sm: "120px" }}
               flexDir="column"
               alignItems="flex-start"
-              boxShadow={action.gradient ? "lg" : "none"}
+              boxShadow={action.gradient ? "0 4px 18px rgba(7, 18, 16, 0.25)" : "none"}
               _hover={{
-                bgGradient: action.gradient ? "linear(to-br, accent.600, accent.700)" : undefined,
-                bg: action.gradient ? undefined : "primary.600/60",
-                borderColor: action.gradient ? undefined : "primary.400"
+                bg: action.gradient ? "accent.400" : "primary.600/60",
+                borderColor: action.gradient ? "accent.600" : "primary.400",
               }}
               _focus={{ ring: 2, ringColor: "accent.400", ringOffset: 2, ringOffsetColor: "primary.900" }}
             >
               <Flex
                 w={{ base: 9, sm: 10 }}
                 h={{ base: 9, sm: 10 }}
-                bg={action.gradient ? "whiteAlpha.200" : "whiteAlpha.50"}
+                bg={action.gradient ? "primary.900/12" : "whiteAlpha.50"}
                 borderRadius="lg"
                 align="center"
                 justify="center"
@@ -389,13 +388,13 @@ export default function Dashboard() {
                   as={idx === 0 ? Clock : idx === 1 ? FileText : idx === 2 ? Users : Calendar}
                   w={{ base: 5, sm: 6 }}
                   h={{ base: 5, sm: 6 }}
-                  color={action.gradient ? "white" : "whiteAlpha.700"}
+                  color={action.gradient ? "primary.900" : "whiteAlpha.700"}
                 />
               </Flex>
-              <Text color="white" fontWeight="semibold" fontSize={{ base: "sm", sm: "base" }}>
+              <Text color={action.gradient ? "primary.900" : "white"} fontWeight="semibold" fontSize={{ base: "sm", sm: "base" }}>
                 {action.label}
               </Text>
-              <Text color={action.gradient ? "whiteAlpha.700" : "whiteAlpha.700"} fontSize={{ base: "xs", sm: "sm" }} mt={0.5}>
+              <Text color={action.gradient ? "primary.800" : "whiteAlpha.700"} fontSize={{ base: "xs", sm: "sm" }} mt={0.5} opacity={action.gradient ? 0.85 : 1}>
                 {action.desc}
               </Text>
             </Button>
@@ -682,21 +681,9 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    flex={1}
-                    py={3}
-                    bgGradient="linear(to-br, accent.500, accent.600)"
-                    color="white"
-                    borderRadius="xl"
-                    fontWeight="semibold"
-                    boxShadow="lg"
-                    _hover={{
-                      bgGradient: 'linear(to-br, accent.600, accent.700)',
-                    }}
-                  >
+                  <AccentButton type="submit" flex={1} py={3} borderRadius="xl">
                     Book Consultation
-                  </Button>
+                  </AccentButton>
                 </Flex>
               </Box>
             </>
@@ -712,7 +699,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
                 mx="auto"
                 mb={4}
               >
-                <Box as={Check} w={8} h={8} color="white" />
+                <Box as={Check} w={8} h={8} color="primary.900" />
               </Flex>
               <Heading as="h3" size="lg" color="white" mb={2}>
                 Booking Submitted!

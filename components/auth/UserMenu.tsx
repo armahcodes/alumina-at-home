@@ -99,11 +99,13 @@ export function UserMenu() {
         <Flex
           w={8}
           h={8}
-          bgGradient="linear(to-br, accent.400, accent.600)"
+          bg="accent.500"
+          borderWidth="1px"
+          borderColor="accent.600"
           borderRadius="full"
           align="center"
           justify="center"
-          color="white"
+          color="primary.900"
           fontWeight="bold"
           fontSize="xs"
           flexShrink={0}

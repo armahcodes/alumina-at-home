@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useStore } from '@/lib/store';
 import { authClient } from '@/lib/auth/client';
 import FocusTrap from './FocusTrap';
+import { AccentButton } from '@/components/ui/AccentButton';
 import {
   Box,
   Flex,
@@ -123,13 +124,15 @@ export default function Profile() {
             <Flex
               w={{ base: 20, sm: 24 }}
               h={{ base: 20, sm: 24 }}
-              bgGradient="linear(to-br, accent.400, accent.600)"
+              bg="accent.500"
+              borderWidth="1px"
+              borderColor="accent.600"
               borderRadius="full"
               align="center"
               justify="center"
               fontSize={{ base: '2xl', sm: '3xl' }}
               fontWeight="bold"
-              color="white"
+              color="primary.900"
               boxShadow="lg"
             >
               {displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
@@ -671,21 +674,9 @@ function PersonalInfoModal({
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                flex={1}
-                py={3}
-                bgGradient="linear(to-br, accent.500, accent.600)"
-                color="white"
-                borderRadius="xl"
-                fontWeight="semibold"
-                boxShadow="lg"
-                _hover={{
-                  bgGradient: 'linear(to-br, accent.600, accent.700)',
-                }}
-              >
+              <AccentButton type="submit" flex={1} py={3} borderRadius="xl">
                 Save Changes
-              </Button>
+              </AccentButton>
             </Flex>
           </Box>
         </Box>
@@ -791,22 +782,9 @@ function GoalsModal({ goals, onClose }: { goals: Goal[]; onClose: () => void }) 
               ))}
             </Flex>
 
-            <Button
-              onClick={onClose}
-              w="full"
-              mt={6}
-              py={3}
-              bgGradient="linear(to-br, accent.500, accent.600)"
-              color="white"
-              borderRadius="xl"
-              fontWeight="semibold"
-              boxShadow="lg"
-              _hover={{
-                bgGradient: 'linear(to-br, accent.600, accent.700)',
-              }}
-            >
+            <AccentButton onClick={onClose} w="full" mt={6} py={3} borderRadius="xl">
               Continue
-            </Button>
+            </AccentButton>
           </Box>
         </Box>
       </Box>
@@ -936,21 +914,9 @@ function NotificationsModal({ onClose }: { onClose: () => void }) {
               >
                 Cancel
               </Button>
-              <Button
-                onClick={handleSave}
-                flex={1}
-                py={3}
-                bgGradient="linear(to-br, accent.500, accent.600)"
-                color="white"
-                borderRadius="xl"
-                fontWeight="semibold"
-                boxShadow="lg"
-                _hover={{
-                  bgGradient: 'linear(to-br, accent.600, accent.700)',
-                }}
-              >
+              <AccentButton onClick={handleSave} flex={1} py={3} borderRadius="xl">
                 Save Changes
-              </Button>
+              </AccentButton>
             </Flex>
           </Box>
         </Box>
@@ -1101,21 +1067,9 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                   >
                     Cancel
                   </Button>
-                  <Button
-                    type="submit"
-                    flex={1}
-                    py={3}
-                    bgGradient="linear(to-br, accent.500, accent.600)"
-                    color="white"
-                    borderRadius="xl"
-                    fontWeight="semibold"
-                    boxShadow="lg"
-                    _hover={{
-                      bgGradient: 'linear(to-br, accent.600, accent.700)',
-                    }}
-                  >
+                  <AccentButton type="submit" flex={1} py={3} borderRadius="xl">
                     Send Message
-                  </Button>
+                  </AccentButton>
                 </Flex>
               </Box>
             </>
@@ -1131,7 +1085,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
                 mx="auto"
                 mb={4}
               >
-                <Box as={Check} w={8} h={8} color="white" />
+                <Box as={Check} w={8} h={8} color="primary.900" />
               </Flex>
               <Heading as="h3" size="lg" color="white" mb={2}>
                 Message Sent!
@@ -1176,17 +1130,19 @@ function UpgradeModal({ onClose }: { onClose: () => void }) {
           boxShadow="2xl"
         >
           <Box
-            bgGradient="linear(to-br, accent.500, accent.600)"
+            bg="accent.500"
+            borderBottomWidth="1px"
+            borderColor="accent.600"
             p={{ base: 6, sm: 8 }}
             textAlign="center"
           >
-            <Heading as="h3" size={{ base: "xl", sm: "2xl" }} color="white" mb={2}>
+            <Heading as="h3" size={{ base: "xl", sm: "2xl" }} color="primary.900" mb={2}>
               Lifetime Access
             </Heading>
-            <Text color="white" fontSize={{ base: "3xl", sm: "4xl" }} fontWeight="bold" mb={2}>
+            <Text color="primary.900" fontSize={{ base: "3xl", sm: "4xl" }} fontWeight="bold" mb={2}>
               $497
             </Text>
-            <Text color="whiteAlpha.900" fontSize={{ base: "sm", sm: "base" }}>
+            <Text color="primary.800" fontSize={{ base: "sm", sm: "base" }} opacity={0.9}>
               One-time payment • No recurring fees
             </Text>
           </Box>
@@ -1232,21 +1188,14 @@ function UpgradeModal({ onClose }: { onClose: () => void }) {
               >
                 Maybe Later
               </Button>
-              <Button
+              <AccentButton
                 onClick={() => alert('Payment processing coming soon!')}
                 flex={1}
                 py={3}
-                bgGradient="linear(to-br, accent.500, accent.600)"
-                color="white"
                 borderRadius="xl"
-                fontWeight="semibold"
-                boxShadow="lg"
-                _hover={{
-                  bgGradient: 'linear(to-br, accent.600, accent.700)',
-                }}
               >
                 Upgrade Now
-              </Button>
+              </AccentButton>
             </Flex>
           </Box>
         </Box>

@@ -111,20 +111,23 @@ export default function LoginPage() {
             <Button
               onClick={() => router.push('/auth/sign-in')}
               w="full"
-              bgGradient="linear(to-r, accent.500, accent.600)"
-              color="white"
+              variant="plain"
+              bg="accent.500"
+              color="primary.900"
+              borderWidth="1px"
+              borderColor="accent.600"
               fontWeight="semibold"
               py={3.5}
               borderRadius="xl"
-              boxShadow="lg"
+              boxShadow="0 4px 18px rgba(7, 18, 16, 0.25)"
               _hover={{
-                bgGradient: "linear(to-r, accent.600, accent.700)",
+                bg: "accent.400",
                 transform: "translateY(-1px)",
-                boxShadow: "xl"
+                boxShadow: "0 6px 22px rgba(7, 18, 16, 0.3)",
               }}
               _active={{
-                bgGradient: "linear(to-r, accent.600, accent.700)",
-                transform: "translateY(0)"
+                bg: "accent.600",
+                transform: "translateY(0)",
               }}
               _focus={{
                 ring: 2,

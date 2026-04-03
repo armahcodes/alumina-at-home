@@ -1,7 +1,8 @@
 'use client';
 
 import { Component, ReactNode } from 'react';
-import { Box, Flex, Center, Heading, Text, Button } from '@chakra-ui/react';
+import { Box, Flex, Center, Heading, Text } from '@chakra-ui/react';
+import { AccentButton } from '@/components/ui/AccentButton';
 import { AlertTriangle } from 'lucide-react';
 
 interface Props {
@@ -78,17 +79,11 @@ export default class ErrorBoundary extends Component<Props, State> {
                 </Box>
               </Box>
             )}
-            <Button
+            <AccentButton
               onClick={() => window.location.reload()}
               w="full"
-              bgGradient="linear(to-r, accent.500, accent.600)"
-              color="white"
-              fontWeight="semibold"
               py={3}
               borderRadius="xl"
-              _hover={{
-                bgGradient: "linear(to-r, accent.600, accent.700)"
-              }}
               _focus={{
                 ring: 2,
                 ringColor: "accent.400",
@@ -97,7 +92,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               }}
             >
               Refresh Page
-            </Button>
+            </AccentButton>
           </Box>
         </Flex>
       );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, type KeyboardEvent } from 'react';
+import { useState, useMemo, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { videos, videoCategories, videoCollections, type Video } from '@/lib/data/videos';
 import FocusTrap from './FocusTrap';
@@ -47,11 +47,15 @@ export default function VideoLibrary() {
   const [videoLoading, setVideoLoading] = useState(false);
   const shouldReduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    if (selectedVideo && !selectedVideo.premium) {
-      setVideoLoading(true);
-    }
-  }, [selectedVideo?.id, selectedVideo?.premium]);
+  const openVideo = (video: Video) => {
+    setVideoLoading(!video.premium);
+    setSelectedVideo(video);
+  };
+
+  const closeVideo = () => {
+    setSelectedVideo(null);
+    setVideoLoading(false);
+  };
 
   const categories = ['all', ...Object.keys(videoCategories)];
   const difficulties = ['all', 'beginner', 'intermediate', 'advanced'];
@@ -91,7 +95,7 @@ export default function VideoLibrary() {
         <FocusTrap
           active={true}
           focusTrapOptions={{
-            onDeactivate: () => setSelectedVideo(null),
+            onDeactivate: closeVideo,
             clickOutsideDeactivates: true,
             escapeDeactivates: true,
           }}
@@ -133,7 +137,7 @@ export default function VideoLibrary() {
                 </Flex>
               </Box>
               <Button
-                onClick={() => setSelectedVideo(null)}
+                onClick={closeVideo}
                 aria-label="Close video player"
                 w={10}
                 h={10}
@@ -280,7 +284,7 @@ export default function VideoLibrary() {
                 >
                   <VideoCard 
                     video={video} 
-                    onClick={() => setSelectedVideo(video)} 
+                    onClick={() => openVideo(video)}
                     formatDuration={formatDuration}
                     getCategoryIcon={getCategoryIcon}
                   />
@@ -420,7 +424,7 @@ export default function VideoLibrary() {
                 >
                   <VideoCard
                     video={video}
-                    onClick={() => setSelectedVideo(video)}
+                    onClick={() => openVideo(video)}
                     formatDuration={formatDuration}
                     getCategoryIcon={getCategoryIcon}
                   />
@@ -461,7 +465,7 @@ export default function VideoLibrary() {
                       return (
                         <Button
                           key={videoId}
-                          onClick={() => setSelectedVideo(video)}
+                          onClick={() => openVideo(video)}
                           w="full"
                           justifyContent="space-between"
                           bg="primary.700/50"
@@ -608,7 +612,7 @@ function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCar
             justify="center"
             boxShadow="0 4px 20px rgba(239, 194, 179, 0.4)"
           >
-            <Box as={Play} w={6} h={6} color="white" ml={1} />
+            <Box as={Play} w={6} h={6} color="primary.900" ml={1} />
           </Flex>
         </Flex>
 
@@ -634,15 +638,18 @@ function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCar
             position="absolute"
             top={2}
             left={2}
-            bgGradient="linear(to-r, accent.500, accent.600)"
-            color="white"
+            bg="accent.500"
+            color="primary.900"
+            borderWidth="1px"
+            borderColor="accent.600"
             px={2}
             py={0.5}
             borderRadius="md"
             fontSize="xs"
+            fontWeight="semibold"
           >
             <Flex align="center" gap={1}>
-              <Box as={Lock} w={3} h={3} />
+              <Box as={Lock} w={3} h={3} color="primary.900" aria-hidden />
               Premium
             </Flex>
           </Badge>

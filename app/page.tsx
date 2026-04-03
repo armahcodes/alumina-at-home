@@ -221,11 +221,13 @@ export default function Home() {
                 <Flex
                   w={12}
                   h={12}
-                  bgGradient="linear(to-br, accent.400, accent.600)"
+                  bg="accent.500"
+                  borderWidth="1px"
+                  borderColor="accent.600"
                   borderRadius="full"
                   align="center"
                   justify="center"
-                  color="white"
+                  color="primary.900"
                   fontWeight="bold"
                 >
                   {displayName?.[0]?.toUpperCase() || 'U'}
@@ -437,11 +439,13 @@ export default function Home() {
                     <Flex
                       w={12}
                       h={12}
-                      bgGradient="linear(to-br, accent.400, accent.600)"
+                      bg="accent.500"
+                      borderWidth="1px"
+                      borderColor="accent.600"
                       borderRadius="full"
                       align="center"
                       justify="center"
-                      color="white"
+                      color="primary.900"
                       fontWeight="bold"
                     >
                       {displayName?.[0]?.toUpperCase() || 'U'}
@@ -603,6 +607,7 @@ export default function Home() {
             borderBottom="1px solid"
             borderColor="whiteAlpha.50"
             display={{ base: 'block', lg: 'none' }}
+            className="safe-area-top"
           >
             <Box px={4} py={3}>
               <Flex align="center" justify="space-between">

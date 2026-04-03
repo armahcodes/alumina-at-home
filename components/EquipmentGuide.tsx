@@ -532,20 +532,23 @@ export default function EquipmentGuide() {
                                 >
                                   <Button
                                     w="full"
-                                    bgGradient="linear(to-r, accent.500, accent.600)"
-                                    color="white"
+                                    variant="plain"
+                                    bg="accent.500"
+                                    color="primary.900"
+                                    borderWidth="1px"
+                                    borderColor="accent.600"
                                     fontWeight="semibold"
                                     py={3}
                                     minH="48px"
                                     borderRadius="xl"
-                                    boxShadow="0 4px 20px rgba(239, 194, 179, 0.3)"
-                                    _hover={{ 
-                                      bgGradient: 'linear(to-r, accent.600, accent.700)',
-                                      boxShadow: '0 6px 24px rgba(239, 194, 179, 0.4)',
-                                      transform: 'translateY(-1px)'
+                                    boxShadow="0 4px 18px rgba(7, 18, 16, 0.25)"
+                                    _hover={{
+                                      bg: 'accent.400',
+                                      boxShadow: '0 6px 22px rgba(7, 18, 16, 0.3)',
+                                      transform: 'translateY(-1px)',
                                     }}
                                     _focus={{ ring: 2, ringColor: 'accent.400' }}
-                                    _active={{ transform: 'translateY(0)' }}
+                                    _active={{ bg: 'accent.600', transform: 'translateY(0)' }}
                                     transition="all 0.2s"
                                     gap={2}
                                   >

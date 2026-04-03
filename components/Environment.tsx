@@ -858,15 +858,19 @@ function OptimizationDetailModal({
                 onClick={onToggleComplete}
                 flex={1}
                 py={3}
-                bgGradient={isCompleted ? undefined : "linear(to-br, accent.500, accent.600)"}
-                bg={isCompleted ? 'accent.500' : undefined}
-                color="white"
+                variant="plain"
+                bg={isCompleted ? 'accent.500/20' : 'accent.500'}
+                color={isCompleted ? 'accent.300' : 'primary.900'}
+                borderWidth="1px"
+                borderColor={isCompleted ? 'accent.500' : 'accent.600'}
                 borderRadius="xl"
                 fontWeight="semibold"
-                boxShadow="lg"
+                boxShadow={isCompleted ? 'none' : '0 4px 18px rgba(7, 18, 16, 0.25)'}
                 _hover={{
-                  bgGradient: isCompleted ? undefined : 'linear(to-br, accent.600, accent.700)',
-                  bg: isCompleted ? 'accent.600' : undefined,
+                  bg: isCompleted ? 'accent.500/30' : 'accent.400',
+                }}
+                _active={{
+                  bg: isCompleted ? 'accent.500/40' : 'accent.600',
                 }}
               >
                 <Box as={Check} w={5} h={5} mr={2} />
