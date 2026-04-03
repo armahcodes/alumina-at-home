@@ -332,15 +332,20 @@ export default function Home() {
                 <Button
                   onClick={() => setShowAchievements(true)}
                   aria-label="View all achievements"
+                  variant="plain"
                   w="full"
                   gap={3}
                   px={4}
                   py={3}
-                  bgGradient="linear(to-r, accent.500, accent.600)"
-                  color="white"
+                  bg="accent.500"
+                  color="primary.900"
+                  borderWidth="1px"
+                  borderColor="accent.600"
                   borderRadius="xl"
-                  boxShadow="lg"
-                  _hover={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                  boxShadow="0 4px 18px rgba(7, 18, 16, 0.25)"
+                  fontWeight="semibold"
+                  _hover={{ bg: 'accent.400', borderColor: 'accent.500' }}
+                  _active={{ bg: 'accent.600' }}
                   transition="all 0.3s"
                   _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
                 >
@@ -537,15 +542,20 @@ export default function Home() {
                         setSidebarOpen(false);
                       }}
                       aria-label="View all achievements"
+                      variant="plain"
                       w="full"
                       gap={3}
                       px={4}
                       py={3}
-                      bgGradient="linear(to-r, accent.500, accent.600)"
-                      color="white"
+                      bg="accent.500"
+                      color="primary.900"
+                      borderWidth="1px"
+                      borderColor="accent.600"
                       borderRadius="xl"
-                      boxShadow="lg"
-                      _active={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                      boxShadow="0 4px 18px rgba(7, 18, 16, 0.25)"
+                      fontWeight="semibold"
+                      _hover={{ bg: 'accent.400', borderColor: 'accent.500' }}
+                      _active={{ bg: 'accent.600' }}
                       transition="all 0.3s"
                     >
                       <Box as={CheckCircle} w={5} h={5} aria-hidden="true" />
@@ -611,11 +621,35 @@ export default function Home() {
                   <Box as={MenuIcon} w={6} h={6} aria-hidden="true" />
                 </Button>
 
-                <Flex textAlign="center" flexDir="column" align="center">
-                  <Box w={{ base: 10, sm: 12 }} h={{ base: 12, sm: 14 }}>
-                    <Image src="/alumina-isotipo.webp" alt="Alumina" width={48} height={56} />
+                <Flex
+                  textAlign="center"
+                  flexDir="column"
+                  align="center"
+                  justify="center"
+                  minW={0}
+                  flex={1}
+                  px={2}
+                >
+                  <Box position="relative" w="40px" h="50px" flexShrink={0}>
+                    <Image
+                      src="/alumina-isotipo.webp"
+                      alt="Alumina"
+                      fill
+                      sizes="40px"
+                      className="object-contain"
+                      priority
+                    />
                   </Box>
-                  <Text fontSize={{ base: '10px', sm: 'xs' }} color="accent.200" opacity={0.6} lineHeight="tight" mt={1}>
+                  <Text
+                    as="span"
+                    display="block"
+                    fontSize={{ base: '9px', sm: '10px' }}
+                    color="whiteAlpha.500"
+                    letterSpacing="0.14em"
+                    textTransform="uppercase"
+                    mt={2}
+                    lineHeight={1.2}
+                  >
                     At Home
                   </Text>
                 </Flex>
@@ -661,7 +695,7 @@ export default function Home() {
                     {activeTab === 'supplements' && 'Optimized supplement stack'}
                     {activeTab === 'environment' && 'Transform your home sanctuary'}
                     {activeTab === 'progress' && 'Track your health metrics'}
-                    {activeTab === 'videos' && 'Learn from Dr. Pompa & Human Garage'}
+                    {activeTab === 'videos' && 'Learn from Dr. Pompa, Gary Brecka & Human Garage'}
                     {activeTab === 'equipment' && 'Curated longevity tools'}
                     {activeTab === 'profile' && 'Manage your account'}
                   </Text>
@@ -697,7 +731,7 @@ export default function Home() {
           </Box>
 
           {/* Content */}
-          <Box maxW="7xl" mx="auto" px={{ base: 4, sm: 6, lg: 8 }} py={{ base: 6, sm: 8 }} pb={{ base: 24, lg: 8 }}>
+          <Box maxW="7xl" mx="auto" px={{ base: 4, sm: 6, lg: 8 }} py={{ base: 8, sm: 8 }} pb={{ base: 24, lg: 8 }}>
             {renderContent()}
           </Box>
         </Box>
@@ -744,8 +778,8 @@ export default function Home() {
                   borderRadius="xl"
                   transition="all 0.2s"
                   bg={isActive ? 'accent.500/15' : 'transparent'}
-                  color={isActive ? 'accent.400' : 'whiteAlpha.500'}
-                  _hover={{ bg: isActive ? 'accent.500/20' : 'whiteAlpha.50', color: isActive ? 'accent.400' : 'whiteAlpha.700' }}
+                  color={isActive ? 'accent.400' : 'whiteAlpha.600'}
+                  _hover={{ bg: isActive ? 'accent.500/20' : 'whiteAlpha.50', color: isActive ? 'accent.400' : 'whiteAlpha.800' }}
                   _active={{ transform: 'scale(0.95)' }}
                   _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}
                 >
@@ -779,9 +813,9 @@ export default function Home() {
               px={2}
               py={1.5}
               borderRadius="xl"
-              color="whiteAlpha.500"
+              color="whiteAlpha.600"
               bg="transparent"
-              _hover={{ bg: 'whiteAlpha.50', color: 'whiteAlpha.700' }}
+              _hover={{ bg: 'whiteAlpha.50', color: 'whiteAlpha.800' }}
               _active={{ transform: 'scale(0.95)' }}
               transition="all 0.2s"
               _focus={{ ring: 2, ringColor: 'accent.400', ringOffset: 2, ringOffsetColor: 'primary.900' }}

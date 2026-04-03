@@ -1,9 +1,12 @@
 /**
  * Video Library Database
  *
- * Real YouTube content from:
- * - Dr. Daniel Pompa (Cellular Healing TV) — cellular detox, fasting, keto, 5R protocol
- * - Human Garage (Garry Lineham) — fascial maneuvers, body resets, trauma release
+ * YouTube sources (handles verified via channel pages + oEmbed on each video ID):
+ * - Dr. Daniel Pompa — https://www.youtube.com/@DrDanielPompa
+ * - Gary Brecka — https://www.youtube.com/@garybrecka (long-form + topic clips)
+ * - Human Garage (Garry Lineham & team) — https://www.youtube.com/@HumanGarage
+ *
+ * Thumbnails use YouTube’s CDN: https://img.youtube.com/vi/{id}/mqdefault.jpg
  */
 
 export interface Video {
@@ -11,7 +14,7 @@ export interface Video {
   title: string;
   description: string;
   category: VideoCategory;
-  duration: number; // seconds
+  duration: number; // seconds (approximate when not extracted from API)
   thumbnailUrl: string;
   videoUrl: string;
   instructor: string;
@@ -31,376 +34,552 @@ export type VideoCategory =
   | 'quick-tips'
   | 'meditation';
 
-/** Helper — YouTube thumbnail from video ID (mqdefault is available for almost all public videos; hq can 404) */
+/** YouTube thumbnail from video ID (mqdefault is available for almost all public videos) */
 function ytThumb(videoId: string): string {
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
 }
 
-/** Helper — YouTube watch URL from video ID */
 function ytUrl(videoId: string): string {
   return `https://www.youtube.com/watch?v=${videoId}`;
 }
 
 // ============================================================================
-// DR. DANIEL POMPA — Cellular Healing TV
-// Channel: @DrDanielPompa
+// DR. DANIEL POMPA — @DrDanielPompa
 // ============================================================================
 
 const pompaVideos: Video[] = [
   {
     id: 'pompa-5r-cellular-healing',
-    title: 'The 5R\'s of Cellular Healing & Detox',
-    description: 'Dr. Pompa explains his foundational 5R framework for true cellular detoxification: Remove the source, Regenerate the cell membrane, Restore cellular energy, Reduce inflammation, and Re-establish methylation.',
+    title: 'True Cellular Detox: A Road Map to Fixing the Cell',
+    description:
+      'Dr. Pompa outlines how true cellular detox works as a roadmap to fix the cell — the foundation behind his cellular healing approach.',
     category: 'protocol-guides',
-    duration: 2580,
-    thumbnailUrl: ytThumb('QOEqB6TLvYM'),
-    videoUrl: ytUrl('QOEqB6TLvYM'),
+    duration: 1200,
+    thumbnailUrl: ytThumb('yNGj7tM4lN4'),
+    videoUrl: ytUrl('yNGj7tM4lN4'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['cellular healing', '5R protocol', 'detox', 'cell membrane', 'methylation'],
+    topics: ['cellular healing', 'detox', 'cell membrane', 'true cellular detox'],
     relatedProtocols: ['cellular-detox'],
     featured: true,
   },
   {
     id: 'pompa-intermittent-fasting',
-    title: 'The Power of Intermittent Fasting',
-    description: 'Learn how intermittent fasting triggers autophagy, resets hormones, and activates your body\'s innate healing mechanisms. Dr. Pompa covers time-restricted eating and multi-day fasting strategies.',
+    title: 'See the Newest Intermittent Fasting Study?! Is It Dangerous?',
+    description:
+      'Dr. Pompa breaks down a recent intermittent fasting study and what it means for safety, metabolism, and how you time meals.',
     category: 'protocol-guides',
-    duration: 2940,
-    thumbnailUrl: ytThumb('7jUHfFmhVBY'),
-    videoUrl: ytUrl('7jUHfFmhVBY'),
+    duration: 900,
+    thumbnailUrl: ytThumb('fEoZ67huT2E'),
+    videoUrl: ytUrl('fEoZ67huT2E'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['intermittent fasting', 'autophagy', 'hormones', 'time-restricted eating'],
+    topics: ['intermittent fasting', 'studies', 'metabolism', 'time-restricted eating'],
     relatedProtocols: ['time-restricted-eating'],
     featured: true,
   },
   {
     id: 'pompa-autophagy-explained',
-    title: 'Autophagy: Your Body\'s Cellular Cleanup',
-    description: 'A deep dive into autophagy — the process by which your cells clean out damaged components and regenerate. Learn what triggers it and how to maximize this powerful healing mechanism.',
+    title: 'What is Autophagy?',
+    description:
+      'A focused explanation of autophagy — how cells clear damaged parts and why fasting and lifestyle affect this cleanup process.',
     category: 'science-deep-dives',
-    duration: 2700,
-    thumbnailUrl: ytThumb('fFn5L-JRUEY'),
-    videoUrl: ytUrl('fFn5L-JRUEY'),
+    duration: 720,
+    thumbnailUrl: ytThumb('fOkVqtJh0dY'),
+    videoUrl: ytUrl('fOkVqtJh0dY'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'intermediate',
-    topics: ['autophagy', 'mTOR', 'fasting', 'cellular regeneration', 'longevity'],
+    topics: ['autophagy', 'fasting', 'cellular regeneration', 'longevity'],
     relatedProtocols: ['time-restricted-eating'],
   },
   {
     id: 'pompa-keto-metabolic-flexibility',
-    title: 'Ketogenic Diet & Metabolic Flexibility',
-    description: 'Dr. Pompa discusses how to become a fat-burning machine through ketosis and diet variation. Learn the difference between therapeutic keto and long-term metabolic flexibility.',
+    title: 'Why Ketosis is Different From ANY Other Diet | Dr. Pompa',
+    description:
+      'How ketosis differs from typical diets, fat adaptation, and what metabolic flexibility looks like in practice.',
     category: 'science-deep-dives',
-    duration: 3360,
-    thumbnailUrl: ytThumb('ONSE1rlGcKA'),
-    videoUrl: ytUrl('ONSE1rlGcKA'),
+    duration: 1080,
+    thumbnailUrl: ytThumb('_qdKpjMQLeg'),
+    videoUrl: ytUrl('_qdKpjMQLeg'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'intermediate',
-    topics: ['ketogenic diet', 'metabolic flexibility', 'fat burning', 'diet variation', 'insulin'],
+    topics: ['ketogenic diet', 'metabolic flexibility', 'fat burning', 'ketosis'],
     relatedProtocols: [],
   },
   {
     id: 'pompa-heavy-metal-detox',
-    title: 'Heavy Metal Detox: The Hidden Epidemic',
-    description: 'Mercury, lead, and other heavy metals are a root cause of unexplained illness. Dr. Pompa covers safe chelation strategies and why most detox programs fail.',
+    title: 'Heavy Metal Detox Done Right — Safe Chelation and Mercury',
+    description:
+      'Why heavy metals matter, how detox often goes wrong, and safer framing around chelation and mercury exposure.',
     category: 'science-deep-dives',
-    duration: 3120,
-    thumbnailUrl: ytThumb('g6WznpsOxIw'),
-    videoUrl: ytUrl('g6WznpsOxIw'),
+    duration: 1800,
+    thumbnailUrl: ytThumb('oXurlnMzPVE'),
+    videoUrl: ytUrl('oXurlnMzPVE'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'advanced',
-    topics: ['heavy metals', 'mercury', 'chelation', 'detoxification', 'brain fog'],
+    topics: ['heavy metals', 'mercury', 'chelation', 'detoxification'],
     relatedProtocols: ['cellular-detox'],
     premium: true,
   },
   {
     id: 'pompa-fasting-build-muscle',
-    title: 'How Fasting Can Help Build Muscle',
-    description: 'Counterintuitive but true — learn how strategic fasting combined with resistance training can boost growth hormone and support lean muscle gain.',
+    title: 'Intermittent Fasting, Growth Hormone and Anti-Aging — CHTV Episode 38',
+    description:
+      'Discussion of intermittent fasting in the context of growth hormone, aging, and how fasting intersects with muscle and longevity.',
     category: 'expert-interviews',
-    duration: 2460,
-    thumbnailUrl: ytThumb('Z9idSnGkNz4'),
-    videoUrl: ytUrl('Z9idSnGkNz4'),
+    duration: 2400,
+    thumbnailUrl: ytThumb('VJCk4kN16ac'),
+    videoUrl: ytUrl('VJCk4kN16ac'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'intermediate',
-    topics: ['fasting', 'muscle growth', 'growth hormone', 'resistance training', 'body composition'],
+    topics: ['fasting', 'growth hormone', 'muscle', 'anti-aging'],
     relatedProtocols: ['time-restricted-eating'],
   },
   {
     id: 'pompa-biohack-fasts',
-    title: 'How to Biohack Your Fasts',
-    description: 'Advanced fasting strategies including fasting mimicking diets, dry fasting, and supplement protocols to enhance your fasting results safely.',
+    title: 'How to Biohack your Fasts — CHTV 282',
+    description:
+      'Practical ideas for structuring fasts and supporting the process — from a cellular healing and biohacking lens.',
     category: 'protocol-guides',
-    duration: 2880,
-    thumbnailUrl: ytThumb('nQ2D0o5E8KU'),
-    videoUrl: ytUrl('nQ2D0o5E8KU'),
+    duration: 2100,
+    thumbnailUrl: ytThumb('Vwu-xASWsq0'),
+    videoUrl: ytUrl('Vwu-xASWsq0'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'advanced',
-    topics: ['fasting mimicking', 'dry fasting', 'biohacking', 'supplements', 'autophagy'],
+    topics: ['fasting', 'biohacking', 'autophagy', 'protocols'],
     relatedProtocols: ['time-restricted-eating'],
     premium: true,
   },
   {
     id: 'pompa-gut-health',
-    title: 'Healing the Gut at the Cellular Level',
-    description: 'Leaky gut starts at the cell membrane. Dr. Pompa explains why conventional approaches fail and how to address gut issues through true cellular healing.',
+    title: 'How to Heal Your Leaky Gut with Dr. Daniel Pompa',
+    description:
+      'Approach to leaky gut and gut healing tied to upstream drivers like inflammation and cellular health.',
     category: 'science-deep-dives',
-    duration: 2700,
-    thumbnailUrl: ytThumb('39sEIPuEzFE'),
-    videoUrl: ytUrl('39sEIPuEzFE'),
+    duration: 1500,
+    thumbnailUrl: ytThumb('Wdgp_d6Iu2M'),
+    videoUrl: ytUrl('Wdgp_d6Iu2M'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'intermediate',
-    topics: ['gut health', 'microbiome', 'leaky gut', 'cell membrane', 'inflammation'],
+    topics: ['gut health', 'leaky gut', 'inflammation', 'healing'],
     relatedProtocols: ['cellular-detox'],
   },
   {
     id: 'pompa-hormone-optimization',
-    title: 'Hormone Optimization Through Fasting & Diet',
-    description: 'How fasting and diet variation can naturally rebalance thyroid, adrenals, and sex hormones without replacement therapy.',
+    title: "Why You Can't Fix Your Hormones & The Best Test | Dr. Pompa Explains",
+    description:
+      'Why hormone issues persist without addressing root causes, and how to think about testing and priorities.',
     category: 'expert-interviews',
-    duration: 3600,
-    thumbnailUrl: ytThumb('zHcfRiJxMCM'),
-    videoUrl: ytUrl('zHcfRiJxMCM'),
+    duration: 1200,
+    thumbnailUrl: ytThumb('B8Zv43wlgSA'),
+    videoUrl: ytUrl('B8Zv43wlgSA'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'advanced',
-    topics: ['hormones', 'thyroid', 'adrenals', 'testosterone', 'fasting'],
+    topics: ['hormones', 'testing', 'thyroid', 'root cause'],
     relatedProtocols: [],
     premium: true,
   },
   {
     id: 'pompa-diet-variation',
-    title: 'Diet Variation: Why One Diet Doesn\'t Fit All',
-    description: 'Dr. Pompa\'s ancestral approach to eating — cycling between feast and famine, keto and higher carb phases to keep your metabolism flexible and adaptive.',
+    title: 'What is Diet Variation and Why is it the Best "Diet?"',
+    description:
+      'Feast–famine cycles, variation across the week or season, and why metabolic flexibility beats a single static diet.',
     category: 'protocol-guides',
-    duration: 2520,
-    thumbnailUrl: ytThumb('P8vMaGTem2M'),
-    videoUrl: ytUrl('P8vMaGTem2M'),
+    duration: 1080,
+    thumbnailUrl: ytThumb('z2ul1dasOXY'),
+    videoUrl: ytUrl('z2ul1dasOXY'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['diet variation', 'seasonal eating', 'metabolic flexibility', 'ancestral health'],
+    topics: ['diet variation', 'metabolic flexibility', 'feast famine', 'carb cycling'],
     relatedProtocols: [],
   },
   {
     id: 'pompa-water-fast-benefits',
-    title: '5-Day Water Fast: What Happens to Your Body',
-    description: 'A complete walkthrough of a 5-day water fast — what to expect each day, the science of stem cell regeneration, and how to break your fast safely.',
+    title: 'Pros and Cons — Water Fast, Partial Fast, Fasting Mimicking Diet',
+    description:
+      'Compares water fasting, partial fasting, and fasting-mimicking approaches so you can understand tradeoffs.',
     category: 'protocol-guides',
-    duration: 3180,
-    thumbnailUrl: ytThumb('mxBGOD0SQII'),
-    videoUrl: ytUrl('mxBGOD0SQII'),
+    duration: 1800,
+    thumbnailUrl: ytThumb('pQ2LSjM9IGo'),
+    videoUrl: ytUrl('pQ2LSjM9IGo'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'advanced',
-    topics: ['water fasting', 'stem cells', 'autophagy', 'extended fasting', 'regeneration'],
+    topics: ['water fasting', 'FMD', 'partial fast', 'extended fasting'],
     relatedProtocols: ['time-restricted-eating'],
     premium: true,
   },
   {
     id: 'pompa-cell-membrane',
-    title: 'Regenerating the Cell Membrane',
-    description: 'The cell membrane is the gatekeeper of cellular health. Learn how to restore its function using good fats, phospholipids, and targeted nutrition.',
+    title: "R2 REGENERATE THE CELL MEMBRANE | The 5R's of Health & Healing",
+    description:
+      'Part of the 5R series: regenerating the cell membrane, fats, and why membrane health drives detox and hormone signaling.',
     category: 'science-deep-dives',
-    duration: 2400,
-    thumbnailUrl: ytThumb('L0QHYdIn2Pk'),
-    videoUrl: ytUrl('L0QHYdIn2Pk'),
+    duration: 900,
+    thumbnailUrl: ytThumb('_N4oy6yDBJg'),
+    videoUrl: ytUrl('_N4oy6yDBJg'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'intermediate',
-    topics: ['cell membrane', 'phospholipids', 'nutrition', 'cellular health', 'detox'],
+    topics: ['cell membrane', '5R protocol', 'fats', 'cellular health'],
     relatedProtocols: ['cellular-detox'],
   },
   {
     id: 'pompa-longevity-prevention',
-    title: 'Achieving Longevity Through Prevention',
-    description: 'Dr. Pompa\'s approach to longevity — addressing root causes of disease before they manifest through cellular healing, fasting, and lifestyle optimization.',
+    title: 'Achieving Longevity through Prevention — CHTV 217',
+    description:
+      'Prevention-first longevity — addressing drivers of disease before they fully manifest.',
     category: 'expert-interviews',
-    duration: 3000,
-    thumbnailUrl: ytThumb('o0qfHdNLDg0'),
-    videoUrl: ytUrl('o0qfHdNLDg0'),
+    duration: 2400,
+    thumbnailUrl: ytThumb('DPgO9UGaNdg'),
+    videoUrl: ytUrl('DPgO9UGaNdg'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['longevity', 'prevention', 'cellular healing', 'lifestyle', 'aging'],
+    topics: ['longevity', 'prevention', 'lifestyle', 'aging'],
     relatedProtocols: [],
     featured: true,
   },
   {
     id: 'pompa-fasting-autophagy-skin',
-    title: 'Fasting, Autophagy & Glowing Skin',
-    description: 'How fasting-induced autophagy can improve skin health, reduce inflammation, and slow visible signs of aging from the inside out.',
+    title: 'Fasting, Autophagy, and Glowing Skin with Naomi Whittel — CHTV 246',
+    description:
+      'Conversation on fasting, autophagy, and skin health from a cellular and lifestyle perspective.',
     category: 'quick-tips',
-    duration: 1440,
-    thumbnailUrl: ytThumb('aeJyj4CvDyY'),
-    videoUrl: ytUrl('aeJyj4CvDyY'),
+    duration: 2700,
+    thumbnailUrl: ytThumb('DyWsimG-7SA'),
+    videoUrl: ytUrl('DyWsimG-7SA'),
     instructor: 'Dr. Daniel Pompa',
     difficulty: 'beginner',
-    topics: ['fasting', 'autophagy', 'skin health', 'anti-aging', 'collagen'],
+    topics: ['fasting', 'autophagy', 'skin', 'collagen'],
     relatedProtocols: ['time-restricted-eating'],
   },
 ];
 
 // ============================================================================
-// HUMAN GARAGE — Garry Lineham & Team
-// Channel: @HumanGarage
+// GARY BRECKA — @garybrecka
+// ============================================================================
+
+const breckaVideos: Video[] = [
+  {
+    id: 'brecka-brad-lea-full-episode',
+    title: 'Dropping Bombs with Brad Lea x Gary Brecka | Full Episode',
+    description:
+      'Long-form interview covering human biology, performance, and practical health ideas from Gary Brecka’s perspective.',
+    category: 'expert-interviews',
+    duration: 5400,
+    thumbnailUrl: ytThumb('Bl4Cgvb_edM'),
+    videoUrl: ytUrl('Bl4Cgvb_edM'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['longevity', 'performance', 'human biology', 'interview'],
+    relatedProtocols: [],
+    featured: true,
+  },
+  {
+    id: 'brecka-10x-speech',
+    title: '10X Growth Conference x Gary Brecka | Full Speech',
+    description:
+      'Keynote-style talk on health, energy, and optimization from a 10X Growth Conference stage.',
+    category: 'expert-interviews',
+    duration: 3600,
+    thumbnailUrl: ytThumb('KN0-pPbvzZY'),
+    videoUrl: ytUrl('KN0-pPbvzZY'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['mindset', 'health', 'performance', 'speaking'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'brecka-path-mastery',
+    title: 'Path To Mastery x Gary Brecka',
+    description:
+      'Discussion on mastery, discipline, and applying biology-backed habits in daily life.',
+    category: 'expert-interviews',
+    duration: 3600,
+    thumbnailUrl: ytThumb('iE07t-131GY'),
+    videoUrl: ytUrl('iE07t-131GY'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['mastery', 'habits', 'performance'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'brecka-sleep',
+    title: 'The Importance of Sleep | Gary Brecka',
+    description:
+      'Short breakdown on deep sleep, recovery, and why sleep is a lever for mood, metabolism, and focus.',
+    category: 'quick-tips',
+    duration: 120,
+    thumbnailUrl: ytThumb('lXwPwutw0co'),
+    videoUrl: ytUrl('lXwPwutw0co'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['sleep', 'recovery', 'deep sleep', 'circadian'],
+    relatedProtocols: ['evening-light-dimming'],
+    featured: true,
+  },
+  {
+    id: 'brecka-cold-showers',
+    title: 'How to take cold showers | Gary Brecka',
+    description:
+      'Quick guidance on using cold exposure and cold showers as a resilience and recovery tool.',
+    category: 'quick-tips',
+    duration: 90,
+    thumbnailUrl: ytThumb('Aepjq-Ula2w'),
+    videoUrl: ytUrl('Aepjq-Ula2w'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['cold exposure', 'cold shower', 'resilience', 'stress'],
+    relatedProtocols: ['cold-shower-basic'],
+    featured: true,
+  },
+  {
+    id: 'brecka-breathwork',
+    title: 'Why do Breathwork | Gary Brecka',
+    description:
+      'Why breathwork matters for nervous system regulation and performance.',
+    category: 'breathwork-sessions',
+    duration: 90,
+    thumbnailUrl: ytThumb('39Nrf4Ssv0c'),
+    videoUrl: ytUrl('39Nrf4Ssv0c'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['breathwork', 'nervous system', 'stress', 'HRV'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'brecka-four-oils',
+    title: 'The 4 Oils you Need | Gary Brecka',
+    description:
+      'Overview of dietary fats and oils often emphasized in a whole-food, low-seed-oil framing.',
+    category: 'quick-tips',
+    duration: 90,
+    thumbnailUrl: ytThumb('jdTsKMArg5s'),
+    videoUrl: ytUrl('jdTsKMArg5s'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['fats', 'nutrition', 'oils', 'omega-3'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'brecka-autoimmune',
+    title: 'Autoimmune diseases | Gary Brecka',
+    description:
+      'High-level perspective on autoimmune disease and biology-backed lifestyle context (not medical advice).',
+    category: 'science-deep-dives',
+    duration: 120,
+    thumbnailUrl: ytThumb('9UU2JE3FgVE'),
+    videoUrl: ytUrl('9UU2JE3FgVE'),
+    instructor: 'Gary Brecka',
+    difficulty: 'intermediate',
+    topics: ['autoimmune', 'inflammation', 'immune system'],
+    relatedProtocols: [],
+    premium: true,
+  },
+  {
+    id: 'brecka-tap-water',
+    title: 'Do not Drink Tapwater | Gary Brecka',
+    description:
+      'Short clip on water quality considerations and filtering mindset (verify for your locality).',
+    category: 'quick-tips',
+    duration: 90,
+    thumbnailUrl: ytThumb('2ma1r5o_ilQ'),
+    videoUrl: ytUrl('2ma1r5o_ilQ'),
+    instructor: 'Gary Brecka',
+    difficulty: 'beginner',
+    topics: ['water', 'hydration', 'filtration'],
+    relatedProtocols: [],
+  },
+  {
+    id: 'brecka-depression-truth',
+    title: 'The Truth about Depression | Gary Brecka',
+    description:
+      'Discussion framing depression through a biological lens; not a substitute for professional care.',
+    category: 'science-deep-dives',
+    duration: 120,
+    thumbnailUrl: ytThumb('hOYJLO2xbss'),
+    videoUrl: ytUrl('hOYJLO2xbss'),
+    instructor: 'Gary Brecka',
+    difficulty: 'intermediate',
+    topics: ['mental health', 'depression', 'neuroscience'],
+    relatedProtocols: [],
+    premium: true,
+  },
+];
+
+// ============================================================================
+// HUMAN GARAGE — Garry Lineham & team (@HumanGarage)
+// Channel display name on YouTube: "Human Garage TV"
 // ============================================================================
 
 const humanGarageVideos: Video[] = [
   {
     id: 'hg-full-body-reset',
-    title: '15-Minute Full Body Fascial Reset',
-    description: 'Human Garage\'s signature routine — a 15-minute sequence of fascial maneuvers designed to reduce 70-80% of body stress, unwind tension, and reset the nervous system.',
+    title: '15 Minute Full Body Stress Reset: Self-Care Fascial Maneuvers',
+    description:
+      'Human Garage’s guided sequence to unwind stress through self-applied fascial maneuvers in about fifteen minutes.',
     category: 'movement-routines',
     duration: 960,
-    thumbnailUrl: ytThumb('4BOTvaRaDjI'),
-    videoUrl: ytUrl('4BOTvaRaDjI'),
-    instructor: 'Garry Lineham',
+    thumbnailUrl: ytThumb('wzef2nA9anw'),
+    videoUrl: ytUrl('wzef2nA9anw'),
+    instructor: 'Garry Lineham (Human Garage)',
     difficulty: 'beginner',
-    topics: ['fascia', 'body reset', 'stress relief', 'nervous system', 'tension release'],
+    topics: ['fascia', 'body reset', 'stress relief', 'nervous system'],
     relatedProtocols: ['morning-mobility'],
     featured: true,
   },
   {
     id: 'hg-upper-body-reset',
-    title: 'Upper Body Reset: Neck, Shoulders & Back',
-    description: 'Release chronic tension in your neck, shoulders, and upper back with this targeted fascial maneuver sequence. Great for desk workers and anyone carrying stress.',
+    title: 'Tight Traps & Shoulders? Try This Vagus Nerve Release & Unwind Tension',
+    description:
+      'Upper-back and shoulder release using vagus-nerve–oriented fascial work to drop tension.',
     category: 'movement-routines',
-    duration: 780,
-    thumbnailUrl: ytThumb('lB7oMkNJPOg'),
-    videoUrl: ytUrl('lB7oMkNJPOg'),
+    duration: 600,
+    thumbnailUrl: ytThumb('yxNycxcyWhQ'),
+    videoUrl: ytUrl('yxNycxcyWhQ'),
     instructor: 'Human Garage',
     difficulty: 'beginner',
-    topics: ['upper body', 'neck pain', 'shoulders', 'back pain', 'desk work', 'fascia'],
+    topics: ['upper body', 'shoulders', 'traps', 'vagus nerve'],
     relatedProtocols: ['morning-mobility'],
   },
   {
     id: 'hg-lower-body-reset',
-    title: 'Lower Body Reset: Hips, Legs & Feet',
-    description: 'Unlock your hips, relieve knee tension, and ground yourself through your feet with this lower body fascial maneuver sequence.',
+    title: 'Lower Body Fascia Reset for the hips, knees and legs',
+    description:
+      'Targets hips, knees, and legs to improve mobility and reduce stored lower-body tension.',
     category: 'movement-routines',
-    duration: 840,
-    thumbnailUrl: ytThumb('SsrdctFCzUM'),
-    videoUrl: ytUrl('SsrdctFCzUM'),
+    duration: 720,
+    thumbnailUrl: ytThumb('nrC5RKXSRh8'),
+    videoUrl: ytUrl('nrC5RKXSRh8'),
     instructor: 'Human Garage',
     difficulty: 'beginner',
-    topics: ['lower body', 'hips', 'knee pain', 'feet', 'grounding', 'fascia'],
+    topics: ['lower body', 'hips', 'knees', 'legs', 'fascia'],
     relatedProtocols: ['morning-mobility'],
   },
   {
     id: 'hg-jaw-release',
-    title: 'Jaw Release: Let Go of Anger & Frustration',
-    description: 'Your jaw holds emotional tension from anger and frustration. This fascial maneuver helps release stored emotions and reduce TMJ discomfort.',
+    title: 'The Link Between Jaw & Neck Pain & Your Emotions',
+    description:
+      'How jaw and neck tension connect to stress and anger — with fascial release concepts.',
     category: 'movement-routines',
-    duration: 600,
-    thumbnailUrl: ytThumb('JH3MCzB-bKM'),
-    videoUrl: ytUrl('JH3MCzB-bKM'),
-    instructor: 'Garry Lineham',
+    duration: 180,
+    thumbnailUrl: ytThumb('GG8LdOuFc60'),
+    videoUrl: ytUrl('GG8LdOuFc60'),
+    instructor: 'Garry Lineham (Human Garage)',
     difficulty: 'beginner',
-    topics: ['jaw release', 'TMJ', 'anger', 'emotional release', 'fascia'],
+    topics: ['jaw', 'TMJ', 'neck', 'emotions', 'stress'],
     relatedProtocols: [],
   },
   {
     id: 'hg-organ-reset',
-    title: 'Organ Reset: Visceral Fascial Maneuvers',
-    description: 'Learn to work with the fascia around your internal organs. These gentle maneuvers support digestion, detox, and overall organ function.',
+    title: 'Organ Reset | Fascial Maneuvers: How to Recharge & Repair Organs',
+    description:
+      'Gentle organ-focused fascial maneuvers aimed at stress patterns held around the viscera.',
     category: 'movement-routines',
     duration: 900,
-    thumbnailUrl: ytThumb('R57NVTiGxEQ'),
-    videoUrl: ytUrl('R57NVTiGxEQ'),
+    thumbnailUrl: ytThumb('-dnZbIO_3aE'),
+    videoUrl: ytUrl('-dnZbIO_3aE'),
     instructor: 'Human Garage',
     difficulty: 'intermediate',
-    topics: ['organ reset', 'visceral fascia', 'digestion', 'detox', 'gut health'],
+    topics: ['organ reset', 'visceral fascia', 'stress', 'emotions'],
     relatedProtocols: [],
     premium: true,
   },
   {
     id: 'hg-hip-opener-trauma',
-    title: 'Hip Opener: Release Stored Trauma',
-    description: 'The hips are one of the body\'s primary trauma storage sites. This sequence helps release deep-held tension and emotional patterns.',
+    title: 'Powerful Fascial Maneuver for Healing Emotional Trauma: Partner Belly Breath',
+    description:
+      'Partner-based maneuver emphasizing breath and belly to work with stored emotional tension.',
     category: 'movement-routines',
-    duration: 720,
-    thumbnailUrl: ytThumb('piINifHE4XY'),
-    videoUrl: ytUrl('piINifHE4XY'),
+    duration: 600,
+    thumbnailUrl: ytThumb('fgHrb0WCn00'),
+    videoUrl: ytUrl('fgHrb0WCn00'),
     instructor: 'Human Garage',
     difficulty: 'intermediate',
-    topics: ['hip opener', 'trauma release', 'emotional healing', 'flexibility', 'fascia'],
+    topics: ['trauma release', 'breath', 'partner work', 'fascia'],
     relatedProtocols: [],
   },
   {
     id: 'hg-stress-reset',
-    title: 'Instant Stress Reset (5 Minutes)',
-    description: 'A quick 5-minute fascial maneuver you can do anywhere to immediately reduce stress and calm your nervous system.',
+    title: 'How To Release Anxiety + Tension In Seconds!',
+    description:
+      'Short vagus- and fascia-oriented reset you can use when anxiety spikes.',
     category: 'quick-tips',
-    duration: 360,
-    thumbnailUrl: ytThumb('hVebTWMOLcY'),
-    videoUrl: ytUrl('hVebTWMOLcY'),
-    instructor: 'Garry Lineham',
+    duration: 120,
+    thumbnailUrl: ytThumb('t4jNKNtF-wI'),
+    videoUrl: ytUrl('t4jNKNtF-wI'),
+    instructor: 'Garry Lineham (Human Garage)',
     difficulty: 'beginner',
-    topics: ['stress relief', 'quick reset', 'nervous system', 'fascia', 'anxiety'],
+    topics: ['anxiety', 'vagus nerve', 'quick reset', 'stress'],
     relatedProtocols: [],
     featured: true,
   },
   {
     id: 'hg-shoulder-anxiety',
-    title: 'Shoulder Release for Anxiety',
-    description: 'Anxiety often manifests as tightness in the shoulders and chest. This maneuver opens the chest, drops the shoulders, and creates space for deep breathing.',
+    title: 'Anxiety DIY Remedy — Vagus Nerve Reset',
+    description:
+      'Simple vagus-nerve reset sequence aimed at calming the body during anxious states.',
     category: 'movement-routines',
-    duration: 540,
-    thumbnailUrl: ytThumb('fjYCaPqGF-M'),
-    videoUrl: ytUrl('fjYCaPqGF-M'),
+    duration: 300,
+    thumbnailUrl: ytThumb('bWvkGyYgHac'),
+    videoUrl: ytUrl('bWvkGyYgHac'),
     instructor: 'Human Garage',
     difficulty: 'beginner',
-    topics: ['shoulders', 'anxiety', 'chest opening', 'breathing', 'emotional release'],
+    topics: ['anxiety', 'vagus nerve', 'shoulders', 'calm'],
     relatedProtocols: [],
   },
   {
     id: 'hg-pretzel-squat',
-    title: 'Pretzel Squat: Full Body Integration',
-    description: 'The pretzel squat is one of Human Garage\'s signature moves — a full-body fascial maneuver that integrates multiple chains for total body alignment.',
+    title: 'Fascial Maneuver: Pretzel Squat (Part 1) — Unlock the Hips & Pelvic Floor',
+    description:
+      'Signature pretzel squat progressions for hip and pelvic-floor mobility.',
     category: 'movement-routines',
-    duration: 480,
-    thumbnailUrl: ytThumb('JFqmBMK0Blg'),
-    videoUrl: ytUrl('JFqmBMK0Blg'),
-    instructor: 'Garry Lineham',
+    duration: 720,
+    thumbnailUrl: ytThumb('lvAXQ8aaTR0'),
+    videoUrl: ytUrl('lvAXQ8aaTR0'),
+    instructor: 'Garry Lineham (Human Garage)',
     difficulty: 'intermediate',
-    topics: ['pretzel squat', 'full body', 'alignment', 'integration', 'fascia'],
+    topics: ['pretzel squat', 'hips', 'pelvic floor', 'mobility'],
     relatedProtocols: ['morning-mobility'],
   },
   {
     id: 'hg-morning-wakeup',
-    title: 'Morning Wake-Up Fascial Routine',
-    description: 'Start your day by waking up your fascia with this gentle morning sequence. Takes just 10 minutes and sets the tone for your whole day.',
+    title: 'The Best Morning Ritual',
+    description:
+      'Morning fascial ritual to wake up tissue and set a calmer tone for the day.',
     category: 'movement-routines',
     duration: 600,
-    thumbnailUrl: ytThumb('Y3bJsiQxMz0'),
-    videoUrl: ytUrl('Y3bJsiQxMz0'),
+    thumbnailUrl: ytThumb('94eUZFjo7_M'),
+    videoUrl: ytUrl('94eUZFjo7_M'),
     instructor: 'Human Garage',
     difficulty: 'beginner',
-    topics: ['morning routine', 'wake up', 'energy', 'fascia', 'mobility'],
+    topics: ['morning routine', 'ritual', 'fascia', 'energy'],
     relatedProtocols: ['morning-mobility'],
   },
   {
     id: 'hg-neck-tmj',
-    title: 'Neck & TMJ Fascial Release',
-    description: 'Targeted fascial maneuvers for the neck and jaw area — helps with headaches, TMJ pain, and neck stiffness from screen use.',
+    title: 'Stiff Neck? Try This Fascial Maneuver for Instant Relief!',
+    description:
+      'Targeted neck fascial maneuver for stiffness and screen-related tension.',
     category: 'quick-tips',
-    duration: 480,
-    thumbnailUrl: ytThumb('d3u0IC4hFRw'),
-    videoUrl: ytUrl('d3u0IC4hFRw'),
+    duration: 120,
+    thumbnailUrl: ytThumb('2EHiZ_OqauM'),
+    videoUrl: ytUrl('2EHiZ_OqauM'),
     instructor: 'Human Garage',
     difficulty: 'beginner',
-    topics: ['neck pain', 'TMJ', 'headaches', 'fascia', 'screen posture'],
+    topics: ['neck pain', 'stiff neck', 'fascia', 'posture'],
     relatedProtocols: [],
   },
   {
     id: 'hg-what-is-fascia',
-    title: 'What is Fascia & Why It Matters',
-    description: 'Garry Lineham explains the fascial system — the connective tissue web that runs through your entire body and why it holds the key to pain, posture, and emotional health.',
+    title: 'What Is Fascia?',
+    description:
+      'Foundational explainer on fascia — the connective tissue network — and why it matters for pain and posture.',
     category: 'science-deep-dives',
-    duration: 1200,
-    thumbnailUrl: ytThumb('t_HU-s1mDFk'),
-    videoUrl: ytUrl('t_HU-s1mDFk'),
-    instructor: 'Garry Lineham',
+    duration: 480,
+    thumbnailUrl: ytThumb('99h3K_UhPmc'),
+    videoUrl: ytUrl('99h3K_UhPmc'),
+    instructor: 'Garry Lineham (Human Garage)',
     difficulty: 'beginner',
-    topics: ['fascia', 'connective tissue', 'pain', 'posture', 'emotional health'],
+    topics: ['fascia', 'connective tissue', 'pain', 'posture'],
     relatedProtocols: [],
   },
 ];
@@ -409,7 +588,7 @@ const humanGarageVideos: Video[] = [
 // COMBINED VIDEO LIBRARY
 // ============================================================================
 
-export const videos: Video[] = [...pompaVideos, ...humanGarageVideos];
+export const videos: Video[] = [...pompaVideos, ...breckaVideos, ...humanGarageVideos];
 
 // ============================================================================
 // VIDEO CATEGORIES METADATA
@@ -468,7 +647,7 @@ export const videoCollections: VideoCollection[] = [
   {
     id: 'getting-started-cellular-healing',
     name: 'Getting Started with Cellular Healing',
-    description: 'Dr. Pompa\'s foundational videos on the 5R protocol, fasting, and cellular detox',
+    description: 'Dr. Pompa on cellular detox, fasting, diet variation, and longevity',
     videoIds: [
       'pompa-5r-cellular-healing',
       'pompa-intermittent-fasting',
@@ -478,9 +657,21 @@ export const videoCollections: VideoCollection[] = [
     ],
   },
   {
+    id: 'gary-brecka-essentials',
+    name: 'Gary Brecka — Essentials',
+    description: 'Sleep, cold exposure, breathwork, and long-form talks from Gary Brecka',
+    videoIds: [
+      'brecka-brad-lea-full-episode',
+      'brecka-sleep',
+      'brecka-cold-showers',
+      'brecka-breathwork',
+      'brecka-10x-speech',
+    ],
+  },
+  {
     id: '15-minute-body-resets',
     name: '15-Minute Body Resets',
-    description: 'Human Garage\'s quick fascial routines to release tension and reset your body',
+    description: 'Human Garage fascial routines to release tension and reset your body',
     videoIds: [
       'hg-full-body-reset',
       'hg-upper-body-reset',
@@ -492,7 +683,7 @@ export const videoCollections: VideoCollection[] = [
   {
     id: 'advanced-detox-fasting',
     name: 'Advanced Detox & Fasting',
-    description: 'Deep dives into water fasting, heavy metal detox, and advanced healing protocols',
+    description: 'Heavy metals, water fasting options, biohacking fasts, and autophagy',
     videoIds: [
       'pompa-biohack-fasts',
       'pompa-water-fast-benefits',
@@ -504,7 +695,7 @@ export const videoCollections: VideoCollection[] = [
   {
     id: 'stress-trauma-release',
     name: 'Stress & Trauma Release',
-    description: 'Fascial maneuvers targeting emotional tension, anxiety, and stored trauma',
+    description: 'Fascial maneuvers targeting emotional tension, anxiety, and stored stress',
     videoIds: [
       'hg-jaw-release',
       'hg-hip-opener-trauma',

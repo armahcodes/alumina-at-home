@@ -1,5 +1,12 @@
 @layer reset, base, tokens, recipes, utilities;
 
+/* Sticky mobile header (~76px): keep first lines of scrollable content from sitting under it */
+@media (max-width: 1023px) {
+  html {
+    scroll-padding-top: 4.75rem;
+  }
+}
+
 :root {
   /* Brand Colors */
   --color-primary-50: #E6F2F0;

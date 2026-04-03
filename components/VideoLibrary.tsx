@@ -195,14 +195,18 @@ export default function VideoLibrary() {
                       Upgrade to access this and all premium videos
                     </Text>
                     <Button
-                      bgGradient="linear(to-r, accent.500, accent.600)"
-                      color="white"
+                      variant="plain"
+                      bg="accent.500"
+                      color="primary.900"
+                      borderWidth="1px"
+                      borderColor="accent.600"
                       px={8}
                       py={3}
                       borderRadius="full"
                       fontWeight="semibold"
-                      boxShadow="lg"
-                      _hover={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                      boxShadow="0 4px 18px rgba(7, 18, 16, 0.3)"
+                      _hover={{ bg: 'accent.400' }}
+                      _active={{ bg: 'accent.600' }}
                     >
                       Upgrade Now
                     </Button>

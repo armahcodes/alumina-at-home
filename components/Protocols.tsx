@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useStore } from '@/lib/store';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -150,7 +150,7 @@ export default function Protocols() {
                   }}
                   _focus={{ ring: 2, ringColor: 'accent.400' }}
                 >
-                  {meta && <Text mr={1.5}>{meta.icon}</Text>}
+                  {meta ? <span style={{ marginRight: '0.35rem' }}>{meta.icon}</span> : null}
                   {category === 'all' ? 'All' : meta?.name}
                 </Button>
               );
@@ -200,6 +200,13 @@ export default function Protocols() {
               const IconComponent = categoryIcons[protocol.category] || FileText;
               const isCompleted = completedTasks.includes(protocol.id);
               const isExpanded = selectedProtocol === protocol.id;
+              const toggleExpanded = () => setSelectedProtocol(isExpanded ? null : protocol.id);
+              const onHeaderKeyDown = (e: KeyboardEvent) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleExpanded();
+                }
+              };
 
               return (
                 <motion.div
@@ -217,22 +224,24 @@ export default function Protocols() {
                     _hover={{ borderColor: isCompleted ? 'accent.500/50' : 'primary.300' }}
                     transition="all 0.3s"
                   >
-                    {/* Header */}
-                    <Button
-                      onClick={() => setSelectedProtocol(isExpanded ? null : protocol.id)}
+                    {/* Header — div[role=button]: avoids invalid <button><div/></button> and Chakra Button quirks */}
+                    <Box
+                      role="button"
+                      tabIndex={0}
+                      onClick={toggleExpanded}
+                      onKeyDown={onHeaderKeyDown}
                       aria-expanded={isExpanded}
                       w="full"
                       p={{ base: 4, sm: 5 }}
                       textAlign="left"
+                      cursor="pointer"
                       bg="transparent"
                       _hover={{ bg: 'whiteAlpha.50' }}
-                      transition="all 0.3s"
-                      _focus={{ ring: 2, ringColor: 'accent.400' }}
-                      borderRadius={0}
-                      h="auto"
+                      transition="background 0.3s"
+                      _focusVisible={{ outline: '2px solid', outlineColor: 'accent.400', outlineOffset: '2px' }}
                     >
-                      <Flex align="flex-start" justify="space-between" w="full">
-                        <Flex align="flex-start" gap={3} flex={1} pr={4}>
+                      <Flex align="flex-start" justify="space-between" w="full" gap={2}>
+                        <Flex align="flex-start" gap={3} flex={1} minW={0} pr={2}>
                           <Flex
                             w={{ base: 10, sm: 12 }}
                             h={{ base: 10, sm: 12 }}
@@ -244,13 +253,13 @@ export default function Protocols() {
                           >
                             <Box as={IconComponent} w={{ base: 5, sm: 6 }} h={{ base: 5, sm: 6 }} color="accent.400" />
                           </Flex>
-                          <Box flex={1}>
+                          <Box flex={1} minW={0}>
                             <Flex align="center" gap={2} mb={1.5} flexWrap="wrap">
                               <Heading as="h3" size={{ base: 'sm', sm: 'md' }} color={isCompleted ? 'whiteAlpha.600' : 'white'}>
                                 {protocol.title}
                               </Heading>
                               {isCompleted && (
-                                <Box as={Check} w={5} h={5} color="accent.400" />
+                                <Box as={Check} w={5} h={5} color="accent.400" flexShrink={0} aria-hidden />
                               )}
                             </Flex>
                             <Flex gap={2} mb={2} flexWrap="wrap">
@@ -276,12 +285,12 @@ export default function Protocols() {
                                 {protocol.timeOfDay}
                               </Badge>
                             </Flex>
-                            <Text color="whiteAlpha.600" fontSize={{ base: 'sm', sm: 'base' }} lineClamp={2}>
+                            <Text color="whiteAlpha.600" fontSize={{ base: 'sm', sm: 'base' }} lineClamp={3}>
                               {protocol.description}
                             </Text>
                             <Flex align="center" gap={3} mt={2}>
                               <Flex align="center" gap={1}>
-                                <Box as={Clock} w={4} h={4} color="whiteAlpha.400" />
+                                <Box as={Clock} w={4} h={4} color="whiteAlpha.400" flexShrink={0} />
                                 <Text color="whiteAlpha.400" fontSize="sm">
                                   {formatDuration(protocol.duration)}
                                 </Text>
@@ -292,17 +301,27 @@ export default function Protocols() {
                             </Flex>
                           </Box>
                         </Flex>
-                        <Box
-                          as={ChevronDown}
-                          w={5}
-                          h={5}
-                          color="whiteAlpha.400"
-                          transition="transform 0.3s"
-                          transform={isExpanded ? 'rotate(180deg)' : undefined}
+                        <Flex
+                          align="center"
+                          justify="center"
+                          w={8}
+                          h={8}
                           flexShrink={0}
-                        />
+                          mt={0.5}
+                          aria-hidden
+                        >
+                          <ChevronDown
+                            size={20}
+                            strokeWidth={2}
+                            color="rgba(255, 255, 255, 0.45)"
+                            style={{
+                              transform: isExpanded ? 'rotate(180deg)' : undefined,
+                              transition: 'transform 0.3s ease',
+                            }}
+                          />
+                        </Flex>
                       </Flex>
-                    </Button>
+                    </Box>
 
                     {/* Expanded Content */}
                     {isExpanded && (
@@ -385,12 +404,15 @@ export default function Protocols() {
                             <Box
                               bg="primary.700/50"
                               borderRadius="lg"
-                              p={4}
+                              pl={4}
+                              pr={4}
+                              py={3}
                               mb={5}
-                              borderLeft="3px solid"
-                              borderColor="accent.500"
+                              borderInlineStartWidth="3px"
+                              borderInlineStartStyle="solid"
+                              borderInlineStartColor="accent.500"
                             >
-                              <Text color="whiteAlpha.600" fontSize="sm" fontStyle="italic">
+                              <Text color="whiteAlpha.600" fontSize="sm" fontStyle="italic" lineHeight="1.55">
                                 💡 {protocol.scienceNote}
                               </Text>
                             </Box>
@@ -415,24 +437,33 @@ export default function Protocols() {
                             </Box>
                           )}
 
-                          {/* Action Buttons */}
-                          <Flex gap={3}>
+                          {/* Action Buttons — Chakra v3 solid+gradient often renders as white/invisible label */}
+                          <Flex gap={3} align="stretch">
                             <Button
+                              variant="plain"
                               onClick={() => startTimer(protocol)}
                               flex={1}
-                              bgGradient="linear(to-r, accent.500, accent.600)"
-                              color="white"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
+                              gap={2}
+                              bg="accent.500"
+                              color="primary.900"
                               fontWeight="semibold"
                               py={3}
                               borderRadius="xl"
-                              boxShadow="lg"
-                              _hover={{ bgGradient: 'linear(to-r, accent.600, accent.700)' }}
+                              borderWidth="1px"
+                              borderColor="accent.600"
+                              boxShadow="0 4px 18px rgba(7, 18, 16, 0.3)"
+                              _hover={{ bg: 'accent.400', borderColor: 'accent.500' }}
+                              _active={{ bg: 'accent.600' }}
                               _focus={{ ring: 2, ringColor: 'accent.400' }}
                             >
-                              <Box as={Play} w={5} h={5} mr={2} />
-                              Start Protocol
+                              <Play size={20} strokeWidth={2} aria-hidden />
+                              Start protocol
                             </Button>
                             <Button
+                              variant="plain"
                               onClick={() =>
                                 void toggleProtocolTask(
                                   protocol.id,
@@ -445,15 +476,20 @@ export default function Protocols() {
                                 )
                               }
                               px={4}
+                              minW="52px"
+                              display="flex"
+                              alignItems="center"
+                              justifyContent="center"
                               bg={isCompleted ? 'accent.500/20' : 'primary.700/50'}
                               borderWidth="1px"
                               borderColor={isCompleted ? 'accent.500' : 'primary.400'}
-                              color={isCompleted ? 'accent.300' : 'whiteAlpha.700'}
+                              color={isCompleted ? 'accent.300' : 'white'}
                               borderRadius="xl"
                               _hover={{ bg: isCompleted ? 'accent.500/30' : 'primary.700/70' }}
                               _focus={{ ring: 2, ringColor: 'accent.400' }}
+                              aria-label={isCompleted ? 'Mark protocol incomplete' : 'Mark protocol complete'}
                             >
-                              <Box as={Check} w={5} h={5} />
+                              <Check size={20} strokeWidth={2} aria-hidden />
                             </Button>
                           </Flex>
                         </Box>
