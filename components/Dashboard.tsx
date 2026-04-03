@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useStore } from '@/lib/store';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { useProtocolCompletion } from '@/lib/hooks/useProtocolCompletion';
 import ProtocolTimer from './ProtocolTimer';
 import FocusTrap from './FocusTrap';
 import {
@@ -20,7 +22,9 @@ import {
 import { Zap, Moon, Heart, Flame, Check, Clock, FileText, Users, Calendar } from 'lucide-react';
 
 export default function Dashboard() {
-  const { completedTasks, toggleTask, user } = useStore();
+  const { completedTasks, user } = useStore();
+  const { user: authUser } = useAuth();
+  const { toggleProtocolTask } = useProtocolCompletion(authUser?.id ?? null);
   const [activeTimer, setActiveTimer] = useState<{ id: string; name: string; duration: number } | null>(null);
   const [showConsultationModal, setShowConsultationModal] = useState(false);
   const shouldReduceMotion = useReducedMotion();
@@ -76,7 +80,11 @@ export default function Dashboard() {
           protocolName={activeTimer.name}
           duration={activeTimer.duration}
           onComplete={() => {
-            toggleTask(activeTimer.id);
+            void toggleProtocolTask(
+              activeTimer.id,
+              { taskName: activeTimer.name },
+              completedTasks.includes(activeTimer.id)
+            );
             setActiveTimer(null);
           }}
           onClose={() => setActiveTimer(null)}
@@ -246,7 +254,17 @@ export default function Dashboard() {
                 >
                 <Flex align="center" gap={{ base: 2.5, sm: 3 }}>
                   <Button
-                    onClick={() => toggleTask(protocol.id)}
+                    onClick={() =>
+                      void toggleProtocolTask(
+                        protocol.id,
+                        {
+                          taskName: protocol.title,
+                          taskCategory: protocol.category,
+                          pointsEarned: 10,
+                        },
+                        completedTasks.includes(protocol.id)
+                      )
+                    }
                     aria-label={`Mark ${protocol.title} as ${completedTasks.includes(protocol.id) ? 'incomplete' : 'complete'}`}
                     minW="44px"
                     minH="44px"
@@ -410,7 +428,7 @@ function ConsultationModal({ onClose }: { onClose: () => void }) {
     'Follow-up Consultation'
   ];
 
-  const onSubmit = (data: ConsultationFormData) => {
+  const onSubmit = (_data: ConsultationFormData) => {
     // Here you would typically send to an API
     setSubmitted(true);
     setTimeout(() => {

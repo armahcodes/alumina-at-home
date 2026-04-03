@@ -21,7 +21,7 @@ export async function GET(
     }
 
     return NextResponse.json({ data });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -56,7 +56,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

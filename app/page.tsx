@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { useStore } from '@/lib/store';
 import { useAuth, useSignOut } from '@/lib/hooks/useAuth';
@@ -22,7 +23,6 @@ import {
   Text,
   Button,
   Grid,
-  Spinner,
 } from '@chakra-ui/react';
 import { 
   Home as HomeIcon, 
@@ -51,12 +51,20 @@ interface NavigationItem {
 }
 
 export default function Home() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [showAchievements, setShowAchievements] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Auth session (syncs with Zustand automatically via useAuth hook)
   const { user: authUser, isLoading: isSessionLoading, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    if (isSessionLoading || isAuthenticated) return;
+    const callback = pathname || '/';
+    router.replace(`/auth/sign-in?callbackUrl=${encodeURIComponent(callback)}`);
+  }, [isSessionLoading, isAuthenticated, pathname, router]);
 
   // Zustand store for app-specific state
   const { hasCompletedOnboarding, currentStreak, totalPoints, user } = useStore();
@@ -72,7 +80,7 @@ export default function Home() {
     );
   }
 
-  // Middleware handles redirect, but show loading if somehow not authenticated
+  // Next.js proxy handles redirect; client fallback if session is missing
   if (!isAuthenticated) {
     return (
       <div className="app-loading">

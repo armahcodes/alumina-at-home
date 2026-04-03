@@ -42,7 +42,7 @@ export function useUserProfile(userId: string | null) {
       const res = await fetch(`/api/user/${userId}/profile`);
       if (!res.ok) throw new Error('Failed to fetch profile');
       const data = await res.json();
-      return data.data as UserProfile;
+      return data.data as UserProfile | null;
     },
     enabled: !!userId,
   });
@@ -159,7 +159,25 @@ export function useCompleteTask(userId: string) {
       return res.json();
     },
     onSuccess: () => {
-      // Invalidate both tasks and stats to show updated points
+      queryClient.invalidateQueries({ queryKey: queryKeys.todayTasks(userId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.stats(userId) });
+    },
+  });
+}
+
+export function useRemoveTodayTask(userId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (taskId: string) => {
+      const res = await fetch(
+        `/api/user/${userId}/tasks/today?taskId=${encodeURIComponent(taskId)}`,
+        { method: 'DELETE' }
+      );
+      if (!res.ok) throw new Error('Failed to remove task');
+      return res.json();
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.todayTasks(userId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.stats(userId) });
     },

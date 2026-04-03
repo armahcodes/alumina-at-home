@@ -88,12 +88,17 @@ export async function sendResetPasswordEmail(email: string, url: string) {
     </p>
   `);
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: 'Reset your Alumina At Home password',
     html,
   });
+
+  if (error) {
+    console.error('[Email] Failed to send reset password email:', error);
+    throw new Error(`Failed to send email: ${error.message}`);
+  }
 }
 
 export async function sendVerificationEmail(email: string, url: string) {
@@ -123,12 +128,17 @@ export async function sendVerificationEmail(email: string, url: string) {
     </p>
   `);
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: 'Verify your Alumina At Home email',
     html,
   });
+
+  if (error) {
+    console.error('[Email] Failed to send verification email:', error);
+    throw new Error(`Failed to send email: ${error.message}`);
+  }
 }
 
 export async function sendOTPEmail(
@@ -182,10 +192,15 @@ export async function sendOTPEmail(
     </p>
   `);
 
-  await resend.emails.send({
+  const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: subjectMap[type],
     html,
   });
+
+  if (error) {
+    console.error('[Email] Failed to send OTP email:', error);
+    throw new Error(`Failed to send email: ${error.message}`);
+  }
 }

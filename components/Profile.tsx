@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useStore } from '@/lib/store';
@@ -19,7 +18,7 @@ import {
   Textarea,
 } from '@chakra-ui/react';
 import { useSignOut } from '@/lib/hooks/useAuth';
-import { Check, Zap, CheckCircle, Bell, User, Lock, FileText, HelpCircle, ChevronRight, X, LogOut, Settings } from 'lucide-react';
+import { Check, Zap, CheckCircle, Bell, User, Lock, FileText, HelpCircle, ChevronRight, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 interface Goal {
@@ -39,8 +38,6 @@ export default function Profile() {
   const [showSupportModal, setShowSupportModal] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const shouldReduceMotion = useReducedMotion();
-  const router = useRouter();
-  
   // Auth session
   const { data: sessionData } = authClient.useSession();
   const authUser = sessionData?.user;
@@ -79,10 +76,6 @@ export default function Profile() {
     }
   };
   
-  const handleAccountSettings = () => {
-    router.push('/account/settings');
-  };
-
   return (
     <Flex direction="column" gap={{ base: 6, sm: 8 }}>
       {/* Modals */}
@@ -976,7 +969,7 @@ function SupportModal({ onClose }: { onClose: () => void }) {
   const { register, handleSubmit, formState: { errors } } = useForm<SupportFormData>();
   const [submitted, setSubmitted] = useState(false);
 
-  const onSubmit = (data: SupportFormData) => {
+  const onSubmit = (_data: SupportFormData) => {
     setSubmitted(true);
     setTimeout(() => {
       onClose();

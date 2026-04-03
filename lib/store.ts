@@ -1,5 +1,11 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type {
+  User as DbUser,
+  UserProfile as DbUserProfile,
+  UserStats as DbUserStats,
+  CompletedTask,
+} from '@/lib/db';
 
 interface UserProfile {
   name: string;
@@ -57,6 +63,14 @@ export interface AppState {
   incrementStreak: () => void;
   addPoints: (points: number) => void;
   resetDay: () => void;
+
+  /** Overwrite gamification and profile from server (Postgres); server wins on load. */
+  applyServerSnapshot: (input: {
+    user: DbUser;
+    profile: DbUserProfile | null;
+    stats: DbUserStats | null;
+    todayTasks: CompletedTask[];
+  }) => void;
 }
 
 export const useStore = create<AppState>()(
@@ -192,7 +206,30 @@ export const useStore = create<AppState>()(
 
       resetDay: () => {
         set({ completedTasks: [], supplements: [] });
-      }
+      },
+
+      applyServerSnapshot: ({ user, profile, stats, todayTasks }) => {
+        const experienceLevel =
+          (profile?.experienceLevel as UserProfile['experienceLevel']) || 'beginner';
+        const budget = (profile?.budget as UserProfile['budget']) || 'essential';
+
+        set({
+          hasCompletedOnboarding: user.hasCompletedOnboarding ?? false,
+          currentStreak: stats?.currentStreak ?? 0,
+          longestStreak: stats?.longestStreak ?? 0,
+          totalPoints: stats?.totalPoints ?? 0,
+          completedTasks: todayTasks.map((t) => t.taskId),
+          user: {
+            name: user.name,
+            email: user.email,
+            goals: profile?.goals ?? [],
+            experienceLevel,
+            availableTime: profile?.availableTime ?? 30,
+            healthConditions: profile?.healthConditions ?? [],
+            budget,
+          },
+        });
+      },
     }),
     {
       name: 'alumina-storage',

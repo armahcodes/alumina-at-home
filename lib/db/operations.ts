@@ -226,6 +226,70 @@ export async function addCompletedTask(task: NewCompletedTask) {
   }
 }
 
+export async function findTodayCompletedTask(userId: string, taskId: string) {
+  try {
+    const rows = await db
+      .select()
+      .from(schema.completedTasks)
+      .where(
+        and(
+          eq(schema.completedTasks.userId, userId),
+          eq(schema.completedTasks.taskId, taskId),
+          eq(schema.completedTasks.date, sql`CURRENT_DATE`)
+        )
+      )
+      .limit(1);
+    return { data: rows[0] ?? null, error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
+/** Inserts today’s completion if missing, then awards points only when a new row is created. */
+export async function addCompletedTaskIfNew(task: NewCompletedTask) {
+  const { data: existing, error: findError } = await findTodayCompletedTask(
+    task.userId,
+    task.taskId
+  );
+  if (findError) {
+    return { data: null, created: false, error: findError };
+  }
+  if (existing) {
+    return { data: existing, created: false, error: null };
+  }
+
+  const inserted = await addCompletedTask(task);
+  if (inserted.error || !inserted.data) {
+    return { data: inserted.data, created: false, error: inserted.error };
+  }
+
+  const points = task.pointsEarned ?? 10;
+  const pointsResult = await addPoints(task.userId, points);
+  if (pointsResult.error) {
+    return { data: inserted.data, created: true, error: pointsResult.error };
+  }
+
+  return { data: inserted.data, created: true, error: null };
+}
+
+export async function removeTodayCompletedTask(userId: string, taskId: string) {
+  try {
+    const rows = await db
+      .delete(schema.completedTasks)
+      .where(
+        and(
+          eq(schema.completedTasks.userId, userId),
+          eq(schema.completedTasks.taskId, taskId),
+          eq(schema.completedTasks.date, sql`CURRENT_DATE`)
+        )
+      )
+      .returning();
+    return { data: rows[0] || null, error: null };
+  } catch (error) {
+    return { data: null, error };
+  }
+}
+
 export async function getCompletedTasks(userId: string, date?: string) {
   try {
     const results = date

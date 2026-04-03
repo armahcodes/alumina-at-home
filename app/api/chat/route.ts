@@ -2,6 +2,7 @@ import { handleChatStream } from '@mastra/ai-sdk';
 import { createUIMessageStreamResponse } from 'ai';
 import { mastra } from '@/lib/mastra';
 import { memory } from '@/lib/mastra/agents/alumina-agent';
+import { getServerSession } from '@/lib/auth/session';
 
 /**
  * Chat API Route for Alumina Assistant with Personalization
@@ -30,44 +31,67 @@ interface UserContext {
 }
 
 export async function POST(req: Request) {
+  const session = await getServerSession();
+  if (!session?.user?.id) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
   const params = await req.json();
-  const userContext: UserContext | undefined = params.data?.userContext;
-  
-  // Extract thread and resource IDs for memory scoping
-  const threadId = userContext?.threadId || 'default-thread';
-  const resourceId = userContext?.userId || 'anonymous';
-  
-  // If we have user context, update working memory
-  if (userContext && resourceId !== 'anonymous') {
-    try {
-      const workingMemoryContent = buildWorkingMemory(userContext);
-      
-      // Try to update existing working memory, or it will be created on first message
-      await memory.updateWorkingMemory({
+  const clientContext: UserContext | undefined = params.data?.userContext;
+
+  const threadId = clientContext?.threadId || 'default-thread';
+  const resourceId = session.user.id;
+
+  const trustedContext: UserContext = {
+    userId: resourceId,
+    threadId,
+    name: session.user.name ?? clientContext?.name,
+    email: session.user.email ?? clientContext?.email,
+    experienceLevel: clientContext?.experienceLevel,
+    availableTime: clientContext?.availableTime,
+    budget: clientContext?.budget,
+    goals: clientContext?.goals,
+    healthConditions: clientContext?.healthConditions,
+    currentStreak: clientContext?.currentStreak,
+    totalPoints: clientContext?.totalPoints,
+    completedProtocols: clientContext?.completedProtocols,
+    supplements: clientContext?.supplements,
+  };
+
+  try {
+    const workingMemoryContent = buildWorkingMemory(trustedContext);
+    await memory
+      .updateWorkingMemory({
         threadId,
         resourceId,
         workingMemory: workingMemoryContent,
-      }).catch(() => {
+      })
+      .catch(() => {
         // Thread might not exist yet — it will be created on first message
       });
-    } catch {
-      // Working memory update is non-critical; continue with chat
-    }
+  } catch {
+    // Working memory update is non-critical; continue with chat
   }
-  
-  // Handle the chat stream with memory context
+
   const stream = await handleChatStream({
     mastra,
     agentId: 'alumina-agent',
     params: {
       ...params,
+      data: {
+        ...params.data,
+        userContext: trustedContext,
+      },
       memory: {
         thread: threadId,
         resource: resourceId,
       },
     },
   });
-  
+
   return createUIMessageStreamResponse({ stream });
 }
 

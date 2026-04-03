@@ -3,7 +3,7 @@
 import { authClient } from '@/lib/auth/client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Mail, User, Shield, Loader2 } from 'lucide-react';
+import { ArrowLeft, Mail, User, Shield } from 'lucide-react';
 
 export default function AccountPage() {
   const { data, isPending } = authClient.useSession();

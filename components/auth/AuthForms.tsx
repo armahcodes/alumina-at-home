@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { authClient } from '@/lib/auth/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, EyeOff, Mail, Lock, User, ArrowLeft, CheckCircle2, Loader2, ArrowRight } from 'lucide-react';
 
@@ -10,16 +10,42 @@ interface AuthFormProps {
   path: string;
 }
 
+/** Avoid open redirects: only same-origin relative paths. */
+function safeCallbackUrl(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/';
+  return raw;
+}
+
+function AuthFormFallback() {
+  return (
+    <div className="af-form af-centered">
+      <Loader2 size={28} className="af-spin" style={{ color: 'var(--c-accent, #EFC2B3)' }} />
+    </div>
+  );
+}
+
 export default function AuthForms({ path }: AuthFormProps) {
   switch (path) {
     case 'sign-in':
-      return <SignInForm />;
+      return (
+        <Suspense fallback={<AuthFormFallback />}>
+          <SignInForm />
+        </Suspense>
+      );
     case 'sign-up':
-      return <SignUpForm />;
+      return (
+        <Suspense fallback={<AuthFormFallback />}>
+          <SignUpForm />
+        </Suspense>
+      );
     case 'forgot-password':
       return <ForgotPasswordForm />;
     case 'reset-password':
-      return <ResetPasswordForm />;
+      return (
+        <Suspense fallback={<AuthFormFallback />}>
+          <ResetPasswordForm />
+        </Suspense>
+      );
     case 'sign-out':
       return <SignOutView />;
     default:
@@ -277,6 +303,8 @@ function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const postAuthPath = safeCallbackUrl(searchParams.get('callbackUrl'));
 
   // Cooldown timer
   useEffect(() => {
@@ -333,7 +361,7 @@ function SignInForm() {
       setError(error.message || 'Invalid or expired code.');
       setLoading(false);
     } else {
-      router.push('/');
+      router.push(postAuthPath);
     }
   };
 
@@ -363,7 +391,7 @@ function SignInForm() {
       setError(error.message || 'Invalid email or password.');
       setLoading(false);
     } else {
-      router.push('/');
+      router.push(postAuthPath);
     }
   };
 
@@ -510,6 +538,8 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const postAuthPath = safeCallbackUrl(searchParams.get('callbackUrl'));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -522,7 +552,7 @@ function SignUpForm() {
       setError(error.message || 'Could not create account.');
       setLoading(false);
     } else {
-      router.push('/');
+      router.push(postAuthPath);
     }
   };
 
@@ -661,16 +691,27 @@ function ForgotPasswordForm() {
 /* ─── Reset Password ─── */
 
 function ResetPasswordForm() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const token = searchParams.get('token');
+  const urlError = searchParams.get('error');
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+
+  const tokenInvalid = urlError === 'INVALID_TOKEN' || !token?.trim();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (!token?.trim()) {
+      setError('This reset link is missing a token. Request a new link from the forgot password page.');
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
@@ -679,15 +720,44 @@ function ResetPasswordForm() {
 
     setLoading(true);
 
-    const { error } = await authClient.resetPassword({ newPassword: password });
+    const { error: resetErr } = await authClient.resetPassword({
+      token: token.trim(),
+      newPassword: password,
+    });
 
-    if (error) {
-      setError(error.message || 'Could not reset password. The link may have expired.');
+    if (resetErr) {
+      setError(resetErr.message || 'Could not reset password. The link may have expired.');
     } else {
       setSuccess(true);
     }
     setLoading(false);
   };
+
+  if (tokenInvalid) {
+    return (
+      <div className="af-form af-centered">
+        <FormHeader
+          title="Link invalid or expired"
+          subtitle="Request a new reset link and try again."
+        />
+        <div className="af-error" style={{ marginTop: '1rem', textAlign: 'center' }}>
+          <span>
+            {urlError === 'INVALID_TOKEN'
+              ? 'This password reset link is no longer valid.'
+              : 'Open the reset link from your email, or request a new one below.'}
+          </span>
+        </div>
+        <Link href="/auth/forgot-password" className="af-submit" style={{ marginTop: '1.5rem', textAlign: 'center', textDecoration: 'none' }}>
+          <span>Request new link</span>
+          <ArrowRight size={16} className="af-submit-arrow" />
+        </Link>
+        <Link href="/auth/sign-in" className="af-back-link" style={{ marginTop: '1rem' }}>
+          <ArrowLeft size={15} />
+          Back to sign in
+        </Link>
+      </div>
+    );
+  }
 
   if (success) {
     return (
@@ -699,7 +769,7 @@ function ResetPasswordForm() {
         <p className="af-success-desc">
           Your password has been reset. You can now sign in with your new password.
         </p>
-        <button onClick={() => router.push('/auth/sign-in')} className="af-submit" style={{ marginTop: '1.5rem' }}>
+        <button type="button" onClick={() => router.push('/auth/sign-in')} className="af-submit" style={{ marginTop: '1.5rem' }}>
           <span>Continue to Sign In</span>
           <ArrowRight size={16} className="af-submit-arrow" />
         </button>
@@ -748,18 +818,16 @@ function ResetPasswordForm() {
 /* ─── Sign Out ─── */
 
 function SignOutView() {
-  const [done, setDone] = useState(false);
-
-  const doSignOut = useCallback(async () => {
-    if (done) return;
-    setDone(true);
-    await authClient.signOut();
-    window.location.href = '/auth/sign-in';
-  }, [done]);
+  const started = useRef(false);
 
   useEffect(() => {
-    doSignOut();
-  }, [doSignOut]);
+    if (started.current) return;
+    started.current = true;
+    void (async () => {
+      await authClient.signOut();
+      window.location.href = '/auth/sign-in';
+    })();
+  }, []);
 
   return (
     <div className="af-form af-centered">

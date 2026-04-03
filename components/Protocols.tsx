@@ -3,6 +3,8 @@
 import { useState, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useStore } from '@/lib/store';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { useProtocolCompletion } from '@/lib/hooks/useProtocolCompletion';
 import { protocols, protocolCategories, type Protocol } from '@/lib/data/protocols';
 import ProtocolTimer from './ProtocolTimer';
 import {
@@ -37,7 +39,9 @@ export default function Protocols() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [activeDifficulty, setActiveDifficulty] = useState<string>('all');
   const [activeTimer, setActiveTimer] = useState<{ id: string; name: string; duration: number } | null>(null);
-  const { completedTasks, toggleTask } = useStore();
+  const { completedTasks } = useStore();
+  const { user: authUser } = useAuth();
+  const { toggleProtocolTask } = useProtocolCompletion(authUser?.id ?? null);
   const shouldReduceMotion = useReducedMotion();
 
   const categories = ['all', ...Object.keys(protocolCategories)];
@@ -91,7 +95,11 @@ export default function Protocols() {
           protocolName={activeTimer.name}
           duration={activeTimer.duration}
           onComplete={() => {
-            toggleTask(activeTimer.id);
+            void toggleProtocolTask(
+              activeTimer.id,
+              { taskName: activeTimer.name },
+              completedTasks.includes(activeTimer.id)
+            );
             setActiveTimer(null);
           }}
           onClose={() => setActiveTimer(null)}
@@ -425,7 +433,17 @@ export default function Protocols() {
                               Start Protocol
                             </Button>
                             <Button
-                              onClick={() => toggleTask(protocol.id)}
+                              onClick={() =>
+                                void toggleProtocolTask(
+                                  protocol.id,
+                                  {
+                                    taskName: protocol.title,
+                                    taskCategory: protocol.category,
+                                    pointsEarned: protocol.points,
+                                  },
+                                  isCompleted
+                                )
+                              }
                               px={4}
                               bg={isCompleted ? 'accent.500/20' : 'primary.700/50'}
                               borderWidth="1px"

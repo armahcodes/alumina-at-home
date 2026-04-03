@@ -39,9 +39,9 @@ export function useAuth() {
 }
 
 /**
- * Hook to get the current user from Better Auth session
+ * Hook to get the current user from Better Auth session (session only; not DB profile).
  */
-export function useUser() {
+export function useSessionUser() {
   const { data, isPending } = authClient.useSession();
   return {
     user: data?.user ?? null,

@@ -63,6 +63,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "^16.1.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
     "tsx": "^4.20.6",
     "typescript": "^5.8"
   }
