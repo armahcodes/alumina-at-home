@@ -133,13 +133,15 @@ export default function OnboardingFlow() {
         <Flex justify="flex-end" mb={{ base: 3, sm: 4 }}>
           <Button
             onClick={handleSkip}
-            variant="ghost"
-            color="whiteAlpha.600"
-            _hover={{ color: "white" }}
+            variant="plain"
+            color="whiteAlpha.800"
+            _hover={{ color: "white", bg: "whiteAlpha.100" }}
             _active={{ color: "white" }}
             fontSize="sm"
+            fontWeight="medium"
             textDecoration="underline"
             minH="44px"
+            px={2}
           >
             Skip for now
           </Button>
@@ -169,7 +171,8 @@ export default function OnboardingFlow() {
           </Box>
         </Box>
 
-        {/* Steps */}
+        {/* Steps + nav share width so footer aligns with the card */}
+        <Box w="full">
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -556,23 +559,35 @@ export default function OnboardingFlow() {
           )}
         </AnimatePresence>
 
-        {/* Navigation */}
-        <Flex align="center" justify="space-between" mt={{ base: 6, sm: 8 }} gap={3}>
+        {/* Navigation — plain variant avoids v3 recipe clashing with custom fills */}
+        <Flex
+          align="stretch"
+          justify="space-between"
+          mt={{ base: 6, sm: 8 }}
+          gap={3}
+          w="full"
+        >
           <Button
             onClick={handleBack}
             disabled={step === 1}
+            variant="plain"
+            flexShrink={0}
             px={{ base: 5, sm: 6 }}
             py={3.5}
-            bg="primary.600/50"
+            bg="whiteAlpha.200"
             borderWidth="1px"
-            borderColor="primary.400"
+            borderColor="whiteAlpha.400"
             borderRadius="xl"
-            color="whiteAlpha.700"
-            _hover={{ color: "white", borderColor: "primary.300" }}
-            _active={{ color: "white" }}
-            _disabled={{ opacity: 0.3, cursor: "not-allowed" }}
+            color="white"
+            fontWeight="medium"
+            _hover={{
+              bg: "whiteAlpha.300",
+              borderColor: "whiteAlpha.500",
+            }}
+            _active={{ bg: "whiteAlpha.400" }}
+            _disabled={{ opacity: 0.35, cursor: "not-allowed", color: "whiteAlpha.500" }}
             minH="48px"
-            transition="all 0.2s"
+            transition="background 0.2s, border-color 0.2s"
           >
             ← Back
           </Button>
@@ -583,30 +598,42 @@ export default function OnboardingFlow() {
               (step === 1 && !formData.name) ||
               (step === 2 && formData.goals.length === 0)
             }
+            variant="plain"
             flex={1}
             px={{ base: 6, sm: 8 }}
             py={3.5}
-            bgGradient="linear(to-r, accent.500, accent.600)"
-            color="white"
+            bg="accent.500"
+            color="primary.900"
             fontWeight="semibold"
+            fontSize={{ base: "sm", sm: "md" }}
             borderRadius="xl"
-            boxShadow="lg"
+            borderWidth="1px"
+            borderColor="accent.600"
+            boxShadow="0 4px 18px rgba(7, 18, 16, 0.35)"
             _hover={{
-              bgGradient: "linear(to-r, accent.600, accent.700)",
+              bg: "accent.400",
+              borderColor: "accent.500",
               transform: "translateY(-1px)",
-              boxShadow: "xl"
+              boxShadow: "0 6px 22px rgba(7, 18, 16, 0.4)",
             }}
             _active={{
-              bgGradient: "linear(to-r, accent.600, accent.700)",
-              transform: "translateY(0)"
+              bg: "accent.600",
+              borderColor: "accent.700",
+              transform: "translateY(0)",
             }}
-            _disabled={{ opacity: 0.5, cursor: "not-allowed" }}
+            _disabled={{
+              opacity: 0.45,
+              cursor: "not-allowed",
+              transform: "none",
+              boxShadow: "none",
+            }}
             minH="48px"
-            transition="all 0.2s"
+            transition="background 0.2s, transform 0.2s, box-shadow 0.2s"
           >
-            {step === totalSteps ? 'Complete Setup' : 'Next'}
+            {step === totalSteps ? "Complete setup" : "Next"}
           </Button>
         </Flex>
+        </Box>
       </Box>
     </Flex>
   );

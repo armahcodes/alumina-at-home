@@ -31,9 +31,9 @@ export type VideoCategory =
   | 'quick-tips'
   | 'meditation';
 
-/** Helper — YouTube thumbnail from video ID */
+/** Helper — YouTube thumbnail from video ID (mqdefault is available for almost all public videos; hq can 404) */
 function ytThumb(videoId: string): string {
-  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+  return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
 }
 
 /** Helper — YouTube watch URL from video ID */

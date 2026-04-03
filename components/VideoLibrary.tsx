@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import Image from 'next/image';
+import { useState, useMemo, useEffect, type KeyboardEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { videos, videoCategories, videoCollections, type Video } from '@/lib/data/videos';
 import FocusTrap from './FocusTrap';
@@ -47,6 +46,12 @@ export default function VideoLibrary() {
   const [showCollections, setShowCollections] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (selectedVideo && !selectedVideo.premium) {
+      setVideoLoading(true);
+    }
+  }, [selectedVideo?.id, selectedVideo?.premium]);
 
   const categories = ['all', ...Object.keys(videoCategories)];
   const difficulties = ['all', 'beginner', 'intermediate', 'advanced'];
@@ -204,16 +209,18 @@ export default function VideoLibrary() {
                   </Flex>
                 ) : (
                   <ReactPlayer
-                    {...{
-                      url: selectedVideo.videoUrl || 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                      width: '100%',
-                      height: '100%',
-                      controls: true,
-                      playing: true,
-                      onReady: () => setVideoLoading(false),
-                      onBuffer: () => setVideoLoading(true),
-                      onBufferEnd: () => setVideoLoading(false)
-                    } as React.ComponentProps<typeof ReactPlayer>}
+                    key={selectedVideo.id}
+                    src={selectedVideo.videoUrl}
+                    width="100%"
+                    height="100%"
+                    controls
+                    playsInline
+                    // v3 uses `src` (not legacy `url`). Without src, nothing loads.
+                    playing
+                    muted
+                    onReady={() => setVideoLoading(false)}
+                    onError={() => setVideoLoading(false)}
+                    onPlaying={() => setVideoLoading(false)}
                   />
                 )}
               </Box>
@@ -522,9 +529,19 @@ function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCar
   const IconComponent = getCategoryIcon(video.category);
   const thumbnailUrl = getVideoThumbnail(video);
 
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <Button
+    <Box
+      role="button"
+      tabIndex={0}
       onClick={onClick}
+      onKeyDown={onKeyDown}
       w="full"
       h="auto"
       p={0}
@@ -533,20 +550,38 @@ function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCar
       borderColor="primary.400"
       borderRadius="xl"
       overflow="hidden"
-      _hover={{ borderColor: 'accent.500/40', transform: 'translateY(-3px)', boxShadow: '0 12px 32px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(239, 194, 179, 0.1)' }}
-      _focus={{ ring: 2, ringColor: 'accent.400' }}
-      transition="all 0.3s"
+      cursor="pointer"
       textAlign="left"
       display="block"
+      transition="all 0.3s"
+      _hover={{
+        borderColor: "accent.500/40",
+        transform: "translateY(-3px)",
+        boxShadow:
+          "0 12px 32px -8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(239, 194, 179, 0.1)",
+      }}
+      _focusVisible={{
+        outline: "2px solid",
+        outlineColor: "accent.400",
+        outlineOffset: "2px",
+      }}
     >
       {/* Thumbnail */}
       <Box position="relative" aspectRatio={16/9} bg="primary.800" overflow="hidden">
-        <Image
+        {/* Native img: never hits /_next/image (Vercel often 404s YouTube fetches for the optimizer) */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- intentional: bypass optimizer for YouTube CDN */}
+        <img
           src={thumbnailUrl}
           alt={video.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          style={{ objectFit: 'cover' }}
+          loading="lazy"
+          decoding="async"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
         />
         
         {/* Play overlay */}
@@ -654,6 +689,6 @@ function VideoCard({ video, onClick, formatDuration, getCategoryIcon }: VideoCar
           </Text>
         </Flex>
       </Box>
-    </Button>
+    </Box>
   );
 }
