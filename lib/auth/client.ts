@@ -2,6 +2,7 @@
 
 import { createAuthClient } from "better-auth/react";
 import { emailOTPClient } from "better-auth/client/plugins";
+import { dashClient } from "@better-auth/infra/client";
 
 const boundMethodCache = new Map<string | symbol, unknown>();
 
@@ -32,7 +33,7 @@ function instantiateAuthClient() {
   return createAuthClient({
     ...(baseURL ? { baseURL } : {}),
     basePath: "/api/auth",
-    plugins: [emailOTPClient()],
+    plugins: [dashClient(), emailOTPClient()],
   });
 }
 

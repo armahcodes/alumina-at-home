@@ -21,6 +21,7 @@
   "dependencies": {
     "@ai-sdk/gateway": "^3.0.17",
     "@ai-sdk/react": "^3.0.44",
+    "@better-auth/infra": "^0.1.13",
     "@chakra-ui/next-js": "^2.4.2",
     "@chakra-ui/react": "^3.27.1",
     "@emotion/react": "^11.14.0",
@@ -37,7 +38,7 @@
     "@tanstack/react-query-devtools": "^5.90.2",
     "@xstate/react": "^6.0.0",
     "ai": "^6.0.42",
-    "better-auth": "^1.5.4",
+    "better-auth": "1.5.6",
     "drizzle-kit": "^0.31.6",
     "drizzle-orm": "^0.44.7",
     "focus-trap-react": "^11.0.4",
@@ -54,6 +55,10 @@
     "xstate": "^5.23.0",
     "zod": "^4.1.12",
     "zustand": "^5.0.8"
+  },
+  "overrides": {
+    "@better-auth/core": "1.5.6",
+    "@better-auth/sso": "1.5.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

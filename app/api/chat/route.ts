@@ -92,7 +92,10 @@ export async function POST(req: Request) {
     },
   });
 
-  return createUIMessageStreamResponse({ stream });
+  return createUIMessageStreamResponse({
+    // Mastra / @ai-sdk versions can disagree on UIMessageChunk; runtime stream is valid.
+    stream: stream as Parameters<typeof createUIMessageStreamResponse>[0]["stream"],
+  });
 }
 
 /**

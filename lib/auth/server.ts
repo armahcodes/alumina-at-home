@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP } from "better-auth/plugins/email-otp";
+import { dash } from "@better-auth/infra";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendResetPasswordEmail, sendVerificationEmail, sendOTPEmail } from "@/lib/email";
@@ -17,6 +18,8 @@ const authBaseURL =
   process.env.BETTER_AUTH_URL?.trim() ||
   process.env.NEXT_PUBLIC_BETTER_AUTH_URL?.trim() ||
   undefined;
+
+const infraApiKey = process.env.BETTER_AUTH_API_KEY?.trim();
 
 export const auth = betterAuth({
   baseURL: authBaseURL,
@@ -41,6 +44,13 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    ...(infraApiKey
+      ? [
+          dash({
+            apiKey: infraApiKey,
+          }),
+        ]
+      : []),
     emailOTP({
       otpLength: 6,
       expiresIn: 300,
