@@ -4,8 +4,6 @@ import { createAuthClient } from "better-auth/react";
 import { emailOTPClient } from "better-auth/client/plugins";
 import { dashClient } from "@better-auth/infra/client";
 
-const boundMethodCache = new Map<string | symbol, unknown>();
-
 /**
  * Resolve the Better Auth API origin without baking a wrong host into the client bundle.
  * Top-level `window` checks can be evaluated in Node during the Next.js build and pick
@@ -51,17 +49,14 @@ function getAuthClient(): AuthClient {
 /**
  * Lazy proxy so `createAuthClient` runs at runtime in the browser (or SSR with env),
  * not at module load during the build.
+ *
+ * Do not `.bind()` or cache function properties: Better Auth exposes `signIn` / `signUp` as
+ * callable Proxy objects (`typeof signIn === "function"`). Binding them breaks nested
+ * access like `signIn.email` and leads to broken fetch paths and React hydration noise.
  */
 export const authClient = new Proxy({} as AuthClient, {
-  get(_target, prop, receiver) {
+  get(_target, prop) {
     const client = getAuthClient();
-    const value = Reflect.get(client, prop, receiver);
-    if (typeof value !== "function") {
-      return value;
-    }
-    if (!boundMethodCache.has(prop)) {
-      boundMethodCache.set(prop, value.bind(client));
-    }
-    return boundMethodCache.get(prop);
+    return Reflect.get(client, prop, client);
   },
 });
